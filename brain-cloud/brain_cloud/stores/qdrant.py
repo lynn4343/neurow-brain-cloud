@@ -116,3 +116,4 @@ class QdrantStore:
 
     async def close(self):
         await self.client.close()
+        await self.openai_client.close()

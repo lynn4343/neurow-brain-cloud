@@ -59,7 +59,7 @@ async def export_pipeline(user_id: str, stores: StoreManager) -> BrainExport:
         metadata={
             "total_memories": len(memories),
             "stores": 4,
-            "categories": list(set(m.get("category", "") for m in memories)),
+            "categories": list(set(c for c in (m.get("category") for m in memories) if c)),
         },
         episodic=memories,
         graph=graph,

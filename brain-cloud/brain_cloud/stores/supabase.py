@@ -18,10 +18,14 @@ class SupabaseStore:
 
     async def insert_user(self, data: dict) -> dict:
         result = await self.client.table("user_profiles").insert(data).execute()
+        if not result.data:
+            raise RuntimeError("insert_user returned no data")
         return result.data[0]
 
     async def insert_memory(self, data: dict) -> dict:
         result = await self.client.table("memories").insert(data).execute()
+        if not result.data:
+            raise RuntimeError("insert_memory returned no data")
         return result.data[0]
 
     async def bulk_insert_memories(self, records: list[dict]) -> list[dict]:
@@ -85,6 +89,8 @@ class SupabaseStore:
             "current_turn": 1,
             "status": "active",
         }).execute()
+        if not result.data:
+            raise RuntimeError("create_coaching_session returned no data")
         return result.data[0]
 
     async def get_coaching_session(self, session_id: str) -> dict:
@@ -106,7 +112,11 @@ class SupabaseStore:
             .order("started_at", desc=True).execute()
         return result.data
 
+    _VALID_SYNC_STORES = {"neo4j", "qdrant", "mem0"}
+
     async def update_sync_status(self, memory_id: str, store: str, status: str):
+        if store not in self._VALID_SYNC_STORES:
+            raise ValueError(f"Invalid sync store: {store}")
         column = f"{store}_sync_status"
         await (
             self.client.table("memories")

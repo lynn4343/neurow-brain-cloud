@@ -146,8 +146,8 @@ CAPTURED_DATA_DEFAULTS: dict[str, object] = {
 }
 
 # Regex for cleaning unreplaced template placeholders.
-# Matches {snake_case_names} and {dotted.names} but NOT JSON-like braces.
-_PLACEHOLDER_RE = re.compile(r"\{[a-z][a-z0-9_.]*\}")
+# Matches {snake_case_names}, {dotted.names}, and {UPPER_CASE} but NOT JSON-like braces.
+_PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z][a-zA-Z0-9_.]*\}")
 
 
 # ---------------------------------------------------------------------------
@@ -308,8 +308,9 @@ class PromptAssembler:
         if name:
             return name
         display = user_profile.get("display_name") or ""
-        if display:
-            return display.split()[0]
+        parts = display.split()
+        if parts:
+            return parts[0]
         return "there"
 
     def _build_turn_variables(

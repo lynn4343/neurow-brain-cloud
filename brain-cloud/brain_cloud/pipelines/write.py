@@ -72,6 +72,14 @@ async def _extract(content: str, stores: StoreManager) -> ParsedMemory:
         )
     )
     raw_json = response.choices[0].message.content
+    if not raw_json:
+        logger.warning("Empty response from extraction model, using raw fallback.")
+        return ParsedMemory(
+            facts=[ParsedFact(text=content, confidence="explicit", category="uncategorized")],
+            entities=[],
+            relationships=[],
+            categories=["uncategorized"],
+        )
     try:
         return ParsedMemory.model_validate_json(raw_json)
     except ValidationError as e:
@@ -174,6 +182,7 @@ async def write_pipeline(
 
     facts_extracted = len(facts)
     facts_stored = 0
+    entities_written = False
 
     for fact in facts:
         # --- 1. Supabase INSERT ---
@@ -216,13 +225,14 @@ async def write_pipeline(
                 "source": memory_data["source"],
                 "original_ts": memory_data["original_ts"],
             })
-            if entities or relationships:
+            if (entities or relationships) and not entities_written:
                 await stores.neo4j.create_entity_and_relationships(
                     [e.model_dump() for e in entities],
                     [r.model_dump() for r in relationships],
                     memory_id,
                     str(user_uuid),
                 )
+                entities_written = True
             await stores.supabase.update_sync_status(memory_id, "neo4j", "synced")
             store_status["neo4j"] = "synced"
         except Exception as e:

@@ -49,7 +49,10 @@ async def brain_create_profile(
     Use the slug as user_id in other brain_* tools."""
     stores: StoreManager = ctx.request_context.lifespan_context
     # first_name defaults to first word of display_name
-    fname = first_name or display_name.split()[0]
+    parts = display_name.split()
+    if not parts:
+        return json.dumps({"error": "display_name cannot be empty"}, indent=2)
+    fname = first_name or parts[0]
     user_data = {
         "display_name": display_name,
         "first_name": fname,
@@ -177,6 +180,8 @@ async def coaching_get_prompt(
     stores: StoreManager = ctx.request_context.lifespan_context
     uuid = await stores.resolve_user_id(user_id)
     user_profile = await stores.supabase.get_user(uuid)
+    if not user_profile:
+        return json.dumps({"error": "User not found", "user_id": user_id}, indent=2)
 
     # 1. Session creation or retrieval
     if session_id is None:
@@ -281,7 +286,6 @@ async def coaching_store_turn(
     Called by the AI after generating its response. captured_data is a JSON string
     of the fields extracted for this turn. user_id is the slug (e.g. 'theo')."""
     stores: StoreManager = ctx.request_context.lifespan_context
-    uuid = await stores.resolve_user_id(user_id)
 
     session = await stores.supabase.get_coaching_session(session_id)
     if not session:
@@ -369,6 +373,8 @@ async def coaching_get_session_prompt(
     stores: StoreManager = ctx.request_context.lifespan_context
     uuid = await stores.resolve_user_id(user_id)
     user_profile = await stores.supabase.get_user(uuid)
+    if not user_profile:
+        return json.dumps({"error": "User not found", "user_id": user_id}, indent=2)
 
     # Pull relevant Brain Cloud context
     recall_result = await read_pipeline(

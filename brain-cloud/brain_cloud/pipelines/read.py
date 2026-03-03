@@ -63,6 +63,13 @@ def _parse_ts(ts_str: str | None) -> datetime | None:
         return None
 
 
+def _ensure_aware(dt: datetime) -> datetime:
+    """Ensure a datetime is timezone-aware (default UTC)."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 def _compute_score(
     semantic_similarity: float,
     confidence: float,
@@ -71,7 +78,7 @@ def _compute_score(
 ) -> float:
     """Recency-weighted relevance scoring (Tier 1)."""
     if effective_ts:
-        days_since = max((now - effective_ts).days, 0)
+        days_since = max((now - _ensure_aware(effective_ts)).days, 0)
     else:
         days_since = 0
     recency_decay = exp(-0.01 * days_since)
@@ -214,7 +221,7 @@ def _fuse_results(
             effective_ts,
             now,
         )
-        age_days = (now - effective_ts).days if effective_ts else 0
+        age_days = (now - _ensure_aware(effective_ts)).days if effective_ts else 0
         scored.append(
             RecalledMemory(
                 memory_id=data["memory_id"],
@@ -263,7 +270,7 @@ async def read_pipeline(
 
     # Parallel fan-out to all 4 stores
     results = await asyncio.gather(
-        stores.mem0.search_memories(optimized_query, user_id, limit=20),
+        stores.mem0.search_memories(optimized_query, str(user_uuid), limit=20),
         stores.neo4j.query_related(terms, str(user_uuid)),
         stores.supabase.query_memories(str(user_uuid), category=category, limit=20),
         stores.qdrant.search(embedded_query, str(user_uuid), limit=20),

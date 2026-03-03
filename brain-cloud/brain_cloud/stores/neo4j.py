@@ -1,8 +1,12 @@
 import logging
+import re
 
 import neo4j
 
 from brain_cloud.config import Settings
+
+# Regex for validating dynamic Cypher identifiers (labels, relationship types)
+_SAFE_IDENTIFIER_RE = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +67,8 @@ class Neo4jStore:
         async with self.driver.session(database="neo4j") as session:
             result = await session.run("RETURN 1 AS n")
             record = await result.single()
-            assert record["n"] == 1
+            if record is None or record["n"] != 1:
+                raise RuntimeError("Neo4j connection verification failed")
             logger.info("Neo4j connection verified")
 
     async def apply_schema(self):
@@ -90,7 +95,8 @@ class Neo4jStore:
         async with self.driver.session(database="neo4j") as session:
             await session.run(
                 "MERGE (u:User {user_id: $user_id}) "
-                "SET u.display_name = $display_name, u.created_at = datetime()",
+                "ON CREATE SET u.created_at = datetime() "
+                "SET u.display_name = $display_name",
                 user_id=user_id,
                 display_name=display_name,
             )
@@ -120,6 +126,9 @@ class Neo4jStore:
                 # Use Pattern for behavioral/cognitive/emotional/identity types
                 if label in ("Behavior", "Belief", "Pattern"):
                     label = "Pattern"
+                if not _SAFE_IDENTIFIER_RE.match(label):
+                    logger.warning(f"Skipping entity with invalid label: {label}")
+                    continue
                 await session.run(
                     f"MERGE (e:{label} {{user_id: $user_id, name: $name}}) "
                     f"ON CREATE SET e.id = randomUUID(), e.type = $type",
@@ -130,10 +139,14 @@ class Neo4jStore:
 
             # Create relationships between entities and memory
             for rel in relationships:
+                predicate = rel["predicate"]
+                if not _SAFE_IDENTIFIER_RE.match(predicate):
+                    logger.warning(f"Skipping relationship with invalid predicate: {predicate}")
+                    continue
                 await session.run(
                     "MATCH (s {name: $subject, user_id: $user_id}) "
                     "MATCH (o {name: $object, user_id: $user_id}) "
-                    f"CREATE (s)-[:{rel['predicate']}]->(o)",
+                    f"CREATE (s)-[:{predicate}]->(o)",
                     subject=rel["subject"],
                     object=rel["object"],
                     user_id=user_id,
