@@ -40,7 +40,7 @@ async def test_user_id(test_stores):
 
     # --- Setup: create test user ---
     test_user = await stores.supabase.insert_user(TEST_USER_PROFILE)
-    test_uuid = test_user["user_id"]
+    test_uuid = test_user["id"]
     stores._slug_to_uuid[TEST_USER_SLUG] = test_uuid
 
     # Ensure :User node in Neo4j
@@ -51,7 +51,7 @@ async def test_user_id(test_stores):
     # --- Teardown: clean up ALL test data across 4 stores ---
     logger.info(f"Cleaning up test user {test_uuid} across all stores...")
 
-    # 1. Supabase: delete memories, then user
+    # 1. Supabase: delete memories, then coaching_sessions, then user_profiles
     await (
         stores.supabase.client.table("memories")
         .delete()
@@ -59,9 +59,15 @@ async def test_user_id(test_stores):
         .execute()
     )
     await (
-        stores.supabase.client.table("users")
+        stores.supabase.client.table("coaching_sessions")
         .delete()
         .eq("user_id", test_uuid)
+        .execute()
+    )
+    await (
+        stores.supabase.client.table("user_profiles")
+        .delete()
+        .eq("id", test_uuid)
         .execute()
     )
 

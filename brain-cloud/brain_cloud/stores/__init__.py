@@ -48,8 +48,8 @@ class StoreManager:
         if slug in self._slug_to_uuid:
             return self._slug_to_uuid[slug]
         result = (
-            await self.supabase.client.table("users")
-            .select("user_id")
+            await self.supabase.client.table("user_profiles")
+            .select("id")
             .ilike("first_name", slug)
             .limit(1)
             .execute()
@@ -59,7 +59,7 @@ class StoreManager:
                 f"No user found with slug '{slug}'. "
                 f"Create a profile first with brain_create_profile."
             )
-        uuid = result.data[0]["user_id"]
+        uuid = result.data[0]["id"]
         self._slug_to_uuid[slug] = uuid
         return uuid
 

@@ -17,7 +17,7 @@ class SupabaseStore:
         return cls(client)
 
     async def insert_user(self, data: dict) -> dict:
-        result = await self.client.table("users").insert(data).execute()
+        result = await self.client.table("user_profiles").insert(data).execute()
         return result.data[0]
 
     async def insert_memory(self, data: dict) -> dict:
@@ -50,13 +50,61 @@ class SupabaseStore:
 
     async def get_user(self, user_id: str) -> dict:
         result = (
-            await self.client.table("users")
+            await self.client.table("user_profiles")
             .select("*")
-            .eq("user_id", user_id)
+            .eq("id", user_id)
             .limit(1)
             .execute()
         )
         return result.data[0] if result.data else {}
+
+    async def get_prompt_template(self, name: str) -> str:
+        """Fetch active prompt template text by name."""
+        result = (
+            await self.client.table("prompt_templates")
+            .select("content")
+            .eq("name", name)
+            .eq("is_active", True)
+            .limit(1)
+            .execute()
+        )
+        if not result.data:
+            raise ValueError(f"Prompt template '{name}' not found")
+        content = result.data[0].get("content")
+        if not isinstance(content, dict) or "text" not in content:
+            raise ValueError(f"Prompt template '{name}' has invalid content structure")
+        return content["text"]
+
+    async def create_coaching_session(
+        self, user_id: str, session_type: str = "clarity_session"
+    ) -> dict:
+        """INSERT into coaching_sessions. Returns the new row."""
+        result = await self.client.table("coaching_sessions").insert({
+            "user_id": user_id,
+            "session_type": session_type,
+            "current_turn": 1,
+            "status": "active",
+        }).execute()
+        return result.data[0]
+
+    async def get_coaching_session(self, session_id: str) -> dict:
+        """SELECT from coaching_sessions by id."""
+        result = await self.client.table("coaching_sessions") \
+            .select("*").eq("id", session_id).limit(1).execute()
+        return result.data[0] if result.data else {}
+
+    async def update_coaching_session(self, session_id: str, data: dict) -> dict:
+        """UPDATE coaching_sessions. Pass only the fields to update."""
+        result = await self.client.table("coaching_sessions") \
+            .update(data).eq("id", session_id).execute()
+        return result.data[0] if result.data else {}
+
+    async def get_coaching_sessions(self, user_id: str) -> list[dict]:
+        """SELECT all coaching sessions for a user (export pipeline)."""
+        result = await self.client.table("coaching_sessions") \
+            .select("*").eq("user_id", user_id) \
+            .order("started_at", desc=True).execute()
+        return result.data
 
     async def update_sync_status(self, memory_id: str, store: str, status: str):
         column = f"{store}_sync_status"

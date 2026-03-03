@@ -66,3 +66,4 @@ class BrainExport(BaseModel):
     graph: dict                # Neo4j nodes + edges
     semantic: list[dict]       # Mem0 memories
     associative: list[dict]    # Qdrant points (without raw vectors)
+    coaching_sessions: list[dict] = []  # Clarity Session data (goals, captured_data)

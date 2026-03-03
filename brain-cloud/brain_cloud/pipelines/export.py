@@ -17,13 +17,16 @@ async def export_pipeline(user_id: str, stores: StoreManager) -> BrainExport:
     user_uuid = await stores.resolve_user_id(user_id)
 
     # Parallel gather from all stores (return_exceptions for graceful degradation)
-    user_profile, memories, graph, mem0_data, qdrant_data = await asyncio.gather(
-        stores.supabase.get_user(str(user_uuid)),
-        stores.supabase.get_all_memories(str(user_uuid)),
-        stores.neo4j.get_user_graph(str(user_uuid)),
-        stores.mem0.get_all_memories(user_id),  # slug — wrapper adds prefix
-        stores.qdrant.get_all_points(str(user_uuid)),
-        return_exceptions=True,
+    user_profile, memories, graph, mem0_data, qdrant_data, coaching_sessions = (
+        await asyncio.gather(
+            stores.supabase.get_user(str(user_uuid)),
+            stores.supabase.get_all_memories(str(user_uuid)),
+            stores.neo4j.get_user_graph(str(user_uuid)),
+            stores.mem0.get_all_memories(user_id),  # slug — wrapper adds prefix
+            stores.qdrant.get_all_points(str(user_uuid)),
+            stores.supabase.get_coaching_sessions(str(user_uuid)),
+            return_exceptions=True,
+        )
     )
 
     # Handle any store that returned an exception — use empty fallback
@@ -42,6 +45,9 @@ async def export_pipeline(user_id: str, stores: StoreManager) -> BrainExport:
     if isinstance(qdrant_data, Exception):
         logger.error(f"Qdrant fetch failed: {qdrant_data}")
         qdrant_data = []
+    if isinstance(coaching_sessions, Exception):
+        logger.error(f"Coaching sessions fetch failed: {coaching_sessions}")
+        coaching_sessions = []
 
     # Filter: only memories with confidence >= 0.3
     memories = [m for m in memories if m.get("confidence", 0.7) >= 0.3]
@@ -59,4 +65,5 @@ async def export_pipeline(user_id: str, stores: StoreManager) -> BrainExport:
         graph=graph,
         semantic=mem0_data,
         associative=[{**p, "vector": None} for p in qdrant_data],  # Strip raw vectors
+        coaching_sessions=coaching_sessions,
     )

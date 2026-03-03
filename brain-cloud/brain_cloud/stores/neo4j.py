@@ -36,6 +36,22 @@ INDEXES = [
 ]
 
 
+def _sanitize_value(value):
+    """Recursively convert Neo4j temporal types to ISO strings."""
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    elif isinstance(value, dict):
+        return {k: _sanitize_value(v) for k, v in value.items()}
+    elif isinstance(value, list):
+        return [_sanitize_value(item) for item in value]
+    return value
+
+
+def _sanitize_props(props: dict) -> dict:
+    """Convert Neo4j temporal types to ISO strings for JSON serialization."""
+    return {key: _sanitize_value(value) for key, value in props.items()}
+
+
 class Neo4jStore:
     def __init__(self, settings: Settings):
         self.driver = neo4j.AsyncGraphDatabase.driver(
@@ -182,7 +198,7 @@ class Neo4jStore:
             async for record in result:
                 nodes.append({
                     "labels": record["labels"],
-                    "properties": record["props"],
+                    "properties": _sanitize_props(record["props"]),
                 })
 
             # Get all relationships between this user's nodes
@@ -196,8 +212,8 @@ class Neo4jStore:
             async for record in result:
                 edges.append({
                     "type": record["type"],
-                    "from": record["from_props"],
-                    "to": record["to_props"],
+                    "from": _sanitize_props(record["from_props"]),
+                    "to": _sanitize_props(record["to_props"]),
                 })
 
         return {"nodes": nodes, "edges": edges}
