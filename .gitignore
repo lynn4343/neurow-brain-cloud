@@ -7,6 +7,7 @@ out/
 dist/
 electron-dist/
 build/
+*.tsbuildinfo
 
 # Environment
 .env
@@ -24,3 +25,15 @@ Thumbs.db
 # Build agent context (contains absolute paths + session state)
 CLAUDE.md
 .claude/
+
+# Python (brain-cloud/)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+.ruff_cache/
+
+# Data pipeline markers (idempotency guards)
+data/Theo_Nakamura_P05/.timestamps_shifted
+data/Theo_Nakamura_P05/.data_cleaned
