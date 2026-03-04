@@ -5,6 +5,7 @@ from math import exp
 
 from brain_cloud.models import RecalledMemory, RecallResult
 from brain_cloud.stores import StoreManager
+from brain_cloud.temporal import get_temporal_context
 from brain_cloud.utils import openai_with_retry
 
 logger = logging.getLogger(__name__)
@@ -300,6 +301,7 @@ async def read_pipeline(
         mem0_results, neo4j_results, supabase_results, qdrant_results, limit
     )
     retrieval_metadata["query_rewritten"] = optimized_query
+    retrieval_metadata["temporal_context"] = get_temporal_context()
 
     return RecallResult(
         memories=memories,

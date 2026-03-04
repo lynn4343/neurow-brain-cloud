@@ -15,11 +15,10 @@ assembled string that becomes the AI model's instructions.
 
 import logging
 import re
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 from brain_cloud.coaching.turn_registry import TurnSpec
 from brain_cloud.stores.supabase import SupabaseStore
+from brain_cloud.temporal import format_temporal_block, get_temporal_context
 
 logger = logging.getLogger(__name__)
 
@@ -153,27 +152,6 @@ _PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z][a-zA-Z0-9_.]*\}")
 # ---------------------------------------------------------------------------
 # Formatting helpers
 # ---------------------------------------------------------------------------
-
-def get_temporal_context(timezone: str = "America/Chicago") -> dict[str, str]:
-    """Resolve all temporal information server-side. Models never calculate dates."""
-    try:
-        tz = ZoneInfo(timezone)
-    except Exception:
-        logger.warning(f"Invalid timezone '{timezone}', falling back to America/Chicago")
-        tz = ZoneInfo("America/Chicago")
-    now = datetime.now(tz)
-    one_year = now + timedelta(days=365)
-    return {
-        "current_date": now.strftime("%A, %B %d, %Y"),
-        "current_time": now.strftime("%I:%M %p %Z"),
-        "day_of_week": now.strftime("%A"),
-        "current_date_plus_one_year": one_year.strftime("%B %d, %Y"),
-    }
-
-
-def format_temporal_context(temporal: dict[str, str]) -> str:
-    """Format the temporal dict into a human-readable string for Layer 1 injection."""
-    return f"Today is {temporal['current_date']}. Current time: {temporal['current_time']}."
 
 
 def format_captured_data(captured_data: dict) -> str:
@@ -338,6 +316,9 @@ class PromptAssembler:
             "current_time": temporal["current_time"],
             "day_of_week": temporal["day_of_week"],
             "current_date_plus_one_year": temporal["current_date_plus_one_year"],
+            "time_of_day": temporal["time_of_day"].replace("_", " "),
+            "is_weekend": "weekend" if temporal["is_weekend"] else "weekday",
+            "week_position": temporal["week_position"],
             # Formatted context blocks
             "captured_data_summary": format_captured_data(captured_data),
             "declared_challenges": format_declared_challenges(
@@ -398,7 +379,7 @@ class PromptAssembler:
         layer1_vars = {
             "COACHING_STYLE_MODIFIER": self._resolve_coaching_style(user_profile),
             "USER_TYPE_MODIFIER": self._resolve_user_type(user_profile),
-            "TEMPORAL_CONTEXT": format_temporal_context(temporal),
+            "TEMPORAL_CONTEXT": format_temporal_block(temporal),
         }
         layer1 = inject_variables(master, layer1_vars)
 
@@ -461,14 +442,14 @@ class PromptAssembler:
         temporal = get_temporal_context()
         coaching_style = self._resolve_coaching_style(user_profile)
         user_type = self._resolve_user_type(user_profile)
-        temporal_str = format_temporal_context(temporal)
+        temporal_block = format_temporal_block(temporal)
 
         # --- Layer 1: Master System Prompt ---
         master = await self._get_template("master/system_prompt")
         layer1_vars = {
             "COACHING_STYLE_MODIFIER": coaching_style,
             "USER_TYPE_MODIFIER": user_type,
-            "TEMPORAL_CONTEXT": temporal_str,
+            "TEMPORAL_CONTEXT": temporal_block,
         }
         layer1 = inject_variables(master, layer1_vars)
 
@@ -487,11 +468,14 @@ class PromptAssembler:
             "current_date": temporal["current_date"],
             "current_time": temporal["current_time"],
             "day_of_week": temporal["day_of_week"],
+            "time_of_day": temporal["time_of_day"].replace("_", " "),
+            "is_weekend": "weekend" if temporal["is_weekend"] else "weekday",
+            "week_position": temporal["week_position"],
             "brain_cloud_context": brain_cloud_context or "No coaching history available yet.",
             # Uppercase Layer-1-style variables (ongoing template uses these)
             "COACHING_STYLE_MODIFIER": coaching_style,
             "USER_TYPE_MODIFIER": user_type,
-            "TEMPORAL_CONTEXT": temporal_str,
+            "TEMPORAL_CONTEXT": temporal_block,
         }
         layer2 = inject_variables(session_prompt, session_vars)
 
