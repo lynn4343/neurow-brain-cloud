@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
   Paperclip,
   Microphone,
   ArrowUp,
-  Sparkle,
-  CaretDown,
-  Check,
 } from "@phosphor-icons/react";
 
 interface ChatInputProps {
@@ -22,24 +19,7 @@ export function ChatInput({
   placeholder = "What's on your mind?",
 }: ChatInputProps) {
   const [value, setValue] = useState("");
-  const [selectedCoach, setSelectedCoach] = useState("Executive Coach");
-  const [coachMenuOpen, setCoachMenuOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const coachMenuRef = useRef<HTMLDivElement>(null);
-
-  const coachOptions = ["Executive Coach", "Chief of Staff", "Thinking Partner", "Creative Director", "Challenge Me"];
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    if (!coachMenuOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (coachMenuRef.current && !coachMenuRef.current.contains(e.target as Node)) {
-        setCoachMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [coachMenuOpen]);
 
   const autoResize = () => {
     const textarea = textareaRef.current;
@@ -104,41 +84,6 @@ export function ChatInput({
             >
               <Paperclip className="size-4" weight="regular" />
             </button>
-
-            <div className="relative" ref={coachMenuRef}>
-              <button
-                type="button"
-                className="flex h-7 items-center gap-2 rounded-full bg-[#FAF8F8] px-2 hover:bg-[#E6E5E3]"
-                onClick={() => setCoachMenuOpen((prev) => !prev)}
-              >
-                <Sparkle className="size-3" weight="regular" />
-                <span className="text-sm font-normal leading-5 text-[#1E1E1E]">
-                  {selectedCoach}
-                </span>
-                <CaretDown className="size-3" weight="regular" />
-              </button>
-
-              {coachMenuOpen && (
-                <div className="absolute top-full left-0 mt-1 w-[200px] rounded-lg border border-[#E6E5E3] bg-white py-1 shadow-lg z-50">
-                  {coachOptions.map((coach) => (
-                    <button
-                      key={coach}
-                      type="button"
-                      className="flex w-full items-center justify-between px-3 py-1.5 text-sm text-[#1E1E1E] hover:bg-[#FAF8F8]"
-                      onClick={() => {
-                        setSelectedCoach(coach);
-                        setCoachMenuOpen(false);
-                      }}
-                    >
-                      <span>{coach}</span>
-                      {selectedCoach === coach && (
-                        <Check className="size-3.5" weight="bold" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Right Tools */}

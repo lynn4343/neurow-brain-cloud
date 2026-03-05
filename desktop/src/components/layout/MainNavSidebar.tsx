@@ -17,7 +17,6 @@ import {
   Question,
   PlusCircle,
   Chat,
-  CaretRight,
   CaretDoubleLeft,
   SignOut,
   type IconProps,

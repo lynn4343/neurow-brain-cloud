@@ -23,10 +23,23 @@ export interface ToolActivityEvent {
   summary: string;
 }
 
+// --- User Context (passed to claude.ts for system prompt assembly) ---
+
+import type { GoalCascade } from '@/contexts/UserContext';
+
+export interface UserContext {
+  slug: string;
+  display_name: string;
+  mode: string;
+  coaching_style: string;
+  roles: string[];
+  goal_cascade: GoalCascade | null;
+}
+
 // --- Neurow API type (exposed by preload via contextBridge) ---
 
 interface NeurowAPI {
-  sendMessage: (prompt: string, sessionId?: string) => Promise<string>;
+  sendMessage: (prompt: string, sessionId?: string, userContext?: unknown) => Promise<string>;
   checkClaudeInstalled: () => Promise<boolean>;
   onChatStream: (callback: (data: ChatStreamEvent) => void) => () => void;
   onChatComplete: (callback: (data: ChatCompleteEvent) => void) => () => void;
@@ -44,9 +57,10 @@ declare global {
 
 export async function sendMessage(
   prompt: string,
-  sessionId?: string
+  sessionId?: string,
+  userContext?: UserContext,
 ): Promise<string> {
-  return window.neurow.sendMessage(prompt, sessionId);
+  return window.neurow.sendMessage(prompt, sessionId, userContext);
 }
 
 export async function checkClaudeInstalled(): Promise<boolean> {

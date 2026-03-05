@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import {
-  Plus,
   Cube,
   Briefcase,
   House,
@@ -39,10 +38,6 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ open, onToggle }: ChatSidebarProps) {
-  const handleNewChat = () => {
-    console.log("New chat clicked");
-  };
-
   return (
     <aside
       className={cn(

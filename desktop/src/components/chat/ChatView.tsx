@@ -11,6 +11,7 @@ import {
   BookOpen,
   Brain,
 } from "@phosphor-icons/react";
+import { useUser } from "@/contexts/UserContext";
 import {
   sendMessage,
   onChatStream,
@@ -25,6 +26,7 @@ import {
 import { ActivityIndicator, type ActivityItem } from "./ActivityIndicator";
 
 export function ChatView() {
+  const { activeUser, appPhase } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -43,6 +45,15 @@ export function ChatView() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Reset chat state when user or mode changes
+  useEffect(() => {
+    setMessages([]);
+    setSessionId(null);
+    sessionIdRef.current = null;
+    setActivities([]);
+    setIsLoading(false);
+  }, [activeUser?.slug, appPhase]);
 
   // Auto-scroll to bottom when messages or activities change
   useEffect(() => {
@@ -126,7 +137,7 @@ export function ChatView() {
   }, []);
 
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, modeOverride?: string) => {
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         role: "user",
@@ -137,10 +148,24 @@ export function ChatView() {
       setIsLoading(true);
       setActivities([]);
 
+      // Mode derivation: modeOverride (from quick-action buttons) takes priority.
+      // Then: clarity_session from appPhase, otherwise ongoing.
+      const mode = modeOverride || (appPhase === "clarity_session" ? "clarity_session" : "ongoing");
+
       try {
         const newSessionId = await sendMessage(
           text,
-          sessionIdRef.current || undefined
+          sessionIdRef.current || undefined,
+          activeUser
+            ? {
+                slug: activeUser.slug,
+                display_name: activeUser.display_name,
+                mode,
+                coaching_style: activeUser.coaching_style,
+                roles: activeUser.roles,
+                goal_cascade: activeUser.goal_cascade,
+              }
+            : undefined,
         );
         if (newSessionId) {
           setSessionId(newSessionId);
@@ -159,8 +184,14 @@ export function ChatView() {
         ]);
       }
     },
-    []
+    [activeUser, appPhase],
   );
+
+  // Personalized greeting for welcome screen
+  const firstName = activeUser?.display_name?.trim().split(" ")[0] || "there";
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   // Welcome state — centered logo, gradient heading, input
   if (messages.length === 0 && !isLoading) {
@@ -170,23 +201,23 @@ export function ChatView() {
           <div className="w-full max-w-[767px] flex flex-col items-center gap-8 -translate-y-1/4">
             <NeurowLogo className="h-[69px] w-[49px]" />
             <h1 className="w-full text-center text-2xl font-normal leading-8 animate-gradient">
-              Hello. How can I help you today?
+              {greeting}, {firstName}.
             </h1>
             <div className="w-full">
               <ChatInput onSend={handleSend} disabled={isLoading} />
             </div>
             <div className="flex items-center gap-2 flex-wrap justify-center -mt-4">
               {[
-                { icon: Sun, label: "Plan your day", prompt: "Help me plan my day" },
-                { icon: ChartLineUp, label: "Strategize", prompt: "Let's strategize" },
-                { icon: PencilSimple, label: "Write", prompt: "Help me write" },
-                { icon: BookOpen, label: "Learn", prompt: "Help me learn something new" },
-                { icon: Brain, label: "Brainstorm", prompt: "Let's brainstorm" },
+                { icon: Sun, label: "Morning brief", prompt: "Give me my morning brief", mode: "morning_brief" as string | undefined },
+                { icon: ChartLineUp, label: "Strategize", prompt: "Let's strategize", mode: undefined as string | undefined },
+                { icon: PencilSimple, label: "Write", prompt: "Help me write", mode: undefined as string | undefined },
+                { icon: BookOpen, label: "Learn", prompt: "Help me learn something new", mode: undefined as string | undefined },
+                { icon: Brain, label: "Brainstorm", prompt: "Let's brainstorm", mode: undefined as string | undefined },
               ].map((item) => (
                 <button
                   key={item.label}
                   type="button"
-                  onClick={() => handleSend(item.prompt)}
+                  onClick={() => handleSend(item.prompt, item.mode)}
                   className="flex items-center gap-1.5 rounded-lg border border-[#E6E5E3] bg-white px-3 py-1.5 text-sm text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors"
                 >
                   <item.icon className="size-4" weight="regular" />

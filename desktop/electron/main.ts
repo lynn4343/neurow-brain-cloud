@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
-import { sendMessage, checkClaudeInstalled } from './claude';
+import { sendMessage, checkClaudeInstalled, type UserContext } from './claude';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -34,9 +34,10 @@ function createWindow() {
 
 // --- IPC Handlers ---
 
-ipcMain.handle('send-message', async (_event, prompt: string, sessionId?: string) => {
+// Args are positional through IPC: prompt, sessionId (may be undefined), userContext
+ipcMain.handle('send-message', async (_event, prompt: string, sessionId?: string, userContext?: UserContext) => {
   if (!mainWindow) throw new Error('No window');
-  return sendMessage(mainWindow, prompt, sessionId);
+  return sendMessage(mainWindow, prompt, sessionId, userContext);
 });
 
 ipcMain.handle('check-claude-installed', async () => {

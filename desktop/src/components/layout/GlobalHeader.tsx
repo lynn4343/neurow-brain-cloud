@@ -1,14 +1,9 @@
 "use client";
 
 import { Bell } from "@phosphor-icons/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { ReactNode } from "react";
-
-// User config — swap per user/demo persona. Will be loaded from Brain Cloud profile in production.
-const USER = {
-  name: "Theo Nakamura",
-  avatarUrl: "/avatar.png",
-};
+import { useUser } from "@/contexts/UserContext";
 
 function getInitials(name: string): string {
   return name
@@ -20,11 +15,13 @@ function getInitials(name: string): string {
 }
 
 function UserAvatar() {
+  const { activeUser } = useUser();
+  const displayName = activeUser?.display_name?.trim() || "Neurow";
+
   return (
     <Avatar className="size-9">
-      <AvatarImage src={USER.avatarUrl} alt={USER.name} />
       <AvatarFallback className="bg-[#FAF8F8] text-sm font-normal">
-        {getInitials(USER.name)}
+        {getInitials(displayName)}
       </AvatarFallback>
     </Avatar>
   );

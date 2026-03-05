@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 interface ScrollWheelPickerProps {
   items: string[];
@@ -19,23 +19,21 @@ export function ScrollWheelPicker({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [isInitialMount, setIsInitialMount] = useState(true);
+  const isScrollingRef = useRef(false);
+  const isInitialMountRef = useRef(true);
   const itemHeight = 32;
 
   // Scroll to selected item on mount (instant) and when selectedIndex changes externally
   useEffect(() => {
-    if (containerRef.current && !isScrolling) {
+    if (containerRef.current && !isScrollingRef.current) {
       const scrollTop = selectedIndex * itemHeight;
       containerRef.current.scrollTo({
         top: scrollTop,
-        behavior: isInitialMount ? "auto" : "smooth",
+        behavior: isInitialMountRef.current ? "auto" : "smooth",
       });
-      if (isInitialMount) {
-        setIsInitialMount(false);
-      }
+      isInitialMountRef.current = false;
     }
-  }, [selectedIndex, itemHeight, isInitialMount, isScrolling]);
+  }, [selectedIndex, itemHeight]);
 
   // Snap to nearest item after scrolling stops
   const snapToNearest = useCallback(() => {
@@ -57,14 +55,14 @@ export function ScrollWheelPicker({
       });
     }
 
-    setIsScrolling(false);
+    isScrollingRef.current = false;
   }, [itemHeight, items.length, onChange, selectedIndex]);
 
   // Handle scroll events with debouncing
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
 
-    setIsScrolling(true);
+    isScrollingRef.current = true;
 
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
@@ -80,7 +78,7 @@ export function ScrollWheelPicker({
     (index: number) => {
       if (!containerRef.current) return;
 
-      setIsScrolling(true);
+      isScrollingRef.current = true;
       onChange(index);
 
       containerRef.current.scrollTo({
@@ -96,7 +94,7 @@ export function ScrollWheelPicker({
         clearTimeout(clickTimeoutRef.current);
       }
       clickTimeoutRef.current = setTimeout(() => {
-        setIsScrolling(false);
+        isScrollingRef.current = false;
       }, 300);
     },
     [itemHeight, onChange]
