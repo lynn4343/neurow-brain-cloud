@@ -1,5 +1,5 @@
 """
-Load 18 prompt templates into Supabase prompt_templates table.
+Load 17 prompt templates into Supabase prompt_templates table.
 
 Reads coaching scripts from BUILD_SPECS, extracts content between markers,
 and upserts into prompt_templates. Idempotent: safe to re-run.
@@ -79,22 +79,13 @@ async def main():
 
     templates_to_load: list[dict] = []
 
-    # --- 5 Runtime Prompts ---
+    # --- 4 Runtime Prompts ---
+    # (master/system_prompt REMOVED — CSA-011, 2026-03-04)
+    # Identity, voice, modifiers moved to claude.ts Seat 1.
+    # The Supabase row can remain dormant. Source archived at
+    # Design_Reference/Master_System_Prompt_Hackathon_ARCHIVED.md
 
-    # 1. Master System Prompt
-    text = (SCRIPTS_DIR / "Master_System_Prompt_Hackathon.md").read_text()
-    content = extract_between_markers(text, "### BEGIN RUNTIME PROMPT", "### END RUNTIME PROMPT")
-    templates_to_load.append({
-        "name": "master/system_prompt",
-        "version": 1,
-        "content": {"text": content},
-        "category": "master",
-        "tags": ["master", "personality", "voice", "coaching", "nlp"],
-        "is_active": True,
-        "release_label": "hackathon",
-    })
-
-    # 2. Morning Brief
+    # 1. Morning Brief
     text = (SCRIPTS_DIR / "Morning_Brief_Hackathon.md").read_text()
     content = extract_between_markers(text, "### BEGIN PROMPT", "### END PROMPT")
     templates_to_load.append({
@@ -150,7 +141,7 @@ async def main():
 
     # --- 8 Turn Templates + 5 Signal Handlers ---
 
-    text = (SCRIPTS_DIR / "Clarity_Session_Turn_Templates.md").read_text()
+    text = (SCRIPTS_DIR / "Clarity_Session_Turn_Templates_v2.md").read_text()
     all_turns = extract_turn_templates(text)
 
     # Turn templates

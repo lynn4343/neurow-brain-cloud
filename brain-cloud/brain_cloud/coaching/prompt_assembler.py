@@ -5,12 +5,14 @@ Supabase, injecting user context, temporal data, captured conversation data,
 signal-specific handlers, and coaching style modifiers — then returns a single
 assembled string that becomes the AI model's instructions.
 
-4-layer prompt stack:
-  Layer 1: Master System Prompt (personality, voice, guardrails)
-  Layer 2: Session Context (session type + turn number)
-  Layer 3: Turn Instructions (from Supabase prompt_templates)
-  Layer 4a: Signal Handlers (conditional — crisis/flooding/idk/disagreement)
-  Layer 4b: Universal Guidance (always appended)
+Three-Seat Consciousness Architecture (CSA-011, 2026-03-04):
+  Seat 1 (claude.ts): Identity, voice, modifiers, protocol — loaded once at session start
+  Seat 2 (this assembler): Session context, temporal data, Brain Cloud context
+  Seat 3 (turn templates): Per-turn instructions for Clarity Session
+
+The assembler no longer includes Layer 1 (master system prompt). Identity, voice,
+coaching style modifiers, and user type modifiers are in claude.ts (Seat 1).
+This assembler provides session-specific structure and data only.
 """
 
 import logging
@@ -24,54 +26,65 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Constants: Coaching style modifiers (from Master_System_Prompt_Hackathon.md)
+# Constants: Coaching style modifiers
+# Synced with claude.ts Seat 1c (System_Prompts/Coaching_Style_Modifiers.md)
+# These are still injected into the ongoing/default Supabase template as
+# harmless reinforcement of Seat 1.
 # ---------------------------------------------------------------------------
 
 COACHING_STYLE_MODIFIERS: dict[str, str] = {
     "balanced": (
-        'Coaching style: BALANCED. Equal parts warmth and directness. Validate AND '
-        'challenge in the same breath. "That\'s a real win — and there\'s something '
-        'worth looking at this week." Neither soft nor sharp. Both.'
+        "Coaching style: BALANCED. Equal parts warmth and directness. "
+        "Validate AND challenge in the same breath. Neither soft nor sharp. Both."
     ),
     "gentle": (
-        'Coaching style: GENTLE. Lead with warmth, safety, invitation. Challenges are '
-        'offered, not pressed. "Whenever you\'re ready, there\'s something interesting '
-        'in the data." Never push past resistance — note it and return later.'
+        "Coaching style: GENTLE. Lead with warmth, safety, invitation. "
+        "Challenges are offered, not pressed. Never push past resistance "
+        "\u2014 note it and return when the moment is right."
     ),
     "direct": (
-        'Coaching style: DIRECT. Lead with clarity and efficiency. Minimal preamble. '
-        '"Admin didn\'t happen. Same issue as last week. Library block Wednesday?" '
-        'Warmth is present through the precision of your attention.'
+        "Coaching style: DIRECT. Lead with clarity and efficiency. "
+        "Minimal preamble. Warmth is present through the precision of "
+        "your attention, not softening language."
     ),
     "peak_performance": (
-        'Coaching style: PEAK PERFORMANCE. High-performance coaching. "You held the '
-        'rate 4 times. That\'s the baseline now, not the goal. What\'s the next '
-        'level?" Challenge is primary. Celebrate briefly, then raise the bar.'
+        "Coaching style: PEAK PERFORMANCE. This is accountability coaching "
+        "\u2014 the user chose to be held to their own potential. Track their "
+        "commitments and name gaps directly. Celebrate briefly, then raise "
+        "the bar. Warmth shows as unshakeable belief in their capacity, not comfort."
     ),
 }
 COACHING_STYLE_MODIFIERS["peak"] = COACHING_STYLE_MODIFIERS["peak_performance"]
 
+# Synced with claude.ts Seat 1d (System_Prompts/User_Type_Modifiers.md)
 USER_TYPE_MODIFIERS: dict[str, str] = {
     "business_owner": (
-        "This user is a business owner. Layer these qualities onto your base voice:\n"
-        '- Radical honesty delivered with care. "I\'m saying this because I believe in you."\n'
-        '- Relentless execution focus. "Ideas are easy. What are you going to DO?"\n'
-        '- No tolerance for excuses, with compassion. "That\'s a story. What\'s really going on?"\n'
-        "- Operational excellence applied to ALL life areas, not just business.\n"
-        "- Commitments treated as sacred. Follow-through is non-negotiable.\n"
-        '- Language: "your business", "your practice", "your clients." If freelancer: '
-        '"your freelance business." If side hustle: "your side hustle."'
+        "Build the leader to build the company. Your job is founder development "
+        "\u2014 the business grows when the founder grows.\n\n"
+        "This user lives in the gap between vision and execution. They can see "
+        "where they need to go. Coach the distance between seeing it and building "
+        "it \u2014 that\u2019s your territory.\n\n"
+        "You understand the weight: every hat, hard decisions made alone, the "
+        "isolation that comes with the role. Name it when you see it. Don\u2019t "
+        "dwell on it.\n\n"
+        "Think strategically with them \u2014 second-order consequences, systems "
+        "not willpower, what to stop doing as much as what to start. When "
+        'operational gaps appear: \u201cWhat system would make this automatic?\u201d\n\n'
+        "Their language: \u201cyour business,\u201d \u201cyour practice,\u201d "
+        "\u201cyour clients.\u201d Personal growth and business growth are the "
+        "same conversation \u2014 never separate them.\n\n"
+        "Ask the question they\u2019re avoiding."
     ),
     "career_professional": (
-        "This user is a career professional. Adapt language:\n"
-        '- NEVER say "your business" — always "your career."\n'
-        "- Reference their career situation when providing examples.\n"
-        "- Career-specific framing: advancement, visibility, managing up, strategic impact.\n"
-        "- Do NOT use the high-directness business owner modifier. Standard warmth/directness blend."
+        "This user is a career professional. Adapt language: \u201cyour career,\u201d "
+        "not \u201cyour business.\u201d Frame through career context \u2014 advancement, "
+        "visibility, managing up, strategic positioning. Ground examples in their "
+        "work situation."
     ),
     "default": (
-        "This user is focused on a life area (health, relationships, personal growth, etc.). "
-        "Standard voice. No business or career modifier. Ground examples in their specific focus area."
+        "This user is focused on personal growth. Standard voice. Ground examples "
+        "in their specific focus area \u2014 health, relationships, creativity, or "
+        "whatever they\u2019re working on."
     ),
 }
 
@@ -144,6 +157,11 @@ CAPTURED_DATA_DEFAULTS: dict[str, object] = {
     "release_items": [],
 }
 
+# Arc labels for Clarity Session preamble — maps turn position (0-indexed) to display label.
+ARC_LABELS: list[str] = [
+    "Vision", "Goal", "Why", "Milestone", "Action", "Identity", "Release", "Close",
+]
+
 # Regex for cleaning unreplaced template placeholders.
 # Matches {snake_case_names}, {dotted.names}, and {UPPER_CASE} but NOT JSON-like braces.
 _PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z][a-zA-Z0-9_.]*\}")
@@ -155,7 +173,12 @@ _PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z][a-zA-Z0-9_.]*\}")
 
 
 def format_captured_data(captured_data: dict) -> str:
-    """Format captured_data dict as readable context for prompt injection."""
+    """Format captured_data dict as readable context for prompt injection.
+
+    NOTE: After v2 preamble introduction (W4-1.1), this function is no longer
+    called by Clarity Session assembly (replaced by format_captured_data_for_preamble).
+    Kept intentionally for non-Clarity session contexts and debugging.
+    """
     if not captured_data:
         return "No prior data captured yet."
     lines: list[str] = []
@@ -168,6 +191,49 @@ def format_captured_data(captured_data: dict) -> str:
         elif value:  # Skip empty strings
             lines.append(f"- {label}: {value}")
     return "\n".join(lines) if lines else "No prior data captured yet."
+
+
+def format_captured_data_for_preamble(captured_data: dict, first_name: str) -> str:
+    """Format captured data with raw/refined separation for the session preamble.
+
+    Raw fields (_raw suffix) are quoted — they're the user's exact words.
+    Refined fields (_refined suffix) are unquoted — they're the confirmed versions.
+    Other fields (goal_why, halfway_milestone, etc.) appear in the 'shared' section.
+
+    Returns empty string if no captured data — caller omits the data section entirely.
+    """
+    if not captured_data:
+        return ""
+
+    raw_lines: list[str] = []
+    refined_lines: list[str] = []
+    other_lines: list[str] = []
+
+    for key, value in captured_data.items():
+        if not value:
+            continue
+        label = DISPLAY_NAMES.get(key, key.replace("_", " ").title())
+
+        if key.endswith("_raw"):
+            short_label = label.replace(" (your words)", "").replace(" (raw)", "")
+            raw_lines.append(f'- {short_label}: "{value}"')
+        elif key.endswith("_refined"):
+            short_label = label.replace(" (refined)", "")
+            refined_lines.append(f"- {short_label}: {value}")
+        elif isinstance(value, list) and value:
+            other_lines.append(f"- {label}: {', '.join(str(v) for v in value)}")
+        else:
+            other_lines.append(f"- {label}: {value}")
+
+    sections: list[str] = []
+    if raw_lines or other_lines:
+        header = f"WHAT {first_name.upper()} HAS SHARED (in their words):"
+        sections.append(header + "\n" + "\n".join(raw_lines + other_lines))
+    if refined_lines:
+        header = "CONFIRMED (refined together):"
+        sections.append(header + "\n" + "\n".join(refined_lines))
+
+    return "\n\n".join(sections)
 
 
 def format_declared_challenges(challenges: list | None) -> str:
@@ -291,6 +357,68 @@ class PromptAssembler:
             return parts[0]
         return "there"
 
+    def _build_session_preamble(
+        self,
+        turn_number: int,
+        user_profile: dict,
+        captured_data: dict,
+    ) -> str:
+        """Generate the rich session preamble for Clarity Session turns.
+
+        Replaces the thin "Turn N of 8" context line (W4-1.1). Includes:
+        - Goal Cascade definition and stakes
+        - Arc tracking line (completed \u2713, current [now], future Title Case)
+        - Prior data with raw/refined separation (omitted on Turn 1)
+        - User-question handling note
+        """
+        first_name = self._resolve_first_name(user_profile)
+
+        # --- Arc line ---
+        arc_parts: list[str] = []
+        for i, label in enumerate(ARC_LABELS):
+            turn_idx = i + 1  # ARC_LABELS is 0-indexed, turns are 1-indexed
+            if turn_idx < turn_number:
+                arc_parts.append(f"{label} \u2713")
+            elif turn_idx == turn_number:
+                arc_parts.append(f"{label.upper()} [now]")
+            else:
+                arc_parts.append(label)
+        arc_line = " | ".join(arc_parts)
+
+        # --- Data section (empty on Turn 1) ---
+        data_section = format_captured_data_for_preamble(captured_data, first_name)
+
+        # --- Assemble preamble ---
+        lines: list[str] = [
+            f"CLARITY SESSION \u2014 You are building {first_name}'s Goal Cascade.",
+            "",
+            "The Goal Cascade is the foundation for all future coaching \u2014 every morning brief,",
+            "weekly session, and coaching conversation will reference what's built here. By the end,",
+            f"{first_name} should feel clear, aligned, and grounded: a vision, a goal, an identity",
+            "shift, and a concrete next step.",
+            "",
+            f"Arc: {arc_line}",
+        ]
+
+        if data_section:
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append(data_section)
+
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+        lines.append(
+            "Reference their prior answers naturally \u2014 they should never have to repeat themselves."
+        )
+        lines.append(
+            "If they ask a question or want to revisit a prior answer, engage naturally, then return"
+        )
+        lines.append("to this turn's objective.")
+
+        return "\n".join(lines)
+
     def _build_turn_variables(
         self,
         user_profile: dict,
@@ -320,7 +448,8 @@ class PromptAssembler:
             "is_weekend": "weekend" if temporal["is_weekend"] else "weekday",
             "week_position": temporal["week_position"],
             # Formatted context blocks
-            "captured_data_summary": format_captured_data(captured_data),
+            # captured_data_summary removed — now in session preamble
+            # (format_captured_data_for_preamble). Individual fields still injected below.
             "declared_challenges": format_declared_challenges(
                 user_profile.get("declared_challenges")
             ),
@@ -368,50 +497,42 @@ class PromptAssembler:
         conversation_history: list[dict],
         brain_cloud_context: str = "",
     ) -> str:
-        """Build the complete system instruction for a Clarity Session turn.
+        """Build the system instruction for a Clarity Session turn.
 
-        Returns the fully assembled multi-layer prompt string.
+        Identity, voice, modifiers are in claude.ts (Seat 1). This assembler
+        provides session context, turn instructions, and signal handlers only.
         """
         temporal = get_temporal_context()
 
-        # --- Layer 1: Master System Prompt ---
-        master = await self._get_template("master/system_prompt")
-        layer1_vars = {
-            "COACHING_STYLE_MODIFIER": self._resolve_coaching_style(user_profile),
-            "USER_TYPE_MODIFIER": self._resolve_user_type(user_profile),
-            "TEMPORAL_CONTEXT": format_temporal_block(temporal),
-        }
-        layer1 = inject_variables(master, layer1_vars)
+        # Session context — rich v2 preamble with arc tracking and prior data
+        session_context = self._build_session_preamble(
+            turn_spec.turn_number, user_profile, captured_data,
+        )
 
-        # --- Layer 2: Session Context ---
-        layer2 = f"This is a Clarity Session. Turn {turn_spec.turn_number} of 8."
-
-        # --- Layer 3: Turn Instructions ---
-        # Build the complete variable dict for injection.
+        # Turn instructions — with full variable injection
         variables = self._build_turn_variables(
             user_profile, captured_data, conversation_history,
             brain_cloud_context, temporal,
         )
 
         if "crisis" in signals:
-            # CRITICAL: Crisis replaces Layer 3 entirely.
+            # CRITICAL: Crisis replaces turn instructions entirely.
             # The model must exit coaching flow, not try to continue.
-            layer3 = await self._get_template("signals/crisis_handler")
-            layer3 = inject_variables(layer3, variables)
+            turn_instructions = await self._get_template("signals/crisis_handler")
+            turn_instructions = inject_variables(turn_instructions, variables)
             signal_blocks: list[str] = []
         else:
             turn_template = await self._get_template(turn_spec.template_name)
-            layer3 = inject_variables(turn_template, variables)
+            turn_instructions = inject_variables(turn_template, variables)
             signal_blocks = await self._get_signal_blocks(signals)
 
-        # --- Assemble all layers ---
-        parts = [layer1]
-        parts.append(f"\n\n== SESSION CONTEXT ==\n\n{layer2}")
-        parts.append(f"\n\n== TURN INSTRUCTIONS ==\n\n{layer3}")
+        # Assemble — no Layer 1 (identity/voice/modifiers are in Seat 1)
+        parts = [f"== SESSION CONTEXT ==\n\n{session_context}"]
+        parts.append(f"\n\n== TURN INSTRUCTIONS ==\n\n{turn_instructions}")
         for block in signal_blocks:
             parts.append(f"\n\n== SIGNAL HANDLER ==\n\n{block}")
 
-        # --- Layer 4b: Universal Guidance (skip during crisis) ---
+        # Universal guidance (skip during crisis)
         if "crisis" not in signals:
             guidance = await self._get_template("signals/prompt_level_guidance")
             parts.append(f"\n\n== COACHING GUIDANCE ==\n\n{guidance}")
@@ -430,30 +551,22 @@ class PromptAssembler:
         user_profile: dict,
         brain_cloud_context: str = "",
     ) -> str:
-        """Build a non-turn-based session prompt (morning brief, weekly, ongoing, etc.).
+        """Build a non-turn-based session prompt (morning brief, weekly, ongoing).
 
-        Same Layer 1 as Clarity Session, but Layer 2 is the session-specific
-        prompt, and there are no turns or signal handlers.
+        Identity, voice, and modifiers are in claude.ts (Seat 1). This returns
+        the session-specific coaching instructions with temporal context and
+        Brain Cloud data injected.
 
-        The ongoing/default template includes its own modifier/temporal placeholders
-        (redundant with Layer 1 but reinforcing). All variables are injected into
-        both layers to ensure no raw placeholders leak.
+        The ongoing/default template still has {COACHING_STYLE_MODIFIER} and
+        {USER_TYPE_MODIFIER} placeholders — these are injected here as harmless
+        reinforcement of Seat 1.
         """
         temporal = get_temporal_context()
         coaching_style = self._resolve_coaching_style(user_profile)
         user_type = self._resolve_user_type(user_profile)
         temporal_block = format_temporal_block(temporal)
 
-        # --- Layer 1: Master System Prompt ---
-        master = await self._get_template("master/system_prompt")
-        layer1_vars = {
-            "COACHING_STYLE_MODIFIER": coaching_style,
-            "USER_TYPE_MODIFIER": user_type,
-            "TEMPORAL_CONTEXT": temporal_block,
-        }
-        layer1 = inject_variables(master, layer1_vars)
-
-        # --- Layer 2: Session Prompt ---
+        # Session prompt with full variable injection
         template_name = self._SESSION_TEMPLATE_MAP.get(
             session_type, f"{session_type}/session"
         )
@@ -472,14 +585,14 @@ class PromptAssembler:
             "is_weekend": "weekend" if temporal["is_weekend"] else "weekday",
             "week_position": temporal["week_position"],
             "brain_cloud_context": brain_cloud_context or "No coaching history available yet.",
-            # Uppercase Layer-1-style variables (ongoing template uses these)
+            # Uppercase modifier variables (ongoing template uses these —
+            # harmless reinforcement of Seat 1)
             "COACHING_STYLE_MODIFIER": coaching_style,
             "USER_TYPE_MODIFIER": user_type,
             "TEMPORAL_CONTEXT": temporal_block,
         }
-        layer2 = inject_variables(session_prompt, session_vars)
 
-        return f"{layer1}\n\n== SESSION INSTRUCTIONS ==\n\n{layer2}"
+        return inject_variables(session_prompt, session_vars)
 
     async def build_welcome_message(self, user_profile: dict) -> str:
         """Build personalized welcome message for pre-Clarity-Session state.
