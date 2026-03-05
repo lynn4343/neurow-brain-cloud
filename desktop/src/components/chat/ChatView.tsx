@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Fragment } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage, type Message } from "./ChatMessage";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
@@ -10,6 +10,7 @@ import {
   PencilSimple,
   BookOpen,
   Brain,
+  DownloadSimple,
 } from "@phosphor-icons/react";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -25,8 +26,69 @@ import {
 } from "@/lib/electron";
 import { ActivityIndicator, type ActivityItem } from "./ActivityIndicator";
 
+// ---------------------------------------------------------------------------
+// Export download utilities
+// ---------------------------------------------------------------------------
+
+function extractJsonFromCodeBlock(content: string): string | null {
+  const match = content.match(/```json\s*\n([\s\S]*?)\n```/);
+  return match ? match[1] : null;
+}
+
+function downloadJson(jsonData: string, filename: string) {
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function isExportMessage(content: string): boolean {
+  return content.includes('"exported_at"') && content.includes('"episodic"');
+}
+
+// ---------------------------------------------------------------------------
+// Export Download Button
+// ---------------------------------------------------------------------------
+
+function ExportDownloadButton({ content }: { content: string }) {
+  const { activeUser } = useUser();
+
+  function handleDownload() {
+    const json = extractJsonFromCodeBlock(content);
+    if (!json) {
+      console.warn("[ExportDownloadButton] Failed to extract JSON from export message");
+      return;
+    }
+    const slug = activeUser?.slug || "user";
+    const date = new Date().toISOString().split("T")[0];
+    downloadJson(json, `brain-cloud-export-${slug}-${date}.json`);
+  }
+
+  return (
+    <div className="flex justify-start">
+      <button
+        onClick={handleDownload}
+        type="button"
+        className="flex items-center gap-1.5 rounded-lg border border-[#E6E5E3] bg-white px-3 py-1.5 text-sm text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors"
+      >
+        <DownloadSimple className="size-4" weight="bold" />
+        <span>Download Export</span>
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ChatView
+// ---------------------------------------------------------------------------
+
 export function ChatView() {
-  const { activeUser, appPhase } = useUser();
+  const { activeUser, appPhase, pendingChatAction, setPendingChatAction } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -187,6 +249,14 @@ export function ChatView() {
     [activeUser, appPhase],
   );
 
+  // Pick up pending chat actions from other views (e.g. Settings → Export)
+  useEffect(() => {
+    if (pendingChatAction && !isLoading) {
+      handleSend(pendingChatAction);
+      setPendingChatAction(null);
+    }
+  }, [pendingChatAction, handleSend, setPendingChatAction, isLoading]);
+
   // Personalized greeting for welcome screen
   const firstName = activeUser?.display_name?.trim().split(" ")[0] || "there";
   const hour = new Date().getHours();
@@ -237,7 +307,14 @@ export function ChatView() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="w-full max-w-[767px] mx-auto flex flex-col gap-4 pt-6 pb-6 px-4">
           {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
+            <Fragment key={msg.id}>
+              <ChatMessage message={msg} />
+              {msg.role === "assistant" &&
+                !msg.isStreaming &&
+                isExportMessage(msg.content) && (
+                  <ExportDownloadButton content={msg.content} />
+                )}
+            </Fragment>
           ))}
           {activities.length > 0 && (
             <ActivityIndicator activities={activities} />

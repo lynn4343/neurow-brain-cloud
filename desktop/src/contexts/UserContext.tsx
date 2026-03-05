@@ -43,10 +43,12 @@ export interface UserContextType {
   activeUser: UserProfile | null;
   profiles: UserProfile[];
   appPhase: AppPhase;
+  pendingChatAction: string | null;
 
   // Low-level setters (use sparingly — prefer action methods)
   setActiveUser: (profile: UserProfile | null) => void;
   setAppPhase: (phase: AppPhase) => void;
+  setPendingChatAction: (action: string | null) => void;
 
   // Action methods (encapsulate state transitions — preferred API)
   switchProfile: (slug: string) => void;
@@ -155,6 +157,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<UserProfile[]>([THEO_PROFILE]);
   const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   const [appPhase, setAppPhase] = useState<AppPhase>("loading");
+  const [pendingChatAction, setPendingChatAction] = useState<string | null>(null);
 
   // Client-side initialization — loads profiles from localStorage, sets phase.
   // This is a one-time hydration effect: server renders 'loading', client reads
@@ -236,8 +239,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
         activeUser,
         profiles,
         appPhase,
+        pendingChatAction,
         setActiveUser,
         setAppPhase,
+        setPendingChatAction,
         switchProfile,
         startNewProfile,
         addProfile,

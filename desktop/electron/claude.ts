@@ -284,7 +284,9 @@ You have access to Brain Cloud \u2014 a four-store cognitive memory system:
 - coaching_store_turn(...): Store coaching session progress
 - coaching_get_session_prompt(user_id="${slug}", session_type): Get ongoing coaching instructions
 
-Use brain_recall proactively to provide context-rich responses. Use brain_remember when the user shares important information.`;
+Use brain_recall proactively to provide context-rich responses. Use brain_remember when the user shares important information.
+
+When the user asks to export their data, call brain_export and respond with a brief summary of what's included, then include the COMPLETE exported JSON in a \`\`\`json code block so they can download it.`;
 }
 
 // ---------------------------------------------------------------------------
