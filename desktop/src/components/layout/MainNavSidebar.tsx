@@ -19,10 +19,12 @@ import {
   Chat,
   CaretDoubleLeft,
   SignOut,
+  Brain,
+  GearSix,
   type IconProps,
 } from "@phosphor-icons/react";
 
-export type View = "home" | "daymap" | "chat" | "projects" | "notes";
+export type View = "home" | "daymap" | "chat" | "projects" | "notes" | "brain-cloud" | "settings";
 
 interface NavItem {
   icon: React.ComponentType<IconProps> | (() => React.JSX.Element);
@@ -36,6 +38,8 @@ const mainNavItems: NavItem[] = [
   { icon: Cards, label: "Projects", viewId: "projects" },
   { icon: Note, label: "Notes", viewId: "notes" },
   { icon: Chat, label: "Neurow Chat", viewId: "chat" },
+  { icon: Brain, label: "Brain Cloud", viewId: "brain-cloud" },
+  { icon: GearSix, label: "Settings", viewId: "settings" },
 ];
 
 const resourceNavItems: NavItem[] = [

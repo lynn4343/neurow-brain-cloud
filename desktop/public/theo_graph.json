@@ -1,0 +1,3885 @@
+{
+  "nodes": [
+    {
+      "labels": [
+        "Person"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "School of Motion Module 1",
+        "id": "0663dfda-a003-4926-84c4-9ac4f87158e7",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Is Home insight",
+        "id": "d6e84878-4402-4b9c-9056-a4a7b16c07bd",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Town Lake trail",
+        "id": "37c9daf7-2c98-42f2-af09-35b53b6caae4",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "coaching session",
+        "id": "59f48941-0a5f-46b8-9d96-0bc1fb0a4e03",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour project",
+        "id": "2b938265-e300-49ec-bcd7-764ca419d822",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map insight",
+        "id": "3616cd80-ea36-4f65-b404-29c28288e5db",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "School of Motion",
+        "id": "ab5aed84-7a81-406a-bd89-2383c6d41f8e",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin",
+        "id": "58a68772-42a9-48a5-a98b-f6ab7629139c",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope documents",
+        "id": "a7b73c3b-8a9c-47f0-b7fa-d13d3e9dd09e",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "invisible pipeline",
+        "id": "55cbc75e-b178-4f68-960e-b3639d0088f3",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC debt kill date",
+        "id": "7b09fc30-3cd2-4a3e-b764-de7ee3acd4c3",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Blender",
+        "id": "7da1f40f-1d64-465b-b559-75f885a63a76",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "identity shift",
+        "id": "b43c4b7c-1ccb-4d08-8071-ddd4a0524459",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Clarity Session",
+        "id": "c1141839-2af6-44c6-86cb-6e0c41db6a70",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Goal"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour rate",
+        "id": "cde60310-42a1-42fd-911c-7d2efefad4da",
+        "type": "goal"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "client onboarding template",
+        "id": "fa1d9d06-0b49-46c8-b28c-84f2a7007467",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "School of Motion",
+        "id": "7590660b-4162-4926-a311-207bf61d6a9a",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "invoices",
+        "id": "d35204c4-bc8b-4f34-8acc-2f82744e7f80",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD",
+        "id": "94ae0365-8854-48e7-bb7a-d9669db53923",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian brand deck",
+        "id": "51ee963a-fd8d-4f0b-a2d3-fba9df15009b",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "invoicing and follow-ups",
+        "id": "23f38550-d736-41bd-a860-4702881da784",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "sunset run",
+        "id": "c3a1127f-e27a-4c8e-81ad-bf13781d60fa",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "coaching signal",
+        "id": "5202c3c5-86b1-4ce6-90da-3611a0a5c774",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library admin block",
+        "id": "0dc8b0b3-65c0-4a68-9d4f-e978d9da8afd",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Goal"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Tuesday library blocks",
+        "id": "cbc8168a-7544-4636-b80d-5600e6992665",
+        "type": "goal"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Person"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "new client",
+        "id": "01d7aaeb-3f57-4acd-b3e7-ac7eef94c9e4",
+        "type": "person"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "boundaries",
+        "id": "9e61a0ae-ecad-49b1-a7b7-4396f092c618",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Goal"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Goal"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Admin Execution",
+        "id": "c1a3cc29-7d9c-4844-b8d6-da6151583d30",
+        "type": "goal"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma creative gravity",
+        "id": "8d9d4b1d-8a33-4808-a46b-87b34421a3e0",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "borrowed scaffolding strategy",
+        "id": "ef12590b-5dc0-4b42-a72f-141cc555967f",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "structural conflict",
+        "id": "a72021ae-a09a-447b-bb37-147911e6cabc",
+        "type": "pattern"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Revision Boundary Loop",
+        "id": "f0b85193-0645-46af-940e-5cee545d7a40",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'finishes what he starts'",
+        "id": "631e6f5b-7c86-44f9-a0a5-d52b7756a698",
+        "type": "belief"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Financial Relationship",
+        "id": "9115fd7e-1525-4bc7-bf61-6bde8a7913e3",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "payoff spreadsheet",
+        "id": "a301e509-8b26-4116-a1ef-d2fa13af0891",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "ab7133e8-4f66-4acc-b303-1ee7ab0c1fc2",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "financial engagement",
+        "id": "633e81c0-b9fc-4109-9852-7298fb6c6307",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Financial Feelings vs Reality insight",
+        "id": "7b6cb609-7b1a-4945-9fad-be204403eaf6",
+        "type": "belief"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Month 2",
+        "id": "52934ad9-429f-4438-a61e-f81a79b8c91d",
+        "type": "pattern"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "brand identity project",
+        "id": "168e8688-f1c4-4cca-be22-2be19c97949e",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Goal"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quarterly goal",
+        "id": "d7d74548-a1cc-41d1-be7b-f5ecc483187d",
+        "type": "goal"
+      }
+    },
+    {
+      "labels": [
+        "Person"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Dev",
+        "id": "44197533-29ab-4808-b6cd-d0645dae041b",
+        "type": "person"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Veracruz All Natural",
+        "id": "eefefe26-acaf-4fbf-b163-65bfa2608cf9",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "lunch",
+        "id": "fb5956ec-8408-4f5e-a57b-5df0058f6dbc",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Revelry Kitchen & Bar",
+        "id": "abb856b1-b63d-4fd3-8eeb-8e1c3680e28e",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Is Home",
+        "id": "4354c85b-2faa-4d75-8c77-eb14a68357af",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85/hour",
+        "id": "c34bcc61-c9c3-4770-b74e-188cb7ced01d",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour",
+        "id": "21d2d26b-cdc1-43e1-8e18-5da074462534",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "revision policy",
+        "id": "6024b3d3-4b9c-4240-b648-ac8c02776f23",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "rate increase email",
+        "id": "79b53b57-3bdb-4d96-8034-d51d803cc937",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "coaching system",
+        "id": "7daedc1d-cb50-4fc6-adce-e0c960ebb49a",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "borrowed scaffolding",
+        "id": "687fced3-5872-41d5-bcfe-d379fa99d7df",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Place"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "coffee shop",
+        "id": "073f288a-03ae-43c2-8027-ab143e27dad1",
+        "type": "place"
+      }
+    },
+    {
+      "labels": [
+        "Pattern"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin tasks",
+        "id": "fc5ce203-e5ec-4be4-9eef-6caa4de59ae9",
+        "type": "behavior"
+      }
+    },
+    {
+      "labels": [
+        "Project"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "labels": [
+        "Concept"
+      ],
+      "properties": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Month 2 posting cadence",
+        "id": "c1822e66-48f7-454a-8db7-208287a2ef52",
+        "type": "concept"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "confidence bridge",
+        "id": "f315752c-9051-47a9-ba91-0c5bd0298c44",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PRODUCED",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Austin Creatives",
+        "id": "aeb84a14-9b90-40fc-9ec3-7f09d40056b1",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "pricing transformation",
+        "id": "eec7b21a-8a34-4f74-9850-30f91a2b57bf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "undercharging pattern",
+        "id": "67b8d0dd-7fff-4794-a688-56a6c5d69c5c",
+        "type": "pattern"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Theo",
+        "id": "04d128b4-5095-4ece-ad08-ce8483d2aeb7",
+        "type": "person"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "jogging",
+        "id": "144b82c8-f595-49c7-81bb-807afaacbf6c",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$100/hour quote",
+        "id": "6727921b-f548-48d4-bdf4-f13d91e925b6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pricing Growth Arc insight",
+        "id": "20c34555-ce71-4b71-a464-db2d48fb9cc4",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "MOVES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin block",
+        "id": "0ea03bd9-31cd-4e42-8a8d-bc76a522c2a7",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "UT library",
+        "id": "d8d366c2-c6d1-403d-b4c8-43d66ff4466b",
+        "type": "place"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "BLOCKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "quote for $100/hour",
+        "id": "1f13e3ea-63f1-424f-9f00-71dd223e2cff",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "$85 quote",
+        "id": "81a96613-25f2-4c1c-ab85-45d2a9e82208",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "PART_OF",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Figma",
+        "id": "a5223f1a-3155-442f-a7f2-464bb8409f86",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Meridian project",
+        "id": "c5d20684-6956-408a-8ee8-e28183c3681f",
+        "type": "project"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "3545e7a6-c366-441c-82a0-5769199a060d",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "CC payoff spreadsheet",
+        "id": "6521eb3c-df0e-4c73-bdd4-07d8e7be6f86",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "October 2026",
+        "id": "fad12ca2-c56e-44dc-80f5-9c0b359cd8d2",
+        "type": "goal"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "SUPPORTS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "automatic extra payments",
+        "id": "c9230753-06f6-48e8-a4cb-385a4729090f",
+        "type": "behavior"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "credit card debt",
+        "id": "b5535910-1541-4c8d-ad3d-97352f7f2daf",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "ADHD Pattern Map",
+        "id": "1d578ed8-cf63-469d-ab79-132bf67769ef",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "'disciplined with admin' identity trait",
+        "id": "4c84b2ab-4c2f-43e7-bb90-690424c6b704",
+        "type": "belief"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "TRACKS",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "scope document",
+        "id": "b3fc8a19-828a-4cc8-a139-20e169f0a13c",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Boundary Enforcement",
+        "id": "b086436d-8d8c-46d3-ba39-653d7ef48c3a",
+        "type": "behavior"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "ADDRESSES",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Pipeline Intentionality",
+        "id": "da66586a-3e26-4405-a9b3-571cf0c8eff6",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Invisible Pipeline",
+        "id": "4efd1d31-0466-46b8-8b1d-88f206cddffe",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "admin blocks",
+        "id": "ac27aed3-30d2-4b47-8eb9-48a3ee570704",
+        "type": "concept"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "library",
+        "id": "a70c766e-b2d1-48b2-85e2-6384a1d7cbb2",
+        "type": "place"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    },
+    {
+      "type": "RELATES_TO",
+      "from": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "portfolio work",
+        "id": "e111dbae-83b4-4649-a023-f30f9892acaf",
+        "type": "project"
+      },
+      "to": {
+        "user_id": "0c4831b5-8df3-4fba-94be-57e4e3112116",
+        "name": "Instagram",
+        "id": "70705b4f-7534-4b05-beac-84245f98eb86",
+        "type": "concept"
+      }
+    }
+  ]
+}

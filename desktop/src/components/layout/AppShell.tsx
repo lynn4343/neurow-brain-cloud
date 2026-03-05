@@ -6,6 +6,8 @@ import { GlobalHeader } from "./GlobalHeader";
 import { ChatLayout } from "@/components/chat/ChatLayout";
 import { DayMapLayout } from "@/components/day-map/DayMapLayout";
 import { NotesLayout } from "@/components/notes/NotesLayout";
+import { SettingsView } from "@/components/settings/SettingsView";
+import { GraphView } from "@/components/graph/GraphView";
 import { checkClaudeInstalled } from "@/lib/electron";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AssistantButton } from "./AssistantButton";
@@ -16,6 +18,8 @@ const headerTitles: Record<View, string> = {
   chat: "NEUROW CHAT",
   projects: "PROJECTS",
   notes: "NOTES",
+  "brain-cloud": "BRAIN CLOUD",
+  settings: "SETTINGS",
 };
 
 export function AppShell() {
@@ -70,7 +74,7 @@ export function AppShell() {
         />
 
         <main className="flex-1 flex flex-col overflow-hidden">
-          <GlobalHeader title={headerTitles[activeView]} />
+          <GlobalHeader title={headerTitles[activeView]} onViewChange={setActiveView} />
 
           {/* Claude not installed warning */}
           {claudeInstalled === false && (
@@ -138,6 +142,26 @@ export function AppShell() {
             }
           >
             <NotesLayout />
+          </div>
+
+          <div
+            className={
+              activeView === "brain-cloud"
+                ? "flex-1 flex flex-col overflow-hidden"
+                : "hidden"
+            }
+          >
+            <GraphView isActive={activeView === "brain-cloud"} />
+          </div>
+
+          <div
+            className={
+              activeView === "settings"
+                ? "flex-1 flex flex-col overflow-hidden"
+                : "hidden"
+            }
+          >
+            <SettingsView onViewChange={setActiveView} />
           </div>
         </main>
 
