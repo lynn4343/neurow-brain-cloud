@@ -46,6 +46,9 @@ contextBridge.exposeInMainWorld('neurow', {
   updateProfile: (userId: string, profileData: Record<string, unknown>) => {
     return ipcRenderer.invoke('update-profile', userId, profileData);
   },
+  getProfile: (userId: string) => {
+    return ipcRenderer.invoke('get-profile', userId);
+  },
   exportData: (userId: string) => {
     return ipcRenderer.invoke('export-data', userId);
   },

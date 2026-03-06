@@ -96,6 +96,7 @@ interface NeurowAPI {
   // Direct Data API (model-agnostic)
   createProfile: (displayName: string) => Promise<CreateProfileResult>;
   updateProfile: (userId: string, profileData: Record<string, unknown>) => Promise<UpdateProfileResult>;
+  getProfile: (userId: string) => Promise<Record<string, unknown>>;
   exportData: (userId: string) => Promise<BrainExportData>;
 }
 
@@ -164,6 +165,10 @@ export async function updateProfile(
   profileData: Record<string, unknown>,
 ): Promise<UpdateProfileResult> {
   return window.neurow.updateProfile(userId, profileData);
+}
+
+export async function getProfile(userId: string): Promise<Record<string, unknown>> {
+  return window.neurow.getProfile(userId);
 }
 
 export async function exportData(userId: string): Promise<BrainExportData> {

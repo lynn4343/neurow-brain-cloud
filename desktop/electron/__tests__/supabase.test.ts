@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   createProfileDirect,
   updateProfileDirect,
+  getProfileDirect,
   exportDataDirect,
   type SupabaseConfig,
 } from '../supabase';
@@ -220,6 +221,53 @@ describe('updateProfileDirect', () => {
     await expect(
       updateProfileDirect(config, 'nonexistent-uuid', { roles: ['founder'] }),
     ).rejects.toThrow('no user found with id nonexistent-uuid');
+  });
+});
+
+// ===========================================================================
+// getProfileDirect
+// ===========================================================================
+
+describe('getProfileDirect', () => {
+  it('fetches a user profile by UUID', async () => {
+    const profile = {
+      id: 'uuid-123',
+      display_name: 'Test User',
+      goal_cascade: { vision: 'test vision', next_action_step: 'do something' },
+    };
+    mockFetch.mockResolvedValueOnce(okResponse([profile]));
+
+    const result = await getProfileDirect(config, 'uuid-123');
+    expect(result.display_name).toBe('Test User');
+    expect(result.goal_cascade).toEqual({
+      vision: 'test vision',
+      next_action_step: 'do something',
+    });
+  });
+
+  it('returns profile with null goal_cascade when not yet completed', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okResponse([{ id: 'uuid-456', display_name: 'New User', goal_cascade: null }]),
+    );
+
+    const result = await getProfileDirect(config, 'uuid-456');
+    expect(result.goal_cascade).toBeNull();
+  });
+
+  it('throws when user not found', async () => {
+    mockFetch.mockResolvedValueOnce(okResponse([]));
+    await expect(getProfileDirect(config, 'nonexistent')).rejects.toThrow(
+      'No user found with id nonexistent',
+    );
+  });
+
+  it('throws on HTTP error', async () => {
+    mockFetch.mockResolvedValueOnce(
+      new Response('server error', { status: 500 }),
+    );
+    await expect(getProfileDirect(config, 'uuid')).rejects.toThrow(
+      'Profile fetch failed: 500',
+    );
   });
 });
 

@@ -62,6 +62,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'career_situation', 'career_stage',
   'career_focus', 'career_challenges',
   'love_partner_situation', 'onboarding_completed',
+  'goal_cascade', 'clarity_session_completed',
 ]);
 
 // ---------------------------------------------------------------------------
@@ -170,6 +171,35 @@ export async function updateProfileDirect(
   }
 
   return { updated: true, fields: Object.keys(safeData) };
+}
+
+// ---------------------------------------------------------------------------
+// getProfileDirect
+// ---------------------------------------------------------------------------
+
+export async function getProfileDirect(
+  config: SupabaseConfig,
+  userId: string,
+): Promise<Record<string, unknown>> {
+  const response = await fetch(
+    `${config.url}/rest/v1/user_profiles?id=eq.${userId}&select=*`,
+    {
+      headers: headers(config.anonKey, false),
+      signal: AbortSignal.timeout(config.timeoutMs),
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Profile fetch failed: ${response.status} ${error}`);
+  }
+
+  const rows = await response.json();
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error(`No user found with id ${userId}`);
+  }
+
+  return rows[0];
 }
 
 // ---------------------------------------------------------------------------

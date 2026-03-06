@@ -516,7 +516,7 @@ async def coaching_store_turn(
 
     if turn_number == 9 and is_complete:
         due_date = compute_action_due_date(datetime.now(timezone.utc))
-        response["goal_cascade"] = {
+        goal_cascade_data = {
             "vision": existing_data.get("one_year_vision_refined", ""),
             "quarterly_goal": existing_data.get("quarterly_goal_refined", ""),
             "goal_why": existing_data.get("goal_why", ""),
@@ -525,6 +525,17 @@ async def coaching_store_turn(
             "next_action_step": existing_data.get("next_action_step", ""),
             "next_action_due": due_date,
         }
+        response["goal_cascade"] = goal_cascade_data
+
+        # Server-authoritative: persist goal cascade to user profile
+        session_user_id = str(session.get("user_id"))
+        try:
+            await stores.supabase.update_user(session_user_id, {
+                "goal_cascade": goal_cascade_data,
+                "clarity_session_completed": True,
+            })
+        except Exception as e:
+            logger.error(f"Goal cascade profile write failed: {e}")
 
     return json.dumps(response, indent=2)
 

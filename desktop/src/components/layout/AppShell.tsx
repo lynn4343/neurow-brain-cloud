@@ -161,7 +161,7 @@ export function AppShell() {
                 : "hidden"
             }
           >
-            <SettingsView onViewChange={setActiveView} />
+            <SettingsView />
           </div>
         </main>
 

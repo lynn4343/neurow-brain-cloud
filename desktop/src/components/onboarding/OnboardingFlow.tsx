@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import { ProfileCreation } from "./ProfileCreation";
+import { MemoryImportStep } from "./MemoryImportStep";
 import { OnboardingScreens, type OnboardingData } from "./OnboardingScreens";
 import { ProfileUpdateLoader } from "./ProfileUpdateLoader";
 import type { UserProfile } from "@/contexts/UserContext";
 
-// "import" step is W4-5 scope (DataImportPage). For now, profile → screens → updating_profile.
-type OnboardingStep = "profile" | "screens" | "updating_profile";
+// profile → import → screens → updating_profile
+type OnboardingStep = "profile" | "import" | "screens" | "updating_profile";
 
 interface OnboardingFlowProps {
   onComplete: (profile: UserProfile) => void;
@@ -30,7 +31,15 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   switch (step) {
     case "profile":
-      return <ProfileCreation onComplete={() => setStep("screens")} />;
+      return <ProfileCreation onComplete={() => setStep("import")} />;
+
+    case "import":
+      return (
+        <MemoryImportStep
+          onComplete={() => setStep("screens")}
+          onSkip={() => setStep("screens")}
+        />
+      );
 
     case "screens":
       return (

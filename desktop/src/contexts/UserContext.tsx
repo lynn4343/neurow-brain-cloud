@@ -122,23 +122,63 @@ const THEO_PROFILE: UserProfile = {
 };
 
 // ---------------------------------------------------------------------------
+// Default profile — Avery (judge onboarding persona, pre-populated)
+// ---------------------------------------------------------------------------
+
+const AVERY_PROFILE: UserProfile = {
+  id: "6afa0062-93f6-427e-bad3-b0542d6692a5",
+  slug: "avery",
+  display_name: "Avery Alfonso",
+  onboarding_completed: true,
+  clarity_session_completed: false,
+  coaching_style: "balanced",
+  roles: ["founder", "creative"],
+  focus_area: "career-business",
+  declared_challenges: [
+    "procrastination",
+    "perfectionism",
+    "overwhelm",
+    "dont-know-next",
+    "time-scarcity",
+    "money-scarcity",
+  ],
+  goal_cascade: null,
+  is_business_owner: true,
+  business_description:
+    "I have a supplement business called Mastermind, we make nootropics",
+  business_stage: "momentum",
+  current_business_focus:
+    "building the social media presence and consistency and doing brand collaborations",
+  business_challenges: [
+    "procrastination",
+    "perfectionism",
+    "overwhelm",
+    "dont-know-next",
+    "time-scarcity",
+    "money-scarcity",
+  ],
+};
+
+const DEFAULT_PROFILES = [THEO_PROFILE, AVERY_PROFILE];
+
+// ---------------------------------------------------------------------------
 // localStorage helpers
 // ---------------------------------------------------------------------------
 
 const STORAGE_KEY = "neurow_profiles";
 
 function loadProfiles(): UserProfile[] {
-  if (typeof window === "undefined") return [THEO_PROFILE];
+  if (typeof window === "undefined") return DEFAULT_PROFILES;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [THEO_PROFILE];
+    if (!raw) return DEFAULT_PROFILES;
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) return [THEO_PROFILE];
+    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PROFILES;
     return parsed;
   } catch {
     // Corrupted localStorage — reset to defaults
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([THEO_PROFILE]));
-    return [THEO_PROFILE];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROFILES));
+    return DEFAULT_PROFILES;
   }
 }
 
@@ -176,7 +216,7 @@ export function useUser(): UserContextType {
 // ---------------------------------------------------------------------------
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [profiles, setProfiles] = useState<UserProfile[]>([THEO_PROFILE]);
+  const [profiles, setProfiles] = useState<UserProfile[]>(DEFAULT_PROFILES);
   const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   const [appPhase, setAppPhase] = useState<AppPhase>("loading");
   const [pendingChatAction, setPendingChatAction] = useState<string | null>(null);

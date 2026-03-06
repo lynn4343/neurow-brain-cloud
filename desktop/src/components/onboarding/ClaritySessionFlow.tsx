@@ -20,6 +20,7 @@ import {
   type ToolActivityEvent,
 } from "@/lib/electron";
 import type { GoalCascade } from "@/contexts/UserContext";
+import { GoalCascadeFetcher } from "./GoalCascadeFetcher";
 
 // Close phrase from the Turn 9 verbatim close template.
 // Both apostrophe variants: straight (U+0027) and curly (U+2019).
@@ -40,6 +41,7 @@ export function ClaritySessionFlow() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [closeDelivered, setCloseDelivered] = useState(false);
+  const [phase, setPhase] = useState<"chat" | "syncing">("chat");
 
   // Refs for event listener callbacks (prevents stale closures in useEffect([]))
   const sessionIdRef = useRef<string | null>(null);
@@ -228,19 +230,38 @@ export function ClaritySessionFlow() {
   useEffect(() => {
     if (!autoStartedRef.current && activeUser) {
       autoStartedRef.current = true;
-      handleSend(
-        "Just finished setting up my profile — ready to close the gap between vision and reality.",
-      );
+      const timer = setTimeout(() => {
+        handleSend(
+          "Just finished setting up my profile — ready to close the gap between vision and reality.",
+        );
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [activeUser, handleSend]);
 
   // --- "Continue to Neurow" handler ---
 
   function handleComplete() {
-    completeClaritySession(goalCascadeRef.current ?? undefined);
+    // Fast path: IPC already delivered goal_cascade
+    if (goalCascadeRef.current) {
+      completeClaritySession(goalCascadeRef.current);
+      return;
+    }
+    // Slow path: fetch from Supabase (server wrote it on Turn 9)
+    setPhase("syncing");
   }
 
   // --- Render ---
+
+  if (phase === "syncing") {
+    if (!activeUser) return null;
+    return (
+      <GoalCascadeFetcher
+        userId={activeUser.id}
+        onComplete={(gc) => completeClaritySession(gc ?? undefined)}
+      />
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col">

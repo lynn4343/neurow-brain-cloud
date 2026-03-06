@@ -41,6 +41,15 @@ export function ChatView() {
   const messagesRef = useRef<Message[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Ref for handleSend — allows import processing useEffect to call it
+  // without adding handleSend to its dependency array (same pattern as
+  // sessionIdRef/messagesRef above — prevents stale closures).
+  const handleSendRef = useRef<((text: string, modeOverride?: string) => Promise<void>) | null>(null);
+
+  // Ref for import processing timer — persists across processImports calls
+  // and ensures cleanup always clears the correct timer.
+  const importTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Keep refs in sync
   useEffect(() => {
     sessionIdRef.current = sessionId;
@@ -201,6 +210,99 @@ export function ChatView() {
     },
     [activeUser, appPhase],
   );
+
+  // Keep handleSend ref in sync (for import processing useEffect)
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  }, [handleSend]);
+
+  // ---------------------------------------------------------------------------
+  // Pending import processing — detects localStorage items from import modals
+  // and auto-sends them to Claude for brain_remember ingestion.
+  //
+  // Two activation paths:
+  //   1. Mount check — fires when ChatView first renders (after Clarity Session)
+  //   2. Event listener — fires when import modals dispatch 'neurow-import-ready'
+  //      (covers Settings path where ChatView is already mounted but CSS-hidden)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const processImports = () => {
+      if (!activeUser?.slug) return;
+
+      // Clear any pending timer to prevent stale callbacks from earlier calls
+      if (importTimerRef.current) {
+        clearTimeout(importTimerRef.current);
+        importTimerRef.current = null;
+      }
+
+      const aiKey = `neurow_pending_import_${activeUser.slug}`;
+      const fileKey = `neurow_pending_file_import_${activeUser.slug}`;
+
+      // Atomic claim: read + clear to prevent double-fire (Strict Mode, races).
+      // Trade-off: if component unmounts within the 200ms send delay, claimed
+      // data is lost. This window is acceptably small — the alternative
+      // (deferred removal) risks double-processing which is worse.
+      const aiRaw = localStorage.getItem(aiKey);
+      const fileRaw = localStorage.getItem(fileKey);
+      if (aiRaw) localStorage.removeItem(aiKey);
+      if (fileRaw) localStorage.removeItem(fileKey);
+
+      if (!aiRaw && !fileRaw) return;
+
+      // Build import message
+      const parts: string[] = [];
+
+      if (aiRaw) {
+        try {
+          const pending = JSON.parse(aiRaw);
+          if (pending.text?.trim()) {
+            parts.push(
+              `I want to import memories from my other AI into Brain Cloud. Here is the export from my other AI:\n\n${pending.text}`,
+            );
+          }
+        } catch {
+          /* ignore malformed */
+        }
+      }
+
+      if (fileRaw) {
+        try {
+          const pending = JSON.parse(fileRaw);
+          if (pending.content?.trim()) {
+            parts.push(
+              `I have a data file to import into Brain Cloud. File: ${pending.fileName} (${pending.recordCount} records):\n\n${pending.content}`,
+            );
+          }
+        } catch {
+          /* ignore malformed */
+        }
+      }
+
+      if (parts.length === 0) return;
+
+      const importMessage = parts.join("\n\n---\n\n");
+
+      // Short delay ensures event listeners are registered and state is settled
+      importTimerRef.current = setTimeout(() => {
+        importTimerRef.current = null;
+        handleSendRef.current?.(importMessage);
+      }, 200);
+    };
+
+    // Path 1: mount check (onboarding → main app transition)
+    processImports();
+
+    // Path 2: event listener (Settings import while ChatView is already mounted)
+    window.addEventListener("neurow-import-ready", processImports);
+
+    return () => {
+      window.removeEventListener("neurow-import-ready", processImports);
+      if (importTimerRef.current) {
+        clearTimeout(importTimerRef.current);
+        importTimerRef.current = null;
+      }
+    };
+  }, [activeUser?.slug]);
 
   // Personalized greeting for welcome screen
   const firstName = activeUser?.display_name?.trim().split(" ")[0] || "there";

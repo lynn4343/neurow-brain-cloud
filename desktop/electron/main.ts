@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { sendMessage, checkClaudeInstalled, type UserContext } from './claude';
-import { createProfileDirect, updateProfileDirect, exportDataDirect, type SupabaseConfig } from './supabase';
+import { createProfileDirect, updateProfileDirect, getProfileDirect, exportDataDirect, type SupabaseConfig } from './supabase';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -71,6 +71,13 @@ ipcMain.handle('update-profile', (_event, userId: string, profileData: Record<st
     throw new Error('profileData is required and must be an object');
   }
   return updateProfileDirect(supabaseConfig, userId, profileData);
+});
+
+ipcMain.handle('get-profile', (_event, userId: string) => {
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId is required and must be a string');
+  }
+  return getProfileDirect(supabaseConfig, userId);
 });
 
 ipcMain.handle('export-data', (_event, userId: string) => {
