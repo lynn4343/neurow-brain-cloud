@@ -20,6 +20,7 @@ export interface GoalCascade {
   identity_traits: string[];
   release_items: string[];
   next_action_step: string;
+  next_action_due?: string; // ISO date "YYYY-MM-DD" — computed server-side at session completion
   focus_area?: string;
   declared_challenges?: string[];
   context_line?: string;
@@ -33,7 +34,21 @@ export interface UserProfile {
   clarity_session_completed: boolean;
   coaching_style: string;
   roles: string[];
+  focus_area?: string;
+  declared_challenges?: string[];
   goal_cascade: GoalCascade | null;
+  // Onboarding fields (W4-4a port)
+  is_business_owner?: boolean;
+  side_hustle_goal?: string;
+  business_description?: string;
+  business_stage?: string;
+  current_business_focus?: string;
+  business_challenges?: string[];
+  career_situation?: string;
+  career_stage?: string;
+  career_focus?: string;
+  career_challenges?: string[];
+  love_partner_situation?: string;
 }
 
 export type AppPhase = "loading" | "main" | "onboarding" | "clarity_session";
@@ -55,7 +70,7 @@ export interface UserContextType {
   startNewProfile: () => void;
   addProfile: (profile: UserProfile) => void;
   completeOnboarding: (profile: UserProfile) => void;
-  completeClaritySession: () => void;
+  completeClaritySession: (goalCascade?: GoalCascade) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -70,6 +85,13 @@ const THEO_PROFILE: UserProfile = {
   clarity_session_completed: true,
   coaching_style: "balanced",
   roles: ["business_owner"],
+  focus_area: "career-business",
+  declared_challenges: [
+    "inconsistent income",
+    "pricing and knowing my worth",
+    "following through on plans",
+    "managing finances",
+  ],
   goal_cascade: {
     context_line:
       "Theo is a 23-year-old freelance graphic designer in East Austin, growing his creative practice.",
@@ -89,7 +111,7 @@ const THEO_PROFILE: UserProfile = {
       "putting off systems until later",
     ],
     next_action_step: "Update my rate sheet and send to my next inquiry",
-    focus_area: "career and professional growth",
+    focus_area: "career-business",
     declared_challenges: [
       "inconsistent income",
       "pricing and knowing my worth",
@@ -216,11 +238,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setAppPhase("clarity_session");
   }, []);
 
-  const completeClaritySession = useCallback(() => {
+  const completeClaritySession = useCallback((goalCascade?: GoalCascade) => {
     if (!activeUser) return;
-    const withClarity = {
+    const withClarity: UserProfile = {
       ...activeUser,
       clarity_session_completed: true,
+      goal_cascade: goalCascade
+        ? {
+            ...goalCascade,
+            // Merge onboarding data from top-level profile fields (preserve goalCascade values as fallback)
+            focus_area: activeUser.focus_area ?? goalCascade.focus_area,
+            declared_challenges: activeUser.declared_challenges ?? goalCascade.declared_challenges,
+          }
+        : activeUser.goal_cascade,
     };
     setProfiles((prev) => {
       const updated = prev.map((p) =>

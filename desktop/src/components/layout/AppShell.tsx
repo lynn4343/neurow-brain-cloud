@@ -23,7 +23,7 @@ const headerTitles: Record<View, string> = {
 };
 
 export function AppShell() {
-  const [activeView, setActiveView] = useState<View>("chat");
+  const [activeView, setActiveView] = useState<View>("daymap");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [claudeInstalled, setClaudeInstalled] = useState<boolean | null>(null);
 

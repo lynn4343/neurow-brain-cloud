@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Fragment } from "react";
-import { ChatInput } from "./ChatInput";
-import { ChatMessage, type Message } from "./ChatMessage";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { ChatMessage, type Message } from "@/components/chat/ChatMessage";
+import { ActivityIndicator, type ActivityItem } from "@/components/chat/ActivityIndicator";
+import { Button } from "@/components/ui/button";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
-import {
-  Sun,
-  ChartLineUp,
-  PencilSimple,
-  BookOpen,
-  Brain,
-} from "@phosphor-icons/react";
 import { useUser } from "@/contexts/UserContext";
 import {
   sendMessage,
@@ -18,60 +13,64 @@ import {
   onChatComplete,
   onChatError,
   onToolActivity,
+  onSessionComplete,
   type ChatStreamEvent,
   type ChatCompleteEvent,
   type ChatErrorEvent,
   type ToolActivityEvent,
 } from "@/lib/electron";
-import { ActivityIndicator, type ActivityItem } from "./ActivityIndicator";
+import type { GoalCascade } from "@/contexts/UserContext";
+
+// Close phrase from the Turn 9 verbatim close template.
+// Both apostrophe variants: straight (U+0027) and curly (U+2019).
+const CLOSE_PHRASES = [
+  "Don\u2019t worry about perfection",
+  "Don't worry about perfection",
+] as const;
 
 // ---------------------------------------------------------------------------
-// ChatView
+// ClaritySessionFlow
 // ---------------------------------------------------------------------------
 
-export function ChatView() {
-  const { activeUser, appPhase } = useUser();
+export function ClaritySessionFlow() {
+  const { activeUser, completeClaritySession } = useUser();
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [closeDelivered, setCloseDelivered] = useState(false);
 
-  // Refs for event listener callbacks (prevents stale closures — BUG-000b)
+  // Refs for event listener callbacks (prevents stale closures in useEffect([]))
   const sessionIdRef = useRef<string | null>(null);
-  const messagesRef = useRef<Message[]>([]);
+  const goalCascadeRef = useRef<GoalCascade | null>(null);
+  const closeDeliveredRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const autoStartedRef = useRef(false);
 
-  // Keep refs in sync
+  // Keep session ID ref in sync
   useEffect(() => {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
 
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
-
-  // Reset chat state when user or mode changes
-  useEffect(() => {
-    setMessages([]);
-    setSessionId(null);
-    sessionIdRef.current = null;
-    setActivities([]);
-    setIsLoading(false);
-  }, [activeUser?.slug, appPhase]);
-
-  // Auto-scroll to bottom when messages or activities change
+  // Auto-scroll on new messages/activities
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, activities]);
 
-  // Set up event listeners — synchronous registration for correct
-  // React Strict Mode cleanup (no .then() race with double-mount)
+  // --- IPC listeners ---
+
   useEffect(() => {
+    // Synchronous registration — no .then() race with React Strict Mode cleanup.
+    // The preload API is synchronous. Unlisteners are in the array immediately.
     const unlisteners: Array<() => void> = [];
 
+    // Layer 3: suppress post-close activity indicators.
     unlisteners.push(onToolActivity((payload: ToolActivityEvent) => {
+      if (closeDeliveredRef.current) return;
+
       setActivities((prev) => {
         if (prev.some((a) => a.summary === payload.summary)) return prev;
         return [
@@ -82,27 +81,40 @@ export function ChatView() {
     }));
 
     unlisteners.push(onChatStream((payload: ChatStreamEvent) => {
+      // Layer 3: suppress post-close stream events.
+      if (closeDeliveredRef.current) return;
+
       setMessages((prev) => {
         const lastMsg = prev[prev.length - 1];
         if (lastMsg && lastMsg.role === "assistant") {
           return prev.map((m, i) =>
             i === prev.length - 1
               ? { ...m, content: payload.content, isStreaming: payload.is_partial }
-              : m
+              : m,
           );
-        } else {
-          return [
-            ...prev,
-            {
-              id: `assistant-${Date.now()}`,
-              role: "assistant",
-              content: payload.content,
-              timestamp: new Date().toISOString(),
-              isStreaming: payload.is_partial,
-            },
-          ];
         }
+        return [
+          ...prev,
+          {
+            id: `assistant-${Date.now()}`,
+            role: "assistant",
+            content: payload.content,
+            timestamp: new Date().toISOString(),
+            isStreaming: payload.is_partial,
+          },
+        ];
       });
+
+      // Layer 2: detect the close. is_partial is now false when the assistant
+      // message is complete (Layer 1 fix), so this fires on the finalized message.
+      if (
+        !payload.is_partial &&
+        !closeDeliveredRef.current &&
+        CLOSE_PHRASES.some((phrase) => payload.content.includes(phrase))
+      ) {
+        closeDeliveredRef.current = true;
+        setCloseDelivered(true);
+      }
     }));
 
     unlisteners.push(onChatComplete((payload: ChatCompleteEvent) => {
@@ -112,8 +124,8 @@ export function ChatView() {
         prev.map((m, i) =>
           i === prev.length - 1 && m.isStreaming
             ? { ...m, isStreaming: false }
-            : m
-        )
+            : m,
+        ),
       );
       if (payload.session_id) {
         setSessionId(payload.session_id);
@@ -135,13 +147,25 @@ export function ChatView() {
       ]);
     }));
 
+    // Goal cascade capture + fallback button trigger.
+    unlisteners.push(onSessionComplete((payload) => {
+      goalCascadeRef.current = payload.goal_cascade as GoalCascade;
+
+      if (!closeDeliveredRef.current) {
+        closeDeliveredRef.current = true;
+        setCloseDelivered(true);
+      }
+    }));
+
     return () => {
       unlisteners.forEach((u) => u());
     };
   }, []);
 
+  // --- Send message ---
+
   const handleSend = useCallback(
-    async (text: string, modeOverride?: string) => {
+    async (text: string) => {
       const userMsg: Message = {
         id: `user-${Date.now()}`,
         role: "user",
@@ -152,10 +176,6 @@ export function ChatView() {
       setIsLoading(true);
       setActivities([]);
 
-      // Mode derivation: modeOverride (from quick-action buttons) takes priority.
-      // Then: clarity_session from appPhase, otherwise ongoing.
-      const mode = modeOverride || (appPhase === "clarity_session" ? "clarity_session" : "ongoing");
-
       try {
         const newSessionId = await sendMessage(
           text,
@@ -164,7 +184,7 @@ export function ChatView() {
             ? {
                 slug: activeUser.slug,
                 display_name: activeUser.display_name,
-                mode,
+                mode: "clarity_session",
                 coaching_style: activeUser.coaching_style,
                 roles: activeUser.roles,
                 goal_cascade: activeUser.goal_cascade,
@@ -187,87 +207,84 @@ export function ChatView() {
         }
       } catch (err) {
         setIsLoading(false);
+        const errorMessage = err instanceof Error ? err.message : String(err);
         setMessages((prev) => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             role: "assistant",
-            content: `Error: ${err}`,
+            content: `Error: ${errorMessage}`,
             timestamp: new Date().toISOString(),
             isStreaming: false,
           },
         ]);
       }
     },
-    [activeUser, appPhase],
+    [activeUser],
   );
 
-  // Personalized greeting for welcome screen
-  const firstName = activeUser?.display_name?.trim().split(" ")[0] || "there";
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  // --- Auto-start: send initial message on mount ---
 
-  // Welcome state — centered logo, gradient heading, input
-  if (messages.length === 0 && !isLoading) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex flex-1 flex-col items-center justify-center px-4">
-          <div className="w-full max-w-[767px] flex flex-col items-center gap-8 -translate-y-1/4">
-            <NeurowLogo className="h-[69px] w-[49px]" />
-            <h1 className="w-full text-center text-2xl font-normal leading-8 animate-gradient">
-              {greeting}, {firstName}.
-            </h1>
-            <div className="w-full">
-              <ChatInput onSend={handleSend} disabled={isLoading} />
-            </div>
-            <div className="flex items-center gap-2 flex-wrap justify-center -mt-4">
-              {[
-                { icon: Sun, label: "Morning brief", prompt: "Give me my morning brief", mode: "morning_brief" as string | undefined },
-                { icon: ChartLineUp, label: "Strategize", prompt: "Let's strategize", mode: undefined as string | undefined },
-                { icon: PencilSimple, label: "Write", prompt: "Help me write", mode: undefined as string | undefined },
-                { icon: BookOpen, label: "Learn", prompt: "Help me learn something new", mode: undefined as string | undefined },
-                { icon: Brain, label: "Brainstorm", prompt: "Let's brainstorm", mode: undefined as string | undefined },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => handleSend(item.prompt, item.mode)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#E6E5E3] bg-white px-3 py-1.5 text-sm text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors"
-                >
-                  <item.icon className="size-4" weight="regular" />
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  useEffect(() => {
+    if (!autoStartedRef.current && activeUser) {
+      autoStartedRef.current = true;
+      handleSend(
+        "Just finished setting up my profile — ready to close the gap between vision and reality.",
+      );
+    }
+  }, [activeUser, handleSend]);
+
+  // --- "Continue to Neurow" handler ---
+
+  function handleComplete() {
+    completeClaritySession(goalCascadeRef.current ?? undefined);
   }
 
-  // Active chat state — messages scrolling, input fixed at bottom
+  // --- Render ---
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-screen flex-col">
+      {/* Minimal header */}
+      <div className="flex h-[60px] items-center justify-center border-b bg-white">
+        <NeurowLogo className="h-6 w-[17px]" />
+      </div>
+
+      {/* Chat area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="w-full max-w-[767px] mx-auto flex flex-col gap-4 pt-6 pb-6 px-4">
+        <div className="mx-auto flex w-full max-w-[767px] flex-col gap-4 px-4 pt-6 pb-6">
           {messages.map((msg) => (
             <Fragment key={msg.id}>
               <ChatMessage message={msg} />
             </Fragment>
           ))}
-          {activities.length > 0 && (
+          {!closeDelivered && activities.length > 0 && (
             <ActivityIndicator activities={activities} />
           )}
-          {isLoading && activities.length === 0 && messages[messages.length - 1]?.role === "user" && (
+          {!closeDelivered && isLoading && activities.length === 0 && messages[messages.length - 1]?.role === "user" && (
             <ThinkingIndicator />
           )}
         </div>
       </div>
-      <div className="flex-shrink-0 w-full flex justify-center px-4 pb-4">
-        <div className="w-full max-w-[767px]">
-          <ChatInput onSend={handleSend} disabled={isLoading} />
-        </div>
+
+      {/* Input area + completion button */}
+      <div className="flex-shrink-0 bg-white">
+        {closeDelivered ? (
+          <div className="flex justify-center px-4 py-6">
+            <Button onClick={handleComplete} size="lg" className="px-8">
+              Continue to Neurow
+            </Button>
+          </div>
+        ) : (
+          <div className="flex w-full justify-center px-4 pb-4">
+            <div className="w-full max-w-[767px]">
+              <ChatInput
+                onSend={handleSend}
+                disabled={isLoading}
+                placeholder="Share what's on your mind..."
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -275,14 +292,14 @@ export function ChatView() {
 
 function ThinkingIndicator() {
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start" role="status" aria-label="Loading response">
       <div className="flex items-center gap-1.5 px-4 py-3 text-muted-foreground">
-        <div className="flex gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:0ms]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:150ms]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
+        <div className="flex gap-1" aria-hidden="true">
+          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:0ms]" />
+          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:150ms]" />
+          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:300ms]" />
         </div>
-        <span className="text-sm ml-2">Thinking...</span>
+        <span className="ml-2 text-sm">Thinking...</span>
       </div>
     </div>
   );

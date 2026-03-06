@@ -23,9 +23,16 @@ export interface ToolActivityEvent {
   summary: string;
 }
 
-// --- User Context (passed to claude.ts for system prompt assembly) ---
+// --- Session Complete Event (Goal Cascade from Clarity Session Turn 9) ---
 
 import type { GoalCascade } from '@/contexts/UserContext';
+
+export interface SessionCompleteEvent {
+  session_id: string;
+  goal_cascade: GoalCascade;
+}
+
+// --- User Context (passed to claude.ts for system prompt assembly) ---
 
 export interface UserContext {
   slug: string;
@@ -34,6 +41,46 @@ export interface UserContext {
   coaching_style: string;
   roles: string[];
   goal_cascade: GoalCascade | null;
+  // Onboarding context (W4-4a port)
+  focus_area?: string;
+  declared_challenges?: string[];
+  is_business_owner?: boolean;
+  business_description?: string;
+  business_stage?: string;
+  current_business_focus?: string;
+  business_challenges?: string[];
+  career_situation?: string;
+  career_stage?: string;
+  career_focus?: string;
+  career_challenges?: string[];
+}
+
+// --- Neurow API type (exposed by preload via contextBridge) ---
+
+// --- Direct Data API types (model-agnostic, no AI in the loop) ---
+
+export interface CreateProfileResult {
+  id: string;
+  slug: string;
+  display_name: string;
+  first_name: string;
+}
+
+export interface UpdateProfileResult {
+  updated: boolean;
+  fields: string[];
+}
+
+export interface BrainExportData {
+  version: string;
+  exported_at: string;
+  user: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  episodic: Record<string, unknown>[];
+  graph: Record<string, unknown>;
+  semantic: Record<string, unknown>[];
+  associative: Record<string, unknown>[];
+  coaching_sessions: Record<string, unknown>[];
 }
 
 // --- Neurow API type (exposed by preload via contextBridge) ---
@@ -45,6 +92,11 @@ interface NeurowAPI {
   onChatComplete: (callback: (data: ChatCompleteEvent) => void) => () => void;
   onChatError: (callback: (data: ChatErrorEvent) => void) => () => void;
   onToolActivity: (callback: (data: ToolActivityEvent) => void) => () => void;
+  onSessionComplete: (callback: (data: SessionCompleteEvent) => void) => () => void;
+  // Direct Data API (model-agnostic)
+  createProfile: (displayName: string) => Promise<CreateProfileResult>;
+  updateProfile: (userId: string, profileData: Record<string, unknown>) => Promise<UpdateProfileResult>;
+  exportData: (userId: string) => Promise<BrainExportData>;
 }
 
 declare global {
@@ -67,33 +119,53 @@ export async function checkClaudeInstalled(): Promise<boolean> {
   return window.neurow.checkClaudeInstalled();
 }
 
-// --- Event Listeners (same function signatures as tauri.ts) ---
-// Return Promise<() => void> to match tauri.ts API exactly
+// --- Event Listeners ---
+// Synchronous — the preload API registers ipcRenderer.on and returns
+// an unlistener function immediately. No Promise wrapper needed.
 
 export function onChatStream(
   callback: (payload: ChatStreamEvent) => void
-): Promise<() => void> {
-  const unlisten = window.neurow.onChatStream(callback);
-  return Promise.resolve(unlisten);
+): () => void {
+  return window.neurow.onChatStream(callback);
 }
 
 export function onChatComplete(
   callback: (payload: ChatCompleteEvent) => void
-): Promise<() => void> {
-  const unlisten = window.neurow.onChatComplete(callback);
-  return Promise.resolve(unlisten);
+): () => void {
+  return window.neurow.onChatComplete(callback);
 }
 
 export function onChatError(
   callback: (payload: ChatErrorEvent) => void
-): Promise<() => void> {
-  const unlisten = window.neurow.onChatError(callback);
-  return Promise.resolve(unlisten);
+): () => void {
+  return window.neurow.onChatError(callback);
 }
 
 export function onToolActivity(
   callback: (payload: ToolActivityEvent) => void
-): Promise<() => void> {
-  const unlisten = window.neurow.onToolActivity(callback);
-  return Promise.resolve(unlisten);
+): () => void {
+  return window.neurow.onToolActivity(callback);
+}
+
+export function onSessionComplete(
+  callback: (payload: SessionCompleteEvent) => void
+): () => void {
+  return window.neurow.onSessionComplete(callback);
+}
+
+// --- Direct Data API (model-agnostic, no AI in the loop) ---
+
+export async function createProfile(displayName: string): Promise<CreateProfileResult> {
+  return window.neurow.createProfile(displayName);
+}
+
+export async function updateProfile(
+  userId: string,
+  profileData: Record<string, unknown>,
+): Promise<UpdateProfileResult> {
+  return window.neurow.updateProfile(userId, profileData);
+}
+
+export async function exportData(userId: string): Promise<BrainExportData> {
+  return window.neurow.exportData(userId);
 }

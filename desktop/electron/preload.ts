@@ -27,12 +27,27 @@ interface ToolActivityPayload {
   summary: string;
 }
 
+interface SessionCompletePayload {
+  session_id: string;
+  goal_cascade: Record<string, unknown>;
+}
+
 contextBridge.exposeInMainWorld('neurow', {
   sendMessage: (prompt: string, sessionId?: string, userContext?: UserContext) => {
     return ipcRenderer.invoke('send-message', prompt, sessionId, userContext);
   },
   checkClaudeInstalled: () => {
     return ipcRenderer.invoke('check-claude-installed');
+  },
+  // --- Direct Data API (model-agnostic, no AI in the loop) ---
+  createProfile: (displayName: string) => {
+    return ipcRenderer.invoke('create-profile', displayName);
+  },
+  updateProfile: (userId: string, profileData: Record<string, unknown>) => {
+    return ipcRenderer.invoke('update-profile', userId, profileData);
+  },
+  exportData: (userId: string) => {
+    return ipcRenderer.invoke('export-data', userId);
   },
   onChatStream: (callback: (data: ChatStreamPayload) => void) => {
     const handler = (_event: IpcRendererEvent, data: ChatStreamPayload) => callback(data);
@@ -53,5 +68,10 @@ contextBridge.exposeInMainWorld('neurow', {
     const handler = (_event: IpcRendererEvent, data: ToolActivityPayload) => callback(data);
     ipcRenderer.on('chat_activity', handler);
     return () => { ipcRenderer.removeListener('chat_activity', handler); };
+  },
+  onSessionComplete: (callback: (data: SessionCompletePayload) => void) => {
+    const handler = (_event: IpcRendererEvent, data: SessionCompletePayload) => callback(data);
+    ipcRenderer.on('session_complete', handler);
+    return () => { ipcRenderer.removeListener('session_complete', handler); };
   },
 });

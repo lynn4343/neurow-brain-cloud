@@ -8,11 +8,11 @@ interface SettingsViewProps {
   onViewChange: (view: View) => void;
 }
 
-export function SettingsView({ onViewChange }: SettingsViewProps) {
+export function SettingsView({ onViewChange: _onViewChange }: SettingsViewProps) {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="mx-auto max-w-2xl space-y-8 px-6 py-8">
-        <ExportSection onViewChange={onViewChange} />
+        <ExportSection />
         <div className="h-px bg-[#E6E5E3]" />
         <BYOKSection />
       </div>

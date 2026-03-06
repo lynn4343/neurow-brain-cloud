@@ -1,11 +1,15 @@
 """Tests for brain_cloud.temporal — temporal awareness module."""
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from brain_cloud.temporal import format_temporal_block, get_temporal_context
+from brain_cloud.temporal import (
+    compute_action_due_date,
+    format_temporal_block,
+    get_temporal_context,
+)
 
 TZ = ZoneInfo("America/Chicago")
 
@@ -184,3 +188,60 @@ def test_format_includes_date_and_time(mock_dt):
     first_line = block.split("\n")[0]
     assert ctx["current_date"] in first_line
     assert ctx["current_time"] in first_line
+
+
+# ---------------------------------------------------------------------------
+# compute_action_due_date() tests
+# ---------------------------------------------------------------------------
+
+
+def test_due_date_monday():
+    """Monday completion → this Sunday (6 days)."""
+    completed = datetime(2026, 3, 2, 16, 0, tzinfo=timezone.utc)  # Mon Mar 2
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-08"
+
+
+def test_due_date_tuesday():
+    """Tuesday completion → this Sunday (5 days)."""
+    completed = datetime(2026, 3, 3, 16, 0, tzinfo=timezone.utc)  # Tue Mar 3
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-08"
+
+
+def test_due_date_wednesday():
+    """Wednesday completion → this Sunday (4 days)."""
+    completed = datetime(2026, 3, 4, 16, 0, tzinfo=timezone.utc)  # Wed Mar 4
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-08"
+
+
+def test_due_date_thursday():
+    """Thursday completion → next Sunday (10 days)."""
+    completed = datetime(2026, 3, 5, 16, 0, tzinfo=timezone.utc)  # Thu Mar 5
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-15"
+
+
+def test_due_date_friday():
+    """Friday completion → next Sunday (9 days)."""
+    completed = datetime(2026, 3, 6, 16, 0, tzinfo=timezone.utc)  # Fri Mar 6
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-15"
+
+
+def test_due_date_saturday():
+    """Saturday completion → next Sunday (8 days)."""
+    completed = datetime(2026, 3, 7, 16, 0, tzinfo=timezone.utc)  # Sat Mar 7
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-15"
+
+
+def test_due_date_sunday():
+    """Sunday completion → next Sunday (7 days)."""
+    completed = datetime(2026, 3, 8, 16, 0, tzinfo=timezone.utc)  # Sun Mar 8
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-15"
+
+
+def test_due_date_timezone_edge():
+    """Wed 11:30pm CST (Thu 05:30 UTC) → user's local day is Wed → this Sunday.
+
+    This is the critical edge case: UTC says Thursday (→ next Sunday),
+    but the user's local time is Wednesday (→ this Sunday).
+    """
+    completed = datetime(2026, 3, 5, 5, 30, tzinfo=timezone.utc)  # Thu 05:30 UTC = Wed 11:30pm CST
+    assert compute_action_due_date(completed, tz="America/Chicago") == "2026-03-08"

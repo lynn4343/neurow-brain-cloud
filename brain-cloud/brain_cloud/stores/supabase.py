@@ -52,6 +52,13 @@ class SupabaseStore:
         )
         return result.data
 
+    async def update_user(self, user_id: str, data: dict) -> dict:
+        """Update user_profiles row. Pass only the fields to update."""
+        result = await self.client.table("user_profiles").update(data).eq("id", user_id).execute()
+        if not result.data:
+            raise RuntimeError(f"update_user: no user found with id {user_id}")
+        return result.data[0]
+
     async def get_user(self, user_id: str) -> dict:
         result = (
             await self.client.table("user_profiles")
@@ -111,6 +118,13 @@ class SupabaseStore:
             .select("*").eq("user_id", user_id) \
             .order("started_at", desc=True).execute()
         return result.data
+
+    async def get_most_recent_session(self, user_id: str) -> dict:
+        """SELECT the most recently started coaching session for a user."""
+        result = await self.client.table("coaching_sessions") \
+            .select("*").eq("user_id", user_id) \
+            .order("started_at", desc=True).limit(1).execute()
+        return result.data[0] if result.data else {}
 
     _VALID_SYNC_STORES = {"neo4j", "qdrant", "mem0"}
 

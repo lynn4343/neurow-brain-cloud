@@ -25,7 +25,7 @@ export function ChatInput({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      const newHeight = Math.min(textarea.scrollHeight, 224);
+      const newHeight = Math.min(textarea.scrollHeight, 200);
       textarea.style.height = `${newHeight}px`;
     }
   };
@@ -57,7 +57,7 @@ export function ChatInput({
 
   return (
     <div className={`w-full ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-      <div className="flex w-full h-[125px] flex-col gap-2.5 rounded-[20px] border border-[#E6E5E3] bg-white p-2 pt-4">
+      <div className="flex w-full min-h-[125px] max-h-[300px] flex-col gap-2.5 rounded-[20px] border border-[#E6E5E3] bg-white p-2 pt-4">
         {/* Text Input Area */}
         <div className="flex flex-1 items-start gap-2.5 px-3">
           <textarea
@@ -68,7 +68,7 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             disabled={disabled}
             className="flex-1 resize-none bg-transparent text-sm font-normal leading-5 text-[#1E1E1E] placeholder:text-[#7F7F7F] focus:outline-none overflow-y-auto"
-            style={{ maxHeight: "224px", minHeight: "20px" }}
+            style={{ maxHeight: "200px", minHeight: "20px" }}
           />
         </div>
 

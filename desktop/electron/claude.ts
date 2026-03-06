@@ -7,7 +7,7 @@ import os from 'os';
 
 // --- Types (match claude.rs exactly) ---
 
-interface ClaudeStreamMessage {
+export interface ClaudeStreamMessage {
   type: string;
   subtype?: string;
   session_id?: string;
@@ -19,10 +19,23 @@ interface ClaudeStreamMessage {
       id?: string;
       name?: string;
       input?: Record<string, unknown>;
+      // tool_result fields (type="user" messages from MCP tool responses)
+      tool_use_id?: string;
+      content?: string | Array<{ type: string; text?: string }>;
     }>;
   };
   cost_usd?: number;
   duration_ms?: number;
+}
+
+// --- Stream Emitter (abstracts IPC for testability) ---
+
+export interface StreamEmitter {
+  chatStream: (data: { session_id: string; content: string; is_partial: boolean }) => void;
+  chatActivity: (data: { session_id: string; tool_name: string; summary: string }) => void;
+  sessionComplete: (data: { session_id: string; goal_cascade: Record<string, unknown> }) => void;
+  chatComplete: (data: { session_id: string; cost_usd: number; duration_ms: number }) => void;
+  chatError: (data: { session_id: string; error: string }) => void;
 }
 
 // --- User Context Types ---
@@ -48,6 +61,18 @@ export interface UserContext {
   coaching_style: string;
   roles: string[];
   goal_cascade: GoalCascade | null;
+  // Onboarding context (W4-4a port)
+  focus_area?: string;
+  declared_challenges?: string[];
+  is_business_owner?: boolean;
+  business_description?: string;
+  business_stage?: string;
+  current_business_focus?: string;
+  business_challenges?: string[];
+  career_situation?: string;
+  career_stage?: string;
+  career_focus?: string;
+  career_challenges?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -152,6 +177,8 @@ const COACHING_STYLE_MODIFIERS: Record<string, string> = {
     'Coaching style: DIRECT. Lead with clarity and efficiency. Minimal preamble. Warmth is present through the precision of your attention, not softening language.',
   peak_performance:
     'Coaching style: PEAK PERFORMANCE. This is accountability coaching \u2014 the user chose to be held to their own potential. Track their commitments and name gaps directly. Celebrate briefly, then raise the bar. Warmth shows as unshakeable belief in their capacity, not comfort.',
+  'peak-performance':
+    'Coaching style: PEAK PERFORMANCE. This is accountability coaching \u2014 the user chose to be held to their own potential. Track their commitments and name gaps directly. Celebrate briefly, then raise the bar. Warmth shows as unshakeable belief in their capacity, not comfort.',
 };
 
 // ---------------------------------------------------------------------------
@@ -184,16 +211,58 @@ Ask the question they\u2019re avoiding.`,
 
 function resolveUserTypeModifier(roles?: string[]): string {
   if (!roles || roles.length === 0) return USER_TYPE_MODIFIERS.default;
-  if (roles.includes('business_owner')) return USER_TYPE_MODIFIERS.business_owner;
-  if (roles.includes('freelancer')) return USER_TYPE_MODIFIERS.business_owner;
-  if (roles.includes('side_hustler')) return USER_TYPE_MODIFIERS.business_owner;
-  if (roles.includes('career_professional')) return USER_TYPE_MODIFIERS.career_professional;
+  // Business owner: production IDs + Theo legacy (business_owner, side_hustler)
+  if (roles.some(r => ['founder', 'freelancer', 'side-hustler', 'business_owner', 'side_hustler'].includes(r)))
+    return USER_TYPE_MODIFIERS.business_owner;
+  // Career professional: production ID + Theo legacy (career_professional)
+  if (roles.some(r => ['employed', 'career_professional'].includes(r)))
+    return USER_TYPE_MODIFIERS.career_professional;
   return USER_TYPE_MODIFIERS.default;
 }
 
 // ---------------------------------------------------------------------------
 // Seat 1b: User Context Block (with Goal Cascade dossier)
 // ---------------------------------------------------------------------------
+
+// Lookup maps for human-readable display (IDs → labels)
+const FOCUS_AREA_LABELS: Record<string, string> = {
+  'career-business': 'Career/Business',
+  'health': 'Health & Wellness',
+  'family': 'Family',
+  'love': 'Love/Partner',
+  'home': 'Home',
+  'finance': 'Personal Finance',
+  'education': 'Education',
+  'personal-growth': 'Mental/Emotional (Personal Growth)',
+  'spirituality': 'Spirituality',
+};
+
+const BUSINESS_STAGE_LABELS: Record<string, string> = {
+  'idea': 'Idea Stage',
+  'building': 'Building Stage',
+  'momentum': 'Building Momentum',
+  'scaling': 'Scaling Up',
+  'established': 'Established Business',
+};
+
+const CAREER_SITUATION_LABELS: Record<string, string> = {
+  'growing': 'Growing where I am',
+  'making-move': 'Making a move',
+  'landing-next': 'Landing my next role',
+  'finding-direction': 'Finding my direction',
+};
+
+const CAREER_STAGE_LABELS: Record<string, string> = {
+  'early': 'Early career',
+  'mid': 'Mid career',
+  'senior': 'Senior',
+  'executive': 'Executive / Leadership',
+};
+
+function labelFromId(id: string, lookup?: Record<string, string>): string {
+  if (lookup?.[id]) return lookup[id];
+  return id.replace(/-/g, ' ').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
 function buildUserContextBlock(ctx: UserContext): string {
   const lines: string[] = [
@@ -202,6 +271,43 @@ function buildUserContextBlock(ctx: UserContext): string {
     `IMPORTANT: Pass user_id="${ctx.slug}" to EVERY Brain Cloud MCP tool call.`,
   ];
 
+  // Onboarding context — available before Clarity Session completes
+  if (ctx.focus_area) {
+    lines.push('');
+    lines.push(`Focus Area: ${FOCUS_AREA_LABELS[ctx.focus_area] || ctx.focus_area}`);
+  }
+  if (ctx.is_business_owner !== undefined) {
+    lines.push(`Business Owner: ${ctx.is_business_owner ? 'Yes' : 'No'}`);
+  }
+  if (ctx.business_description) {
+    lines.push(`Business: ${ctx.business_description}`);
+  }
+  if (ctx.business_stage) {
+    lines.push(`Business Stage: ${labelFromId(ctx.business_stage, BUSINESS_STAGE_LABELS)}`);
+  }
+  if (ctx.current_business_focus) {
+    lines.push(`Current Business Focus: ${ctx.current_business_focus}`);
+  }
+  if (ctx.business_challenges?.length) {
+    lines.push(`Business Challenges: ${ctx.business_challenges.map(c => labelFromId(c)).join(', ')}`);
+  }
+  if (ctx.career_situation) {
+    lines.push(`Career Situation: ${labelFromId(ctx.career_situation, CAREER_SITUATION_LABELS)}`);
+  }
+  if (ctx.career_stage) {
+    lines.push(`Career Stage: ${labelFromId(ctx.career_stage, CAREER_STAGE_LABELS)}`);
+  }
+  if (ctx.career_focus) {
+    lines.push(`Career Focus: ${ctx.career_focus}`);
+  }
+  if (ctx.career_challenges?.length) {
+    lines.push(`Career Challenges: ${ctx.career_challenges.map(c => labelFromId(c)).join(', ')}`);
+  }
+  if (ctx.declared_challenges?.length) {
+    lines.push(`Declared Challenges: ${ctx.declared_challenges.map(c => labelFromId(c)).join(', ')}`);
+  }
+
+  // Goal Cascade — available after Clarity Session completes
   if (ctx.goal_cascade) {
     const gc = ctx.goal_cascade;
     lines.push('');
@@ -233,16 +339,22 @@ This is a Clarity Session \u2014 the user\u2019s first coaching interaction with
 
 You\u2019re building their Goal Cascade \u2014 the foundation every future coaching interaction references. What\u2019s captured here becomes their morning briefs, weekly priorities, and identity anchors.
 
-The session is 8 turns. One turn per exchange \u2014 never compress or skip turns. Let each turn breathe. Connect their answers to the next question \u2014 they should feel a conversation building toward something, not a form being filled out.
+The session is 9 turns. One turn per exchange \u2014 never compress or skip turns. Let each turn breathe. Connect their answers to the next question \u2014 they should feel a conversation building toward something, not a form being filled out.
 
 BEFORE each of your responses:
-1. Call coaching_get_prompt(user_id="${slug}", user_message="<the user\u2019s most recent message>")
+1. Call coaching_get_prompt with user_id="${slug}", user_message="<the user\u2019s most recent message>", and session_id="<from previous response>" (omit session_id on your first call)
 2. Read the system_instruction returned and follow it \u2014 it tells you what to ask, how to frame it, and what data to capture
 
 AFTER each of your responses:
-1. Call coaching_store_turn(user_id="${slug}", session_id="<from coaching_get_prompt>", turn_number=<current turn>, captured_data="<JSON of captured fields>", user_message="<user\u2019s message>", ai_response="<your response>")
+1. Call coaching_store_turn with user_id="${slug}", session_id="<session_id>", turn_number=<the turn_number from coaching_get_prompt>, captured_data="<JSON string of the fields you captured this turn>", user_message="<the user\u2019s message>", ai_response="<your response>"
 
-When session_complete: true \u2014 the close is the most important moment. Reflect their own words back as a narrative that shows them who they\u2019re becoming. That\u2019s the gift.`;
+SESSION COMPLETION \u2014 CRITICAL:
+When coaching_store_turn returns session_complete: true, the session is FINISHED.
+\u2022 Do NOT call coaching_get_prompt again.
+\u2022 Do NOT generate any additional text, messages, or responses.
+\u2022 Do NOT acknowledge or comment on the session_complete signal.
+\u2022 Your last output to the user was the close you just delivered. That is the final message.
+The system handles the transition to ongoing coaching automatically. Any text you generate after session_complete will overwrite the close and break the user experience.`;
 }
 
 function morningBriefProtocol(slug: string): string {
@@ -280,6 +392,7 @@ You have access to Brain Cloud \u2014 a four-store cognitive memory system:
 - brain_remember(user_id="${slug}", content): Store new information
 - brain_export(user_id="${slug}"): Export all user data as portable JSON
 - brain_create_profile(display_name): Create new user profiles
+- brain_update_profile(user_id="${slug}", profile_data): Update user profile with onboarding data
 - coaching_get_prompt(user_id="${slug}", user_message): Get coaching session instructions
 - coaching_store_turn(...): Store coaching session progress
 - coaching_get_session_prompt(user_id="${slug}", session_type): Get ongoing coaching instructions
@@ -386,7 +499,8 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
       if (name.startsWith('mcp__brain-cloud__brain_remember')) return 'Storing to memory...';
       if (name.startsWith('mcp__brain-cloud__brain_export')) return 'Exporting your data...';
       if (name.startsWith('mcp__brain-cloud__brain_create_profile')) return 'Creating profile...';
-      if (name.startsWith('mcp__brain-cloud__coaching_get_prompt')) return 'Preparing coaching...';
+      if (name.startsWith('mcp__brain-cloud__brain_update_profile')) return 'Updating your profile...';
+      if (name.startsWith('mcp__brain-cloud__coaching_get_prompt')) return 'Reflecting...';
       if (name.startsWith('mcp__brain-cloud__coaching_store_turn')) return 'Saving session progress...';
       if (name.startsWith('mcp__brain-cloud__coaching_get_session_prompt')) return 'Loading coaching session...';
       if (name.startsWith('mcp__brain-cloud__')) return 'Using Brain Cloud...';
@@ -398,6 +512,141 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
       if (name.startsWith('mcp__supabase__')) return 'Querying database...';
       return `Using ${name}...`;
   }
+}
+
+// ---------------------------------------------------------------------------
+// NDJSON Handler — Pure function, fully testable
+// Extracted from sendMessage for testability. Takes an emitter interface
+// instead of calling window.webContents.send directly.
+// ---------------------------------------------------------------------------
+
+export function createNDJSONHandler(emit: StreamEmitter) {
+  let finalSessionId = '';
+  let lastContent = '';
+  let hasUnfinalizedAssistantMessage = false;
+  const seenToolIds = new Set<string>();
+
+  // Send is_partial: false for the completed assistant message.
+  // Called when transitioning from type='assistant' to type='user' or 'result'.
+  function finalizeAssistantMessage() {
+    if (hasUnfinalizedAssistantMessage && lastContent) {
+      emit.chatStream({
+        session_id: finalSessionId,
+        content: lastContent,
+        is_partial: false,
+      });
+      hasUnfinalizedAssistantMessage = false;
+    }
+  }
+
+  function handleLine(line: string): { done: boolean; sessionId: string } {
+    if (!line.trim()) return { done: false, sessionId: finalSessionId };
+
+    let msg: ClaudeStreamMessage;
+    try {
+      msg = JSON.parse(line);
+    } catch {
+      return { done: false, sessionId: finalSessionId };
+    }
+
+    if (msg.session_id) {
+      finalSessionId = msg.session_id;
+    }
+
+    switch (msg.type) {
+      case 'system':
+        break;
+
+      case 'assistant': {
+        if (!msg.message) break;
+
+        for (const block of msg.message.content) {
+          if (block.type === 'tool_use' && block.id) {
+            if (!seenToolIds.has(block.id)) {
+              seenToolIds.add(block.id);
+              const toolName = block.name || 'unknown';
+              const summary = summarizeToolUse(toolName, block.input as Record<string, unknown>);
+              emit.chatActivity({
+                session_id: finalSessionId,
+                tool_name: toolName,
+                summary,
+              });
+            }
+          }
+        }
+
+        const content = msg.message.content
+          .filter((b: { type: string; text?: string }) => b.type === 'text' && b.text)
+          .map((b: { text?: string }) => b.text!)
+          .join('');
+
+        const hasVisibleText = content.trim().length > 0;
+        if (hasVisibleText && content !== lastContent) {
+          lastContent = content;
+          hasUnfinalizedAssistantMessage = true;
+          emit.chatStream({
+            session_id: finalSessionId,
+            content,
+            is_partial: true,
+          });
+        }
+        break;
+      }
+
+      case 'user': {
+        // Finalize the previous assistant message before processing tool results.
+        // This is the Layer 1 fix: is_partial: false signals message completion.
+        finalizeAssistantMessage();
+
+        // Tool results from MCP servers arrive as type="user" with tool_result
+        // content blocks. Intercept coaching_store_turn Turn 9 responses to
+        // detect session completion and extract the Goal Cascade for localStorage.
+        if (!msg.message) break;
+        for (const block of msg.message.content) {
+          if (block.type === 'tool_result') {
+            let jsonStr: string | null = null;
+            if (typeof block.content === 'string') {
+              jsonStr = block.content;
+            } else if (Array.isArray(block.content) && block.content.length > 0) {
+              jsonStr = block.content
+                .filter((c: { type?: string; text?: string }) => c.type === 'text' && !!c.text)
+                .map((c: { type?: string; text?: string }) => c.text as string)
+                .join('');
+            }
+            if (jsonStr) {
+              try {
+                const result = JSON.parse(jsonStr);
+                if (result.session_complete === true && result.goal_cascade) {
+                  emit.sessionComplete({
+                    session_id: finalSessionId,
+                    goal_cascade: result.goal_cascade,
+                  });
+                }
+              } catch {
+                // Not JSON — ignore (many tool results aren't JSON)
+              }
+            }
+          }
+        }
+        break;
+      }
+
+      case 'result':
+        // Finalize any pending assistant message before completing.
+        finalizeAssistantMessage();
+
+        emit.chatComplete({
+          session_id: finalSessionId,
+          cost_usd: msg.cost_usd || 0,
+          duration_ms: msg.duration_ms || 0,
+        });
+        return { done: true, sessionId: finalSessionId };
+    }
+
+    return { done: false, sessionId: finalSessionId };
+  }
+
+  return { handleLine, getSessionId: () => finalSessionId };
 }
 
 // --- Find Claude Binary (port of find_claude_binary from claude.rs) ---
@@ -449,6 +698,7 @@ export function sendMessage(
       'mcp__brain-cloud__brain_remember',
       'mcp__brain-cloud__brain_export',
       'mcp__brain-cloud__brain_create_profile',
+      'mcp__brain-cloud__brain_update_profile',
       'mcp__brain-cloud__coaching_get_prompt',
       'mcp__brain-cloud__coaching_store_turn',
       'mcp__brain-cloud__coaching_get_session_prompt',
@@ -499,73 +749,34 @@ export function sendMessage(
     });
 
     let finalSessionId = sessionId || '';
-    let lastContent = '';
-    const seenToolIds = new Set<string>();
 
+    // Bridge emitter: routes extracted handler events to Electron IPC.
+    // Guard: if the window is closed while CLI is still running, webContents
+    // is destroyed. All sends silently no-op instead of crashing.
+    function safeSend(channel: string, data: unknown) {
+      if (!window.isDestroyed()) {
+        window.webContents.send(channel, data);
+      }
+    }
+
+    const emit: StreamEmitter = {
+      chatStream: (data) => safeSend('chat_stream', data),
+      chatActivity: (data) => safeSend('chat_activity', data),
+      sessionComplete: (data) => safeSend('session_complete', data),
+      chatComplete: (data) => safeSend('chat_complete', data),
+      chatError: (data) => safeSend('chat_error', data),
+    };
+
+    const handler = createNDJSONHandler(emit);
     const rl = createInterface({ input: child.stdout! });
 
     rl.on('line', (line: string) => {
-      if (!line.trim()) return;
-
-      let msg: ClaudeStreamMessage;
-      try {
-        msg = JSON.parse(line);
-      } catch (e) {
-        console.warn('Failed to parse NDJSON line:', e);
-        return;
+      const result = handler.handleLine(line);
+      if (result.sessionId) {
+        finalSessionId = result.sessionId;
       }
-
-      if (msg.session_id) {
-        finalSessionId = msg.session_id;
-      }
-
-      switch (msg.type) {
-        case 'system':
-          break;
-
-        case 'assistant': {
-          if (!msg.message) break;
-
-          for (const block of msg.message.content) {
-            if (block.type === 'tool_use' && block.id) {
-              if (!seenToolIds.has(block.id)) {
-                seenToolIds.add(block.id);
-                const toolName = block.name || 'unknown';
-                const summary = summarizeToolUse(toolName, block.input as Record<string, unknown>);
-                window.webContents.send('chat_activity', {
-                  session_id: finalSessionId,
-                  tool_name: toolName,
-                  summary,
-                });
-              }
-            }
-          }
-
-          const content = msg.message.content
-            .filter((b: { type: string; text?: string }) => b.type === 'text' && b.text)
-            .map((b: { text?: string }) => b.text!)
-            .join('');
-
-          const hasVisibleText = content.trim().length > 0;
-          if (hasVisibleText && content !== lastContent) {
-            lastContent = content;
-            window.webContents.send('chat_stream', {
-              session_id: finalSessionId,
-              content,
-              is_partial: true,
-            });
-          }
-          break;
-        }
-
-        case 'result':
-          window.webContents.send('chat_complete', {
-            session_id: finalSessionId,
-            cost_usd: msg.cost_usd || 0,
-            duration_ms: msg.duration_ms || 0,
-          });
-          rl.close();
-          break;
+      if (result.done) {
+        rl.close();
       }
     });
 
@@ -587,7 +798,7 @@ export function sendMessage(
     });
 
     child.on('error', (err) => {
-      window.webContents.send('chat_error', {
+      emit.chatError({
         session_id: finalSessionId,
         error: err.message,
       });

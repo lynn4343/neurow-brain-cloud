@@ -55,6 +55,7 @@ COACHING_STYLE_MODIFIERS: dict[str, str] = {
     ),
 }
 COACHING_STYLE_MODIFIERS["peak"] = COACHING_STYLE_MODIFIERS["peak_performance"]
+COACHING_STYLE_MODIFIERS["peak-performance"] = COACHING_STYLE_MODIFIERS["peak_performance"]
 
 # Synced with claude.ts Seat 1d (System_Prompts/User_Type_Modifiers.md)
 USER_TYPE_MODIFIERS: dict[str, str] = {
@@ -94,37 +95,224 @@ USER_TYPE_MODIFIERS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 # Check user_profiles.roles in this order. First match wins.
-ROLE_PRIORITY = ["business_owner", "freelancer", "side_hustler", "career_professional"]
+ROLE_PRIORITY = ["founder", "business_owner", "freelancer", "side-hustler", "side_hustler", "employed", "career_professional"]
 
 ROLE_DISPLAY_NAMES: dict[str, str] = {
-    "business_owner": "Founder/Entrepreneur",
+    "founder": "Founder/Entrepreneur",
+    "business_owner": "Founder/Entrepreneur",  # Theo legacy
     "freelancer": "Freelancer",
-    "side_hustler": "Side Hustler",
-    "career_professional": "Career Professional",
+    "side-hustler": "Side Hustler",
+    "side_hustler": "Side Hustler",  # Theo legacy
+    "employed": "Employed Professional",
+    "career_professional": "Career Professional",  # Theo legacy
 }
 
 ROLE_FALLBACK: dict[str, str] = {
-    "business_owner": "Running a business is a wild ride — I get it.",
-    "freelancer": "The freelance life has its own unique challenges — I see you.",
-    "side_hustler": "Balancing a side hustle with everything else? That takes real commitment.",
-    "career_professional": "Navigating your career path takes clarity — let's find it together.",
-    "default": "Life is full of competing priorities — let's cut through the noise.",
+    "founder": "Running a business means holding a hundred things at once.",
+    "business_owner": "Running a business means holding a hundred things at once.",
+    "freelancer": "The freelance life means you're the business AND the talent.",
+    "side-hustler": "Building something on the side of a full life — there's a lot to balance and prioritize.",
+    "side_hustler": "Building something on the side of a full life — there's a lot to balance and prioritize.",
+    "employed": "You know you're capable of more — and the path forward may not be obvious yet.",
+    "career_professional": "You know you're capable of more — and the path forward may not be obvious yet.",
+    "default": "There's a lot competing for your attention in life — and you're ready to get clear on what matters most.",
 }
 
+# Multi-role combo lines. Used when user selects 2+ roles and primary
+# is NOT founder/business_owner. Key is frozenset of the two highest-
+# priority non-founder roles. Falls back to generic if no match.
+ROLE_COMBO_FALLBACK: dict[frozenset[str], str] = {
+    frozenset({"career_professional", "side-hustler"}): "Growing a career while building something on the side — that means holding a hundred things at once.",
+    frozenset({"career_professional", "side_hustler"}): "Growing a career while building something on the side — that means holding a hundred things at once.",
+    frozenset({"employed", "side-hustler"}): "Growing a career while building something on the side — that means holding a hundred things at once.",
+    frozenset({"employed", "side_hustler"}): "Growing a career while building something on the side — that means holding a hundred things at once.",
+    frozenset({"career_professional", "freelancer"}): "Growing a career while running your own thing — that means holding a hundred things at once.",
+    frozenset({"employed", "freelancer"}): "Growing a career while running your own thing — that means holding a hundred things at once.",
+    frozenset({"freelancer", "side-hustler"}): "Freelancing while building something new on the side — that means holding a hundred things at once.",
+    frozenset({"freelancer", "side_hustler"}): "Freelancing while building something new on the side — that means holding a hundred things at once.",
+}
+ROLE_COMBO_GENERIC = "Wearing that many hats means holding a hundred things at once."
+
+# Legacy — no longer used in welcome message (Draft 3). Retained for test_onboarding_port.py.
 LIMITING_BELIEFS: dict[str, str] = {
-    "business_owner": "another productivity system",
+    "founder": "another productivity system",
+    "business_owner": "another productivity system",  # Theo legacy
     "freelancer": "to work harder or hustle more",
-    "side_hustler": "more hours in the day",
-    "career_professional": "a better resume or more connections",
+    "side-hustler": "more hours in the day",
+    "side_hustler": "more hours in the day",  # Theo legacy
+    "employed": "a better resume or more connections",
+    "career_professional": "a better resume or more connections",  # Theo legacy
     "default": "more willpower or motivation",
 }
 
+# Legacy — no longer used in welcome message (Draft 3). Retained for test_onboarding_port.py.
 CLARITY_PROVIDES: dict[str, str] = {
-    "business_owner": "a clear priority that moves the needle, and the confidence to say no to everything else",
+    "founder": "a clear priority that moves the needle, and the confidence to say no to everything else",
+    "business_owner": "a clear priority that moves the needle, and the confidence to say no to everything else",  # Theo legacy
     "freelancer": "focus on the work that matters most, and boundaries that protect your energy",
-    "side_hustler": "one clear action that fits your real life, not someone else's playbook",
-    "career_professional": "clarity on what you actually want, and a concrete step to get there",
+    "side-hustler": "one clear action that fits your real life, not someone else's playbook",
+    "side_hustler": "one clear action that fits your real life, not someone else's playbook",  # Theo legacy
+    "employed": "clarity on what you actually want, and a concrete step to get there",
+    "career_professional": "clarity on what you actually want, and a concrete step to get there",  # Theo legacy
     "default": "one focused priority and the strategy to actually follow through",
+}
+
+# Keyed to focus_area. Normalizes the user's challenge as evidence of
+# a positive quality, not a deficit. Designed to complete the sentence:
+# "{challenge} comes with the territory — {challenge_reframe}."
+CHALLENGE_REFRAME: dict[str, str] = {
+    "career-business": "it means you have standards — and you're ready to channel them",
+    "personal-growth": "it means you're paying attention to who you're becoming",
+    "relationships": "it means the people in your life matter to you",
+    "love": "it means the people in your life matter to you",
+    "health": "it means you know what your body and mind need",
+    "finance": "it means you're ready to face what most people avoid",
+    "creativity": "it means you care about the quality of what you create",
+    "education": "it means you're investing in where you're headed",
+    "spirituality": "it means you're asking the questions that matter",
+    "family": "it means the people in your life matter to you",
+    "home": "it means you care about the space you're building your life in",
+    "default": "it means you care about getting this right",
+}
+
+# Display-formatted focus area labels for the welcome message.
+# Replaces raw .replace("_", " ").replace("-", " ") formatting.
+FOCUS_AREA_DISPLAY_NAMES: dict[str, str] = {
+    "career-business": "career and business",
+    "personal-growth": "personal growth",
+    "health": "health and wellness",
+    "finance": "personal finance",
+    "family": "family",
+    "love": "love and relationships",
+    "home": "home and living space",
+    "education": "education",
+    "spirituality": "spirituality",
+    "creativity": "creativity",
+}
+
+# Short display-friendly form of challenge IDs for the welcome message.
+# Must work in: "{challenge} comes with the territory — {reframe}."
+# Rule: noun-form phrases only. No sentences, no verbs as openers.
+CHALLENGE_DISPLAY: dict[str, str] = {
+    # Business challenges
+    "procrastination": "procrastination",
+    "difficulty-focusing": "difficulty focusing",
+    "starting-not-finishing": "starting strong and not finishing",
+    "overwhelm": "overwhelm",
+    "perfectionism": "perfectionism",
+    "self-doubt": "self-doubt",
+    "imposter-syndrome": "imposter syndrome",
+    "dont-know-next": "not knowing the next move",
+    "questioning-goal": "questioning the goal",
+    "too-many-opportunities": "too many opportunities pulling at you",
+    "time-scarcity": "time scarcity",
+    "money-scarcity": "money scarcity",
+    "energy-burnout": "burnout",
+    "lack-of-support": "lack of support",
+    # Career challenges
+    "dont-know-what-want": "not knowing what you want next",
+    "dont-know-how-progress": "not knowing how to progress",
+    "questioning-right-path": "questioning the path",
+    "avoiding-conversations": "avoiding hard conversations",
+    "difficulty-advocating": "difficulty advocating for yourself",
+    "fear-rejection": "fear of rejection",
+    "feeling-stuck": "feeling stuck",
+    "isolated-lacking-support": "feeling isolated",
+    "job-draining-energy": "a job that drains your energy",
+    # Health challenges
+    "motivated-no-direction": "motivation without direction",
+    "unsure-what-works": "not knowing what routine is right",
+    "overwhelmed-options": "overwhelm from too many options",
+    "too-busy-tired": "never having enough energy",
+    "starting-falling-off": "starting strong then falling off",
+    "prioritizing-others": "putting everyone else first",
+    "self-doubt-change": "self-doubt about change",
+    "losing-motivation": "losing motivation",
+    "past-attempts-hard": "past setbacks making it harder",
+    # Finance challenges
+    "dont-know-where-money-goes": "not knowing where the money goes",
+    "unclear-priorities": "unclear financial priorities",
+    "no-clear-picture": "no clear financial picture",
+    "spending-impulsively": "impulsive spending",
+    "avoiding-finances": "avoiding your finances",
+    "avoiding-actions": "avoiding the hard money moves",
+    "money-anxiety": "money anxiety",
+    "never-enough": "the 'never enough' feeling",
+    "money-relationship-tension": "money tension in relationships",
+    # Family challenges
+    "unclear-needs": "unclear needs in family",
+    "dont-know-how-improve": "not knowing how to improve the dynamic",
+    "confusion-role": "confusion about your role",
+    "not-enough-quality-time": "not enough quality time",
+    "struggling-boundaries": "struggling with boundaries",
+    "guilt-not-present": "guilt about not being present",
+    "resentment-tension": "unresolved tension",
+    "carrying-more-share": "carrying more than your share",
+    # Home challenges
+    "unclear-what-want": "not knowing what you want your home to feel like",
+    "not-sure-improvements": "not sure what improvements matter",
+    "weighing-move": "weighing a big change",
+    "procrastinating-tasks": "procrastinating on home projects",
+    "clutter-building": "letting clutter build up",
+    "overwhelmed-attention": "overwhelm from everything that needs attention",
+    "guilt-shame-state": "guilt about the state of things",
+    "stress-money-resources": "stress about resources",
+    # Education challenges
+    "unsure-credential": "not knowing the right path",
+    "deciding-how-deep": "deciding how deep to go",
+    "connect-to-goals": "connecting learning to real goals",
+    "procrastinating-coursework": "procrastinating on coursework",
+    "balance-priorities": "balancing education with everything else",
+    "burnout-motivation": "burnout",
+    "imposter-behind": "imposter syndrome",
+    "stress-time-cost": "stress about the tradeoffs",
+    # Spirituality challenges
+    "deepen-practice": "wanting to go deeper",
+    "searching-meaning": "searching for meaning",
+    "beliefs-not-fitting": "beliefs not fitting like they used to",
+    "maintaining-practice": "maintaining a consistent practice",
+    "not-making-time": "not making time for stillness",
+    "knowing-not-doing": "knowing what feeds you but not doing it",
+    "feeling-disconnected": "feeling disconnected",
+    "doubt-guilt": "doubt or guilt",
+    "spiritual-dryness": "spiritual dryness",
+    # Mental/Emotional (Personal Growth) challenges
+    "not-sure-where-start": "not knowing where to start",
+    "not-sure-whats-bothering": "not knowing what's really bothering you",
+    "struggling-understand-patterns": "struggling to understand your patterns",
+    "avoiding-what-helps": "avoiding what would actually help",
+    "not-prioritizing-health": "not prioritizing your mental health",
+    "difficulty-asking-help": "difficulty asking for help",
+    "negative-self-talk": "negative self-talk",
+    "anxiety-low-mood": "carrying anxiety or stress",
+    "emotionally-drained": "emotional burnout",
+    # Love - Strengthening
+    "uncertain-direction": "uncertainty about where things are going",
+    "dont-know-needs": "not knowing what you need from your partner",
+    "not-enough-time": "not making enough time for the relationship",
+    "holding-back": "holding back what you really feel",
+    "resentment-past-hurts": "unresolved past hurts",
+    "fear-vulnerable": "fear of being vulnerable",
+    "carrying-more-load": "carrying more of the load",
+    # Love - Finding
+    "dont-know-looking-for": "not knowing what you're looking for",
+    "unclear-ready": "not being sure you're ready",
+    "not-sure-where-meet": "not knowing where to meet the right people",
+    "not-putting-out-there": "not putting yourself out there",
+    "struggling-pacing": "struggling with pacing",
+    "difficulty-expressing": "difficulty expressing what you want",
+    "negative-beliefs-dating": "negative beliefs about dating",
+    "past-relationships-affecting": "past relationships affecting how you show up",
+    # Love - Complicated
+    "not-sure-what-want": "not being sure what you want",
+    "confused-where-stand": "confusion about where things stand",
+    "dont-know-stay-go": "not knowing if you should stay or go",
+    "avoiding-decision": "avoiding a real decision",
+    "not-communicating-needs": "not communicating what you need",
+    "staying-patterns": "staying in patterns that aren't working",
+    "fear-wrong-choice": "fear of making the wrong choice",
+    "guilt-obligation": "guilt or obligation",
+    "drained-uncertainty": "being drained by uncertainty",
 }
 
 # ---------------------------------------------------------------------------
@@ -135,6 +323,7 @@ CLARITY_PROVIDES: dict[str, str] = {
 DISPLAY_NAMES: dict[str, str] = {
     "one_year_vision_raw": "One-Year Vision (your words)",
     "one_year_vision_refined": "One-Year Vision (refined)",
+    "domain_vision_raw": "Domain Vision (your words)",
     "quarterly_goal_raw": "Quarterly Goal (your words)",
     "quarterly_goal_refined": "Quarterly Goal (refined)",
     "goal_why": "Why This Goal Matters",
@@ -148,6 +337,7 @@ DISPLAY_NAMES: dict[str, str] = {
 CAPTURED_DATA_DEFAULTS: dict[str, object] = {
     "one_year_vision_raw": "",
     "one_year_vision_refined": "",
+    "domain_vision_raw": "",
     "quarterly_goal_raw": "",
     "quarterly_goal_refined": "",
     "goal_why": "",
@@ -159,7 +349,7 @@ CAPTURED_DATA_DEFAULTS: dict[str, object] = {
 
 # Arc labels for Clarity Session preamble — maps turn position (0-indexed) to display label.
 ARC_LABELS: list[str] = [
-    "Vision", "Goal", "Why", "Milestone", "Action", "Identity", "Release", "Close",
+    "Vision", "Focus", "Goal", "Why", "Milestone", "Action", "Identity", "Release", "Close",
 ]
 
 # Regex for cleaning unreplaced template placeholders.
@@ -241,12 +431,12 @@ def format_declared_challenges(challenges: list | None) -> str:
     if not challenges:
         return "No challenges declared during onboarding."
     return "Declared challenges: " + ", ".join(
-        c.replace("_", " ") for c in challenges
+        c.replace("_", " ").replace("-", " ") for c in challenges
     )
 
 
 def format_conversation_history(history: list[dict] | None) -> str:
-    """Format conversation_history for Turn 8 injection.
+    """Format conversation_history for Turn 9 injection.
 
     Preserves the user's actual words — the Milton model narrative
     needs their exact language from all prior turns.
@@ -319,13 +509,21 @@ class PromptAssembler:
 
     @staticmethod
     def _resolve_user_type(user_profile: dict) -> str:
-        """Map user_profiles.roles to the appropriate user type modifier."""
+        """Map user_profiles.roles to the appropriate user type modifier.
+
+        Accepts production IDs (founder, employed, side-hustler) AND
+        Theo legacy IDs (business_owner, career_professional, side_hustler).
+        """
         roles = user_profile.get("roles") or []
         if isinstance(roles, str):
             roles = [roles]
-        if "business_owner" in roles or "freelancer" in roles:
+        # Business owner: production + legacy
+        biz_roles = {"founder", "freelancer", "side-hustler", "business_owner", "side_hustler"}
+        if biz_roles.intersection(roles):
             return USER_TYPE_MODIFIERS["business_owner"]
-        if "career_professional" in roles:
+        # Career professional: production + legacy
+        career_roles = {"employed", "career_professional"}
+        if career_roles.intersection(roles):
             return USER_TYPE_MODIFIERS["career_professional"]
         return USER_TYPE_MODIFIERS["default"]
 
@@ -365,7 +563,7 @@ class PromptAssembler:
     ) -> str:
         """Generate the rich session preamble for Clarity Session turns.
 
-        Replaces the thin "Turn N of 8" context line (W4-1.1). Includes:
+        Replaces the thin "Turn N of 9" context line (W4-1.1). Includes:
         - Goal Cascade definition and stakes
         - Arc tracking line (completed \u2713, current [now], future Title Case)
         - Prior data with raw/refined separation (omitted on Turn 1)
@@ -439,6 +637,10 @@ class PromptAssembler:
         variables: dict[str, object] = {
             # User context
             "user.first_name": self._resolve_first_name(user_profile),
+            "focus_area": FOCUS_AREA_DISPLAY_NAMES.get(
+                user_profile.get("focus_area", ""),
+                (user_profile.get("focus_area") or "what matters most").replace("_", " ").replace("-", " "),
+            ),
             # Temporal context (individual fields for Layer 3)
             "current_date": temporal["current_date"],
             "current_time": temporal["current_time"],
@@ -604,58 +806,84 @@ class PromptAssembler:
         template = await self._get_template("clarity_session/welcome")
         primary_role = self._resolve_primary_role(user_profile)
 
-        # Role-based text resolution
-        role_fallback = ROLE_FALLBACK.get(primary_role, ROLE_FALLBACK["default"])
-        limiting_belief = LIMITING_BELIEFS.get(primary_role, LIMITING_BELIEFS["default"])
-        clarity_provides = CLARITY_PROVIDES.get(primary_role, CLARITY_PROVIDES["default"])
-
-        # Format roles_text — display-formatted, joined with " and "
+        # Parse roles ONCE — reused by role_fallback and roles_text
         roles = user_profile.get("roles") or []
         if isinstance(roles, str):
             roles = [roles]
-        if roles:
-            roles_text = " and ".join(
-                ROLE_DISPLAY_NAMES.get(r, r.replace("_", " ").title())
-                for r in roles
-            )
+
+        # --- Multi-role combo check (Section 3a) ---
+        is_founder = primary_role in ("founder", "business_owner")
+        has_multiple_roles = len(roles) >= 2
+
+        if has_multiple_roles and not is_founder:
+            role_set = frozenset(roles)
+            combo_line = None
+            for combo_key, combo_text in ROLE_COMBO_FALLBACK.items():
+                if combo_key.issubset(role_set):
+                    combo_line = combo_text
+                    break
+            role_fallback = combo_line or ROLE_COMBO_GENERIC
         else:
-            roles_text = "person building a better life"
+            role_fallback = ROLE_FALLBACK.get(primary_role, ROLE_FALLBACK["default"])
 
-        # Format focus_area — display-formatted
-        focus_area = user_profile.get("focus_area") or "what matters most"
-        focus_area = focus_area.replace("_", " ")
+        # --- Challenge reframe — keyed to focus_area (Section 3b) ---
+        focus_area_raw = user_profile.get("focus_area") or ""
+        challenge_reframe = CHALLENGE_REFRAME.get(focus_area_raw, CHALLENGE_REFRAME["default"])
 
-        # Challenge — first declared challenge, or fallback
+        # --- Focus area display name (Section 3c) ---
+        focus_area = FOCUS_AREA_DISPLAY_NAMES.get(
+            focus_area_raw,
+            focus_area_raw.replace("_", " ").replace("-", " ") if focus_area_raw else "what matters most",
+        )
+
+        # --- Challenge display (Section 3d) ---
         challenges = user_profile.get("declared_challenges") or []
         if isinstance(challenges, str):
             challenges = [challenges]
         if challenges:
-            challenge = challenges[0].replace("_", " ")
+            raw_challenge = challenges[0]
+            challenge = CHALLENGE_DISPLAY.get(
+                raw_challenge,
+                raw_challenge.replace("_", " ").replace("-", " "),
+            )
         else:
-            challenge = "staying focused on what matters"
+            challenge = "knowing where to focus"
 
+        # --- Roles text — Oxford comma for 3+ (Section 3e) ---
+        if roles:
+            display_roles = [
+                ROLE_DISPLAY_NAMES.get(r, r.replace("_", " ").replace("-", " ").title())
+                for r in roles
+            ]
+            if len(display_roles) == 1:
+                roles_text = display_roles[0]
+            elif len(display_roles) == 2:
+                roles_text = f"{display_roles[0]} and {display_roles[1]}"
+            else:
+                roles_text = ", ".join(display_roles[:-1]) + f", and {display_roles[-1]}"
+        else:
+            roles_text = "person building a better life"
+
+        # --- Variable injection (Section 3f) ---
         variables = {
             "user.first_name": self._resolve_first_name(user_profile),
             "role_fallback": role_fallback,
             "roles_text": roles_text,
             "focus_area": focus_area,
             "challenge": challenge,
-            "limiting_belief": limiting_belief,
-            "clarity_provides": clarity_provides,
+            "challenge_reframe": challenge_reframe,
         }
 
         message = inject_variables(template, variables)
 
-        # Length guard: if > 1,000 chars, use compact fallback
+        # --- Length guard (Section 3g) ---
         if len(message) > 1000:
             first_name = self._resolve_first_name(user_profile)
             message = (
                 f"Hey {first_name}\n\n"
-                f"You don't need {limiting_belief}.\n\n"
-                f"You need {clarity_provides}.\n\n"
-                f"**That's what we're building together.**\n\n"
-                f"By the end of this session, you'll know exactly what to focus on "
-                f"— and how to actually make it happen.\n\n"
+                f"{role_fallback}\n\n"
+                f"Your vision. One real goal. Your very next step. "
+                f"Everything we do together after this starts with what you share now.\n\n"
                 f"Sound good?"
             )
 

@@ -51,6 +51,41 @@ _WEEK_POSITION_PHRASES: dict[str, str] = {
 }
 
 
+def compute_action_due_date(completed_at: datetime, tz: str = _DEFAULT_TZ) -> str:
+    """Compute the due date for a Clarity Session next action step.
+
+    The user always gets a full working week:
+      Mon-Wed completion → due this Sunday (4-6 days)
+      Thu-Sun completion → due next Sunday (7-10 days)
+
+    Args:
+        completed_at: Session completion timestamp (timezone-aware UTC).
+        tz: User's IANA timezone. Defaults to America/Chicago.
+
+    Returns:
+        ISO date string (YYYY-MM-DD), always a Sunday.
+    """
+    if completed_at.tzinfo is None:
+        raise ValueError("completed_at must be timezone-aware (got naive datetime)")
+
+    try:
+        local_tz = ZoneInfo(tz)
+    except Exception:
+        logger.warning("Invalid timezone '%s', falling back to %s", tz, _DEFAULT_TZ)
+        local_tz = ZoneInfo(_DEFAULT_TZ)
+
+    local_dt = completed_at.astimezone(local_tz)
+    weekday = local_dt.weekday()  # 0=Mon, 6=Sun
+
+    if weekday <= 2:  # Mon, Tue, Wed → this Sunday
+        days_until_sunday = 6 - weekday
+    else:  # Thu, Fri, Sat, Sun → next Sunday
+        days_until_sunday = 6 - weekday + 7
+
+    due = local_dt.date() + timedelta(days=days_until_sunday)
+    return due.isoformat()
+
+
 def _classify_time_of_day(hour: int) -> str:
     """Map hour (0-23) to a time-of-day classification."""
     for start, end, classification in _TIME_OF_DAY_RANGES:
