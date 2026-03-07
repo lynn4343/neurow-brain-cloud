@@ -11,12 +11,16 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  compact?: boolean;
+  autoFocus?: boolean;
 }
 
 export function ChatInput({
   onSend,
   disabled = false,
   placeholder = "What's on your mind?",
+  compact = false,
+  autoFocus = false,
 }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -57,7 +61,11 @@ export function ChatInput({
 
   return (
     <div className={`w-full ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-      <div className="flex w-full min-h-[125px] max-h-[300px] flex-col gap-2.5 rounded-[20px] border border-[#E6E5E3] bg-white p-2 pt-4">
+      <div className={`flex w-full flex-col gap-2.5 border border-[#E6E5E3] bg-white ${
+        compact
+          ? "min-h-[48px] max-h-[200px] rounded-[16px] p-2"
+          : "min-h-[125px] max-h-[300px] rounded-[20px] p-2 pt-4"
+      }`}>
         {/* Text Input Area */}
         <div className="flex flex-1 items-start gap-2.5 px-3">
           <textarea
@@ -67,6 +75,7 @@ export function ChatInput({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={disabled}
+            autoFocus={autoFocus}
             className="flex-1 resize-none bg-transparent text-sm font-normal leading-5 text-[#1E1E1E] placeholder:text-[#7F7F7F] focus:outline-none overflow-y-auto"
             style={{ maxHeight: "200px", minHeight: "20px" }}
           />
@@ -76,26 +85,30 @@ export function ChatInput({
         <div className="flex items-center justify-between">
           {/* Left Tools */}
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
-              aria-label="Attach files"
-              onClick={() => console.log("Attach files clicked")}
-            >
-              <Paperclip className="size-4" weight="regular" />
-            </button>
+            {!compact && (
+              <button
+                type="button"
+                className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
+                aria-label="Attach files"
+                onClick={() => console.log("Attach files clicked")}
+              >
+                <Paperclip className="size-4" weight="regular" />
+              </button>
+            )}
           </div>
 
           {/* Right Tools */}
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
-              aria-label="Voice input"
-              onClick={() => console.log("Voice input clicked")}
-            >
-              <Microphone className="size-5" weight="regular" />
-            </button>
+            {!compact && (
+              <button
+                type="button"
+                className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
+                aria-label="Voice input"
+                onClick={() => console.log("Voice input clicked")}
+              >
+                <Microphone className="size-5" weight="regular" />
+              </button>
+            )}
 
             <button
               type="button"

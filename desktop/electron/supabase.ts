@@ -101,7 +101,6 @@ export async function createProfileDirect(
   const userData = {
     display_name: trimmed,
     first_name: firstName,
-    slug,
     coaching_style: 'balanced',
     is_demo_user: false,
     onboarding_completed: false,

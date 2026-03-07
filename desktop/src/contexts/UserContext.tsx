@@ -49,6 +49,7 @@ export interface UserProfile {
   career_focus?: string;
   career_challenges?: string[];
   love_partner_situation?: string;
+  avatar_color?: string; // hex color for avatar circle
 }
 
 export type AppPhase = "loading" | "main" | "onboarding" | "clarity_session";
@@ -71,7 +72,21 @@ export interface UserContextType {
   addProfile: (profile: UserProfile) => void;
   completeOnboarding: (profile: UserProfile) => void;
   completeClaritySession: (goalCascade?: GoalCascade) => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
 }
+
+// ---------------------------------------------------------------------------
+// Avatar color palette — cycles for new profiles
+// ---------------------------------------------------------------------------
+
+const AVATAR_COLORS = [
+  "#E9FF27", // Highlighter Yellow
+  "#9FA3FF", // Liliac
+  "#34C38F", // Jungle
+  "#4456FF", // Cobalt
+  "#A6FFE8", // Mint
+  "#FF7C5E", // Coral
+];
 
 // ---------------------------------------------------------------------------
 // Default profile — Theo (always present, pre-populated for demo)
@@ -81,6 +96,7 @@ const THEO_PROFILE: UserProfile = {
   id: "0c4831b5-8df3-4fba-94be-57e4e3112116",
   slug: "theo",
   display_name: "Theo Nakamura",
+  avatar_color: "#E9FF27",
   onboarding_completed: true,
   clarity_session_completed: true,
   coaching_style: "balanced",
@@ -110,7 +126,8 @@ const THEO_PROFILE: UserProfile = {
       "the barista survival story",
       "putting off systems until later",
     ],
-    next_action_step: "Update my rate sheet and send to my next inquiry",
+    next_action_step: "Send Meridian brand guide revisions",
+    next_action_due: "2026-03-12",
     focus_area: "career-business",
     declared_challenges: [
       "inconsistent income",
@@ -253,15 +270,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const addProfile = useCallback((profile: UserProfile) => {
     setProfiles((prev) => {
-      if (prev.some((p) => p.slug === profile.slug)) {
+      const existing = prev.find((p) => p.slug === profile.slug);
+      if (existing) {
+        setActiveUser(existing);
+        setAppPhase(phaseForProfile(existing));
         return prev;
       }
-      const updated = [...prev, profile];
+      const withColor = profile.avatar_color
+        ? profile
+        : { ...profile, avatar_color: AVATAR_COLORS[prev.length % AVATAR_COLORS.length] };
+      const updated = [...prev, withColor];
       saveProfiles(updated);
+      setActiveUser(withColor);
+      setAppPhase(phaseForProfile(withColor));
       return updated;
     });
-    setActiveUser(profile);
-    setAppPhase(phaseForProfile(profile));
   }, []);
 
   const completeOnboarding = useCallback((profile: UserProfile) => {
@@ -303,6 +326,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setAppPhase("main");
   }, [activeUser]);
 
+  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
+    if (!activeUser) return;
+    const merged = { ...activeUser, ...updates };
+    setProfiles((prev) => {
+      const updated = prev.map((p) =>
+        p.slug === merged.slug ? merged : p,
+      );
+      saveProfiles(updated);
+      return updated;
+    });
+    setActiveUser(merged);
+  }, [activeUser]);
+
   return (
     <UserContext.Provider
       value={{
@@ -318,6 +354,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         addProfile,
         completeOnboarding,
         completeClaritySession,
+        updateProfile,
       }}
     >
       {children}

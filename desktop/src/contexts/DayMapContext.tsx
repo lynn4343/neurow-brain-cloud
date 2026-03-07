@@ -22,6 +22,7 @@ export type CalendarView = "Day" | "Week" | "Month" | "Year";
 interface DayMapContextType {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
   hourRowHeight: number;
   zoomIn: () => void;
   zoomOut: () => void;
@@ -104,6 +105,7 @@ export function DayMapProvider({ children }: { children: ReactNode }) {
       value={{
         sidebarOpen,
         toggleSidebar,
+        setSidebarOpen,
         hourRowHeight,
         zoomIn,
         zoomOut,

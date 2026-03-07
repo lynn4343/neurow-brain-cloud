@@ -49,8 +49,8 @@ export function ExportSection() {
         Your Data
       </h2>
       <p className="text-sm text-muted-foreground mb-4">
-        Export your complete Brain Cloud as a portable JSON file.
-        Everything about you is yours.
+
+        Export your data as a portable JSON file. Everything about you is yours.
       </p>
       <Button
         onClick={handleExport}

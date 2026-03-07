@@ -1,15 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useDayMap } from "@/contexts/DayMapContext";
+import { useUser } from "@/contexts/UserContext";
 import { StickyWeekHeader } from "./StickyWeekHeader";
 import { SunIcon } from "./icons/SunIcon";
 import { MoonIcon } from "./icons/MoonIcon";
 import { getCurrentDayOfWeek } from "@/lib/calendar-utils";
+import { CALENDAR_EVENTS, getUserData } from "@/lib/demo-data";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { getEventLayout } from "@/lib/event-layout";
+import { EventBlock } from "./EventBlock";
 import { cn } from "@/lib/utils";
 import { addDays, format, isSameWeek, startOfToday } from "date-fns";
 
 export function WeekTimelineView() {
   const { hourRowHeight, currentWeek } = useDayMap();
+  const { activeUser } = useUser();
 
   const hours = [
     "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
@@ -21,6 +28,18 @@ export function WeekTimelineView() {
 
   const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+  // Reactive current time — updates every 60s
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const minuteOffset = (currentMinute / 60) * hourRowHeight;
+
   // Only highlight current day if we're viewing the actual current week
   const isCurrentWeek = isSameWeek(currentWeek, startOfToday(), { weekStartsOn: 0 });
   const currentDay = isCurrentWeek ? getCurrentDayOfWeek(new Date()) : "";
@@ -30,6 +49,9 @@ export function WeekTimelineView() {
     const date = addDays(currentWeek, i);
     return parseInt(format(date, "d"));
   });
+
+  // Event data
+  const { events: allEvents, openEventModal, openNewEventModal } = useDemoData();
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden rounded-[8px] border border-[#F1F0F0] bg-white">
@@ -50,7 +72,7 @@ export function WeekTimelineView() {
         </div>
 
         {/* Hourly Grid */}
-        <div className="-mt-[72px]">
+        <div className="-mt-[72px] relative">
           {hours.map((hour, hourIndex) => (
             <div
               key={`${hour}-${hourIndex}`}
@@ -66,11 +88,11 @@ export function WeekTimelineView() {
                   {hour}
                 </span>
 
-                {/* Dotted line for current time indicator (at 10 AM) */}
-                {hour === "10 AM" && (
+                {/* Dotted line — only at current hour, only if viewing current week */}
+                {hourIndex === currentHour && isCurrentWeek && (
                   <div
-                    className="absolute left-0 right-0 h-[2px] border-t border-dashed border-[#D1D1D1]"
-                    style={{ top: `${hourRowHeight / 2}px` }}
+                    className="absolute left-0 right-0 z-[5] h-[2px] border-t border-dashed border-[#D1D1D1]"
+                    style={{ top: `${minuteOffset}px` }}
                   />
                 )}
               </div>
@@ -79,6 +101,15 @@ export function WeekTimelineView() {
               {days.map((day, dayIndex) => (
                 <div
                   key={day}
+                  onDoubleClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const yInRow = e.clientY - rect.top;
+                    const rawMinute = Math.round((yInRow / hourRowHeight) * 60 / 30) * 30;
+                    const minute = Math.min(rawMinute, 30);
+                    const startTime = `${String(hourIndex).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                    const clickDate = addDays(currentWeek, dayIndex);
+                    openNewEventModal(format(clickDate, "yyyy-MM-dd"), startTime);
+                  }}
                   className={cn(
                     "relative flex-[1_0_0] border-b",
                     day === currentDay
@@ -86,14 +117,14 @@ export function WeekTimelineView() {
                       : "border-r border-[#E6E5E3] last:border-r-0"
                   )}
                 >
-                  {/* Current Time Indicator (at 10 AM) */}
-                  {hour === "10 AM" && (
+                  {/* Current time indicator — solid line across all columns, dot only on current day */}
+                  {hourIndex === currentHour && isCurrentWeek && (
                     <div
-                      className="absolute left-0 right-0 flex items-center"
-                      style={{ top: `${hourRowHeight / 2}px` }}
+                      className="absolute left-0 right-0 z-[5] flex items-center"
+                      style={{ top: `${minuteOffset}px` }}
                     >
                       <div className="h-[2px] w-full bg-[#1E1E1E]" />
-                      {dayIndex === 0 && (
+                      {dayIndex === now.getDay() && (
                         <div className="absolute -left-1 h-3 w-3 rounded-full bg-[#1E1E1E]" />
                       )}
                     </div>
@@ -102,6 +133,36 @@ export function WeekTimelineView() {
               ))}
             </div>
           ))}
+
+          {/* Event overlay — z-[2] so current time indicator (z-[5]) renders on top */}
+          <div
+            className="absolute top-0 bottom-0 z-[2] pointer-events-none"
+            style={{ left: "72px", right: "0px" }}
+          >
+            {days.map((day, dayIndex) => {
+              const colDate = format(addDays(currentWeek, dayIndex), "yyyy-MM-dd");
+              const colEvents = allEvents.filter(e => e.date === colDate);
+              const colLayout = getEventLayout(colEvents, hourRowHeight);
+
+              return (
+                <div
+                  key={day}
+                  className="absolute top-0 bottom-0"
+                  style={{
+                    left: `calc(${(dayIndex / 7) * 100}% + 2px)`,
+                    width: `calc(${100 / 7}% - 4px)`,
+                  }}
+                >
+                  {colEvents.map(event => {
+                    const pos = colLayout.get(event.id);
+                    return pos ? (
+                      <EventBlock key={event.id} event={event} position={pos} compact onEventClick={openEventModal} />
+                    ) : null;
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Gradient fade zone bottom */}

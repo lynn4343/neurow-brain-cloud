@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StickyCalendarHeader } from "./StickyCalendarHeader";
 import { SunIcon } from "./icons/SunIcon";
 import { MoonIcon } from "./icons/MoonIcon";
 import { useDayMap } from "@/contexts/DayMapContext";
+import { useUser } from "@/contexts/UserContext";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { CALENDAR_EVENTS, getUserData } from "@/lib/demo-data";
+import { getEventLayout } from "@/lib/event-layout";
+import { EventBlock } from "./EventBlock";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const hours = [
@@ -16,16 +22,28 @@ const hours = [
 ];
 
 export function TimelineView() {
-  const { hourRowHeight } = useDayMap();
+  const { hourRowHeight, currentDay } = useDayMap();
+  const { activeUser } = useUser();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Dynamic current time
-  const now = new Date();
+  // Reactive current time — updates every 60s
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
-  // Map to hours array index (12 AM = 0, 1 AM = 1, ..., 11 PM = 23)
   const currentHourIndex = currentHour;
   const minuteOffset = (currentMinute / 60) * hourRowHeight;
+
+  // Event data for current day
+  const { events: allEvents, openEventModal, openNewEventModal } = useDemoData();
+  const dateStr = format(currentDay, "yyyy-MM-dd");
+  const dayEvents = allEvents.filter(e => e.date === dateStr);
+  const layout = getEventLayout(dayEvents, hourRowHeight);
 
   // Auto-scroll to current time on mount
   useEffect(() => {
@@ -54,7 +72,7 @@ export function TimelineView() {
         </div>
 
         {/* Hourly Grid */}
-        <div className="-mt-[72px]">
+        <div className="-mt-[72px] relative">
           {hours.map((hour, index) => (
             <div
               key={`${hour}-${index}`}
@@ -74,16 +92,28 @@ export function TimelineView() {
               </div>
 
               {/* Event Area */}
-              <div className="relative flex-1 border-b border-[#E6E5E3] pl-4">
-                {/* Current Time Indicator */}
+              <div
+                className="relative flex-1 border-b border-[#E6E5E3] pl-4"
+                onDoubleClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const yInRow = e.clientY - rect.top;
+                  const rawMinute = Math.round((yInRow / hourRowHeight) * 60 / 30) * 30;
+                  const hour = rawMinute >= 60 ? index + 1 : index;
+                  const minute = rawMinute >= 60 ? 0 : rawMinute;
+                  if (hour > 23) return;
+                  const startTime = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                  openNewEventModal(format(currentDay, "yyyy-MM-dd"), startTime);
+                }}
+              >
+                {/* Current Time Indicator — z-[5] to render above event overlay (z-[2]) */}
                 {index === currentHourIndex && (
                   <>
                     <div
-                      className="absolute -left-14 h-[2px] w-[50px] border-t border-dashed border-[#D1D1D1]"
+                      className="absolute -left-14 z-[5] h-[2px] w-[50px] border-t border-dashed border-[#D1D1D1]"
                       style={{ top: `${minuteOffset}px` }}
                     />
                     <div
-                      className="absolute left-0 right-0 flex items-center"
+                      className="absolute left-0 right-0 z-[5] flex items-center"
                       style={{ top: `${minuteOffset}px` }}
                     >
                       <div className="h-[2px] w-full bg-[#1E1E1E]" />
@@ -94,6 +124,17 @@ export function TimelineView() {
               </div>
             </div>
           ))}
+
+          {/* Event overlay — z-[2] so current time indicator (z-[5]) renders on top */}
+          <div
+            className="absolute top-0 bottom-0 z-[2] pointer-events-none"
+            style={{ left: "calc(3rem + 4px)", right: "4px" }}
+          >
+            {dayEvents.map(event => {
+              const pos = layout.get(event.id);
+              return pos ? <EventBlock key={event.id} event={event} position={pos} onEventClick={openEventModal} /> : null;
+            })}
+          </div>
         </div>
 
         {/* Gradient fade zone bottom */}

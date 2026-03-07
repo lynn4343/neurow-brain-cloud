@@ -27,11 +27,11 @@ export function GratitudeSection() {
 
       {isExpanded && (
         <div className="mt-3 space-y-3">
-          <p className="text-sm text-[#5F5E5B]">
-            What are you grateful for today?
+          <p className="text-[13px] leading-snug text-[#949494]">
+            Neuroscience shows gratitude rewires your brain&apos;s prefrontal cortex &mdash; boosting focus, reducing anxiety, and building resilience over time.
           </p>
           <textarea
-            placeholder="Write your gratitude here..."
+            placeholder="What are you grateful for today?"
             className="w-full min-h-[80px] rounded-lg border border-[#E6E5E3] bg-white p-3 text-sm text-[#1E1E1E] placeholder:text-[#949494] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4f5bb3] resize-none"
           />
         </div>

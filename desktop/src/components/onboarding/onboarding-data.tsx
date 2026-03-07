@@ -56,3 +56,45 @@ export const BUSINESS_STAGES: BusinessStageOption[] = [
       "Profitable and stable, focused on optimization and expansion",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Coaching styles — shared between onboarding + settings
+// ---------------------------------------------------------------------------
+
+export interface CoachingStyle {
+  id: string;
+  emoji: string;
+  title: string;
+  description: string;
+  tag?: string;
+}
+
+export const COACHING_STYLES: CoachingStyle[] = [
+  {
+    id: "balanced",
+    emoji: "\u2696\uFE0F",
+    title: "Balanced",
+    tag: "(Recommended)",
+    description:
+      "I'll adapt based on what you need\u2014gentle when you're struggling, direct when you need momentum.",
+  },
+  {
+    id: "gentle",
+    emoji: "\uD83C\uDF38",
+    title: "Gentle Guidance",
+    description:
+      "Warm, supportive, and encouraging, I'll be your cheerleader.",
+  },
+  {
+    id: "direct",
+    emoji: "\uD83C\uDFAF",
+    title: "Direct",
+    description: "Straightforward. Tell it to me blunt.",
+  },
+  {
+    id: "peak-performance",
+    emoji: "\uD83D\uDD25",
+    title: "Peak Performance",
+    description: "Full accountability mode. Push me to be my best.",
+  },
+];

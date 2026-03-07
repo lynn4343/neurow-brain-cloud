@@ -226,16 +226,27 @@ export function ClaritySessionFlow() {
   );
 
   // --- Auto-start: send initial message on mount ---
+  // Reset ref in cleanup so React StrictMode's second mount can retry.
+  // StrictMode: mount→cleanup→remount. Without the reset, the ref stays
+  // true after cleanup cancels the timer, and the remount never fires.
 
   useEffect(() => {
     if (!autoStartedRef.current && activeUser) {
       autoStartedRef.current = true;
+      let fired = false;
       const timer = setTimeout(() => {
+        fired = true;
         handleSend(
           "Just finished setting up my profile — ready to close the gap between vision and reality.",
         );
       }, 0);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // Only reset if the timer was cancelled before firing (StrictMode case)
+        if (!fired) {
+          autoStartedRef.current = false;
+        }
+      };
     }
   }, [activeUser, handleSend]);
 

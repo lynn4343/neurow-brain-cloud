@@ -3,27 +3,9 @@
 import { useState } from "react";
 import { CaretDown, CaretUp, Check, Plus, WarningCircle } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-
-type Priority = "Urgent" | "High" | "Medium" | "Low" | "None";
-
-interface MockTask {
-  name: string;
-  priority: Priority;
-  due: string;
-  project: string;
-}
-
-const mockTasks: MockTask[] = [
-  { name: "Review quarterly report", priority: "High", due: "Today", project: "Operations" },
-  { name: "Send client proposal", priority: "High", due: "Today", project: "Sales" },
-  { name: "Update brand guidelines", priority: "Medium", due: "Tomorrow", project: "Marketing" },
-  { name: "Fix login page responsiveness", priority: "Medium", due: "Feb 26", project: "Engineering" },
-  { name: "Prepare investor deck slides", priority: "Medium", due: "Feb 27", project: "Fundraising" },
-  { name: "Schedule team retrospective", priority: "Low", due: "Feb 28", project: "Operations" },
-  { name: "Draft product launch announcement", priority: "High", due: "Mar 1", project: "Marketing" },
-  { name: "Review onboarding flow analytics", priority: "Medium", due: "Mar 2", project: "Engineering" },
-  { name: "Plan team offsite agenda", priority: "Low", due: "Mar 5", project: "Operations" },
-];
+import { useUser } from "@/contexts/UserContext";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { type Task, type Priority, TASKS, PROJECT_COLORS, DEFAULT_PROJECT_COLOR, getUserData } from "@/lib/demo-data";
 
 /* Priority Bars — matches web app PriorityBars component */
 const NUM_BARS = 3;
@@ -76,18 +58,8 @@ function PriorityBars({ priority }: { priority: Priority }) {
   );
 }
 
-const projectColorMap: Record<string, string> = {
-  Operations: "bg-teal-100 text-teal-700 border-teal-200",
-  Sales: "bg-blue-100 text-blue-700 border-blue-200",
-  Marketing: "bg-purple-100 text-purple-700 border-purple-200",
-  Engineering: "bg-pink-100 text-pink-700 border-pink-200",
-  Fundraising: "bg-violet-100 text-violet-700 border-violet-200",
-};
-
-const defaultProjectColor = "bg-gray-100 text-gray-700 border-gray-200";
-
 const getProjectPillClasses = (project: string): string => {
-  return projectColorMap[project] || defaultProjectColor;
+  return PROJECT_COLORS[project] || DEFAULT_PROJECT_COLOR;
 };
 
 /* Sorting */
@@ -146,7 +118,7 @@ function shortDue(due: string): string {
   return due;
 }
 
-function sortTasks(tasks: MockTask[], sortType: DayMapSort): MockTask[] {
+function sortTasks(tasks: Task[], sortType: DayMapSort): Task[] {
   const copy = [...tasks];
   switch (sortType) {
     case "default":
@@ -173,6 +145,9 @@ function sortTasks(tasks: MockTask[], sortType: DayMapSort): MockTask[] {
 }
 
 export function SecondaryTasks() {
+  const { activeUser } = useUser();
+  const demoData = useDemoData();
+  const tasks = demoData.tasks;
   const [isExpanded, setIsExpanded] = useState(true);
   const [sort, setSort] = useState<DayMapSort>("default");
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
@@ -190,7 +165,7 @@ export function SecondaryTasks() {
   const handleDueSort = () => setSort(sort === "due-asc" ? "due-desc" : "due-asc");
   const handleProjectSort = () => setSort(sort === "project-asc" ? "project-desc" : "project-asc");
 
-  const sortedTasks = sortTasks(mockTasks, sort);
+  const sortedTasks = sortTasks(tasks, sort);
 
   return (
     <div className="flex flex-col rounded-[12px] border border-[#E6E5E3] bg-white p-4">
@@ -210,7 +185,10 @@ export function SecondaryTasks() {
             Secondary Tasks
           </span>
         </button>
-        <button className="flex items-center gap-1 text-xs text-[#5F5E5B] hover:text-[#1E1E1E] transition-colors">
+        <button
+          onClick={() => demoData.openNewTaskModal()}
+          className="flex items-center gap-1 text-xs text-[#5F5E5B] hover:text-[#1E1E1E] transition-colors"
+        >
           <Plus className="size-3" weight="bold" />
           New Task
         </button>
@@ -218,7 +196,10 @@ export function SecondaryTasks() {
 
       {isExpanded && (
         <div className="mt-3 relative">
-          <div className="overflow-y-auto scrollbar-thin max-h-[248px]">
+          <div className={cn(
+            "overflow-y-auto scrollbar-thin max-h-[248px]",
+            tasks.length >= 6 && "pb-10"
+          )}>
             {/* Column Headers - Sticky inside scroll container for alignment */}
             <div className="flex items-center border-b border-[#E6E5E3] text-[11px] font-semibold uppercase tracking-wide text-[#949494] sticky top-0 bg-white z-10">
               <div className="flex-[3_1_0%] min-w-0 px-2 pb-2 truncate">
@@ -259,13 +240,23 @@ export function SecondaryTasks() {
               </button>
             </div>
               <div>
-                {sortedTasks.map((task, i) => {
+                {sortedTasks.map((task) => {
                   const done = completedTasks.has(task.name);
+                  const originalIndex = tasks.indexOf(task);
                   return (
                     <div
-                      key={i}
+                      key={task.name}
+                      tabIndex={0}
+                      role="row"
+                      onDoubleClick={() => demoData.openTaskModal(task, originalIndex, "tasks")}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          demoData.openTaskModal(task, originalIndex, "tasks");
+                        }
+                      }}
                       className={cn(
-                        "relative flex items-center border-b border-[#E6E5E3] last:border-b-0 hover:bg-[#FAF8F8] transition-opacity duration-300",
+                        "relative flex items-center border-b border-[#E6E5E3] last:border-b-0 hover:bg-[#FAF8F8] transition-opacity duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#949494]",
                         done && "opacity-55"
                       )}
                       style={{ transitionDelay: done ? "100ms" : "0ms" }}
@@ -333,6 +324,19 @@ export function SecondaryTasks() {
                   );
                 })}
               </div>
+
+            {/* "+ New Task" pill CTA — shown when card has room, hidden once full */}
+            {tasks.length < 6 && (
+              <div className="flex justify-center py-4">
+                <button
+                  onClick={() => demoData.openNewTaskModal()}
+                  className="flex items-center gap-1.5 rounded-full border border-[#E6E5E3] px-10 py-1.5 text-xs text-[#949494] hover:text-[#1E1E1E] hover:border-[#C8C7C5] transition-colors"
+                >
+                  <Plus className="size-3" weight="bold" />
+                  New Task
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Bottom fade mask */}

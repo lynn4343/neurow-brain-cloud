@@ -37,7 +37,10 @@ export function UserDropdown({ onViewChange }: UserDropdownProps) {
           className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Avatar className="size-9 cursor-pointer">
-            <AvatarFallback className="bg-[#FAF8F8] text-sm font-normal">
+            <AvatarFallback
+              className="bg-transparent text-sm font-normal"
+              style={{ backgroundColor: activeUser?.avatar_color || "#FAF8F8" }}
+            >
               {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>

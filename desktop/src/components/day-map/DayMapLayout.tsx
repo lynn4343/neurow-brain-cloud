@@ -2,12 +2,14 @@
 
 import { useRef, useCallback, useEffect } from "react";
 import { DayMapProvider, useDayMap } from "@/contexts/DayMapContext";
+import { DemoDataProvider } from "@/contexts/DemoDataContext";
 import { DayMapSidebar } from "./DayMapSidebar";
 import { CalendarTopTools } from "./CalendarTopTools";
 import { TimelineView } from "./TimelineView";
 import { WeekTimelineView } from "./WeekTimelineView";
 import { MonthCalendarView } from "./MonthCalendarView";
 import { DayMapRightPanel } from "./DayMapRightPanel";
+import { TaskEventModal } from "./TaskEventModal";
 
 const TIMELINE_MIN_WIDTH = 300;
 const TIMELINE_MAX_RATIO = 0.7;
@@ -120,7 +122,14 @@ function MonthViewContent() {
 }
 
 function DayMapContent() {
-  const { sidebarOpen, currentView } = useDayMap();
+  const { sidebarOpen, currentView, setSidebarOpen } = useDayMap();
+
+  // Auto-collapse sidebar when chat panel opens (event-based coordination)
+  useEffect(() => {
+    const handlePanelOpen = () => setSidebarOpen(false);
+    window.addEventListener("neurow-chat-panel-open", handlePanelOpen);
+    return () => window.removeEventListener("neurow-chat-panel-open", handlePanelOpen);
+  }, [setSidebarOpen]);
   const sidebarWidth = sidebarOpen ? 210 : 68;
 
   return (
@@ -174,7 +183,10 @@ function DayMapContent() {
 export function DayMapLayout() {
   return (
     <DayMapProvider>
-      <DayMapContent />
+      <DemoDataProvider>
+        <DayMapContent />
+        <TaskEventModal />
+      </DemoDataProvider>
     </DayMapProvider>
   );
 }

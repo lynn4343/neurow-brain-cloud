@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Check } from "@phosphor-icons/react";
 import { OnboardingLayout } from "./OnboardingLayout";
-import { BUSINESS_STAGES } from "./onboarding-data";
+import { BUSINESS_STAGES, COACHING_STYLES } from "./onboarding-data";
 
 // ---------------------------------------------------------------------------
 // Data contract — fields written to UserProfile after onboarding
@@ -62,35 +62,7 @@ const FOCUS_OPTIONS = [
   { id: "spirituality", label: "Spirituality", emoji: "\uD83D\uDE4F" },
 ];
 
-const COACHING_STYLES = [
-  {
-    id: "gentle",
-    emoji: "\uD83C\uDF38",
-    title: "Gentle Guidance",
-    description:
-      "Warm, supportive, and encouraging, I'll be your cheerleader.",
-  },
-  {
-    id: "balanced",
-    emoji: "\u2696\uFE0F",
-    title: "Balanced",
-    tag: "(Recommended)",
-    description:
-      "I'll adapt based on what you need\u2014gentle when you're struggling, direct when you need momentum.",
-  },
-  {
-    id: "direct",
-    emoji: "\uD83C\uDFAF",
-    title: "Direct",
-    description: "Straightforward. Tell it to me blunt.",
-  },
-  {
-    id: "peak-performance",
-    emoji: "\uD83D\uDD25",
-    title: "Peak Performance",
-    description: "Full accountability mode. Push me to be my best.",
-  },
-];
+// COACHING_STYLES — imported from onboarding-data.tsx (shared with Settings)
 
 // ---------------------------------------------------------------------------
 // Business Stages (verified against production business-stage/page.tsx)

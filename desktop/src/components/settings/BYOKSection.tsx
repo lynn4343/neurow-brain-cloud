@@ -145,16 +145,21 @@ export function BYOKSection() {
       <h2 className="text-sm font-medium uppercase tracking-wider text-[#1E1E1E] mb-1">
         Model Configuration
       </h2>
-      <p className="text-sm text-muted-foreground mb-5">
-        Connect your own API key to use Brain Cloud with any model.
-        Brain Cloud is model-agnostic — the same coaching, memories,
-        and knowledge graph work with any AI.
+      <p className="text-sm text-muted-foreground mb-3">
+        Connect your API key to use Neurow with any model. Neurow is
+        model-agnostic — your coaching, memories, and knowledge graph
+        work with any AI.
+      </p>
+      <p className="text-xs text-muted-foreground mb-5 leading-relaxed">
+        For the best coaching experience, we recommend sticking with our
+        carefully curated model. Stronger reasoning, planning, and behavioral synthesis
+        produce better insights. But the choice is always yours.
       </p>
 
       <div className="space-y-5">
         {/* Provider selector — segmented control */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-[#1E1E1E]">Provider</label>
+        <div>
+          <label className="block mb-2 text-sm font-medium text-[#1E1E1E]">Provider</label>
           <div className="inline-flex gap-1 rounded-lg bg-[#F4F1F1] p-1">
             {PROVIDER_PRESETS.map((preset) => (
               <button
@@ -175,8 +180,8 @@ export function BYOKSection() {
         </div>
 
         {/* API Endpoint */}
-        <div className="space-y-1.5">
-          <label htmlFor="byok-endpoint" className="text-sm font-medium text-[#1E1E1E]">
+        <div>
+          <label htmlFor="byok-endpoint" className="block mb-2 text-sm font-medium text-[#1E1E1E]">
             API Endpoint
           </label>
           <Input
@@ -228,8 +233,8 @@ export function BYOKSection() {
         </div>
 
         {/* API Key */}
-        <div className="space-y-1.5">
-          <label htmlFor="byok-api-key" className="text-sm font-medium text-[#1E1E1E]">
+        <div>
+          <label htmlFor="byok-api-key" className="block mb-2 text-sm font-medium text-[#1E1E1E]">
             API Key
           </label>
           <Input
@@ -242,30 +247,12 @@ export function BYOKSection() {
             placeholder={activePreset.keyPlaceholder}
             className="max-w-sm"
           />
-          <p className="text-xs text-muted-foreground">
-            Your key is stored locally on this device only.
-          </p>
         </div>
 
         {/* Save */}
         <Button onClick={handleSave} variant="outline" size="sm">
           {saved ? "Saved" : "Save"}
         </Button>
-
-        {/* Status indicator */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {config.apiKey ? (
-            <>
-              <Check className="size-4 text-green-600" weight="bold" />
-              <span>Currently using: {activeModelLabel} ({activePreset.name})</span>
-            </>
-          ) : (
-            <>
-              <Info className="size-4" weight="regular" />
-              <span>Currently using: Claude Sonnet 4.6 (Anthropic) via default</span>
-            </>
-          )}
-        </div>
       </div>
     </section>
   );
