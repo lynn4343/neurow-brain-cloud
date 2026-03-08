@@ -55,6 +55,13 @@ export interface UserContext {
   career_challenges?: string[];
 }
 
+// --- Chat Available Result ---
+
+export interface ChatAvailableResult {
+  mode: 'api' | 'cli' | 'none';
+  detail: string;
+}
+
 // --- Neurow API type (exposed by preload via contextBridge) ---
 
 // --- Direct Data API types (model-agnostic, no AI in the loop) ---
@@ -85,6 +92,7 @@ export interface BrainExportData {
 interface NeurowAPI {
   sendMessage: (prompt: string, sessionId?: string, userContext?: unknown) => Promise<string>;
   checkClaudeInstalled: () => Promise<boolean>;
+  checkChatAvailable: () => Promise<ChatAvailableResult>;
   onChatStream: (callback: (data: ChatStreamEvent) => void) => () => void;
   onChatComplete: (callback: (data: ChatCompleteEvent) => void) => () => void;
   onChatError: (callback: (data: ChatErrorEvent) => void) => () => void;
@@ -95,6 +103,8 @@ interface NeurowAPI {
   updateProfile: (userId: string, profileData: Record<string, unknown>) => Promise<UpdateProfileResult>;
   getProfile: (userId: string) => Promise<Record<string, unknown>>;
   exportData: (userId: string) => Promise<BrainExportData>;
+  openBrainCloud: (slug?: string) => Promise<void>;
+  setBYOKConfig: (config: { provider: string; endpoint: string; apiKey: string; model: string } | null) => Promise<ChatAvailableResult>;
 }
 
 declare global {
@@ -115,6 +125,10 @@ export async function sendMessage(
 
 export async function checkClaudeInstalled(): Promise<boolean> {
   return window.neurow.checkClaudeInstalled();
+}
+
+export async function checkChatAvailable(): Promise<ChatAvailableResult> {
+  return window.neurow.checkChatAvailable();
 }
 
 // --- Event Listeners ---
@@ -170,4 +184,14 @@ export async function getProfile(userId: string): Promise<Record<string, unknown
 
 export async function exportData(userId: string): Promise<BrainExportData> {
   return window.neurow.exportData(userId);
+}
+
+export async function openBrainCloud(slug?: string): Promise<void> {
+  return window.neurow.openBrainCloud(slug);
+}
+
+export async function setBYOKConfig(
+  config: { provider: string; endpoint: string; apiKey: string; model: string } | null,
+): Promise<ChatAvailableResult> {
+  return window.neurow.setBYOKConfig(config);
 }

@@ -16,6 +16,7 @@ import {
 export interface GoalCascade {
   vision: string;
   quarterly_goal: string;
+  quarterly_goal_headline?: string;
   goal_why: string;
   identity_traits: string[];
   release_items: string[];
@@ -50,6 +51,9 @@ export interface UserProfile {
   career_challenges?: string[];
   love_partner_situation?: string;
   avatar_color?: string; // hex color for avatar circle
+  deeper_insights_enabled?: boolean; // opt-in for emotional/health/wellbeing pattern recognition
+  pattern_consent?: boolean; // TDPSA § 541.001 — affirmative consent for sensitive data processing
+  pattern_consent_at?: string; // ISO 8601 timestamp of consent grant or withdrawal (audit trail)
 }
 
 export type AppPhase = "loading" | "main" | "onboarding" | "clarity_session";
@@ -100,6 +104,8 @@ const THEO_PROFILE: UserProfile = {
   onboarding_completed: true,
   clarity_session_completed: true,
   coaching_style: "balanced",
+  pattern_consent: true,
+  pattern_consent_at: "2026-02-28T10:00:00.000Z",
   roles: ["business_owner"],
   focus_area: "career-business",
   declared_challenges: [
@@ -115,6 +121,8 @@ const THEO_PROFILE: UserProfile = {
       "Self-sustaining creative practice \u2014 brand identity + motion design, debt cleared, recognized in Austin creative community",
     quarterly_goal:
       "$100/hour for new clients, 3 concurrent projects, School of Motion modules 1-6",
+    quarterly_goal_headline:
+      "Hit $100/hr, 3 active projects, start School of Motion",
     goal_why: "I'm tired of the feast-or-famine cycle",
     identity_traits: [
       "bold with pricing",

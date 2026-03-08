@@ -97,7 +97,7 @@ export function OnboardingLayout({
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex min-h-screen items-start justify-center px-4 pb-8 pt-[90px]">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 pb-8 pt-[90px]">
         <div className={`flex w-full max-w-[450px] flex-col ${contentGap}`}>
           {children}
 

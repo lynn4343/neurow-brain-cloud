@@ -2,8 +2,11 @@ import { BrowserWindow } from 'electron';
 import { spawn, execSync } from 'child_process';
 import { createInterface } from 'readline';
 import { existsSync, mkdirSync } from 'fs';
+import { randomUUID } from 'crypto';
 import path from 'path';
 import os from 'os';
+import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
 // --- Types (match claude.rs exactly) ---
 
@@ -73,6 +76,42 @@ export interface UserContext {
   career_stage?: string;
   career_focus?: string;
   career_challenges?: string[];
+}
+
+// --- MCP Client Types (local interface — ESM subpath resolution workaround) ---
+// @modelcontextprotocol/sdk is ESM-only with subpath exports. TypeScript with
+// "module": "commonjs" + "moduleResolution": "node" can't resolve these types.
+// We define the shape we need here and use dynamic import() at runtime.
+
+interface MCPTool {
+  name: string;
+  description?: string;
+  inputSchema: Record<string, unknown>;
+}
+
+interface MCPToolResult {
+  content: Array<{ type: string; text?: string }>;
+  isError?: boolean;
+}
+
+interface MCPClientLike {
+  connect(transport: unknown): Promise<void>;
+  listTools(): Promise<{ tools: MCPTool[] }>;
+  callTool(params: { name: string; arguments: Record<string, unknown> }): Promise<MCPToolResult>;
+  close(): Promise<void>;
+}
+
+interface AnthropicToolDef {
+  name: string;
+  description: string;
+  input_schema: Record<string, unknown>;
+}
+
+// --- Chat Available Result ---
+
+export interface ChatAvailableResult {
+  mode: 'api' | 'cli' | 'none';
+  detail: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -501,7 +540,17 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
     case 'WebFetch':
       return 'Fetching web page...';
     default:
-      // Brain Cloud tools — specific labels first, catch-all last
+      // Brain Cloud tools — bare names (API mode via MCP client)
+      if (name === 'brain_recall') return 'Searching Brain Cloud...';
+      if (name === 'brain_remember') return 'Storing to memory...';
+      if (name === 'brain_export') return 'Exporting your data...';
+      if (name === 'brain_create_profile') return 'Creating profile...';
+      if (name === 'brain_update_profile') return 'Updating your profile...';
+      if (name === 'coaching_get_prompt') return 'Reflecting...';
+      if (name === 'coaching_store_turn') return 'Saving session progress...';
+      if (name === 'coaching_get_session_prompt') return 'Loading executive intelligence...';
+
+      // Brain Cloud tools — namespaced names (CLI mode via Claude CLI)
       if (name.startsWith('mcp__brain-cloud__brain_recall')) return 'Searching Brain Cloud...';
       if (name.startsWith('mcp__brain-cloud__brain_remember')) return 'Storing to memory...';
       if (name.startsWith('mcp__brain-cloud__brain_export')) return 'Exporting your data...';
@@ -509,7 +558,7 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
       if (name.startsWith('mcp__brain-cloud__brain_update_profile')) return 'Updating your profile...';
       if (name.startsWith('mcp__brain-cloud__coaching_get_prompt')) return 'Reflecting...';
       if (name.startsWith('mcp__brain-cloud__coaching_store_turn')) return 'Saving session progress...';
-      if (name.startsWith('mcp__brain-cloud__coaching_get_session_prompt')) return 'Loading coaching session...';
+      if (name.startsWith('mcp__brain-cloud__coaching_get_session_prompt')) return 'Loading executive intelligence...';
       if (name.startsWith('mcp__brain-cloud__')) return 'Using Brain Cloud...';
       // Other MCP servers
       if (name.startsWith('mcp__google-calendar__')) return 'Checking calendar...';
@@ -824,5 +873,559 @@ export async function checkClaudeInstalled(): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// MCPClientManager — Lazy MCP client for Brain Cloud server
+// Spawns brain-cloud Python server as subprocess (uv run brain-cloud),
+// connects via stdio transport, caches tool definitions.
+// ---------------------------------------------------------------------------
+
+const BRAIN_CLOUD_TOOLS = new Set([
+  'brain_recall', 'brain_remember', 'brain_export',
+  'brain_create_profile', 'brain_update_profile',
+  'coaching_get_prompt', 'coaching_store_turn', 'coaching_get_session_prompt',
+]);
+
+class MCPClientManager {
+  private client: MCPClientLike | null = null;
+  private toolCache: AnthropicToolDef[] | null = null;
+  private connecting: Promise<void> | null = null;
+
+  async ensureConnected(): Promise<void> {
+    if (this.client) return;
+    if (this.connecting) return this.connecting;
+    this.connecting = this._connect();
+    try {
+      await this.connecting;
+    } finally {
+      this.connecting = null;
+    }
+  }
+
+  private async _connect(): Promise<void> {
+    // Dynamic import of ESM-only MCP SDK modules.
+    // TypeScript preserves import() as-is in CJS output.
+    // Node.js handles dynamic import of ESM from CJS at runtime.
+    const clientMod = await import('@modelcontextprotocol/sdk/client/index.js');
+    const stdioMod = await import('@modelcontextprotocol/sdk/client/stdio.js');
+
+    const Client = clientMod.Client;
+    const StdioClientTransport = stdioMod.StdioClientTransport;
+
+    // Brain Cloud server directory — relative to electron-dist/ at runtime
+    const brainCloudDir = path.resolve(__dirname, '../../brain-cloud');
+
+    // Build env: extend PATH for uv/python, filter out undefined values
+    const home = os.homedir();
+    const extraPaths = [
+      '/usr/local/bin',
+      path.join(home, '.local/bin'),
+      path.join(home, '.cargo/bin'),
+      '/opt/homebrew/bin',
+    ];
+    const currentPath = process.env.PATH || '/usr/bin:/bin';
+    const fullPath = [...extraPaths, ...currentPath.split(':')]
+      .filter((v, i, a) => a.indexOf(v) === i).join(':');
+
+    // StdioClientTransport expects Record<string, string> — filter undefined
+    const cleanEnv: Record<string, string> = {};
+    for (const [k, v] of Object.entries(process.env)) {
+      if (v !== undefined) cleanEnv[k] = v;
+    }
+    cleanEnv.PATH = fullPath;
+
+    const transport = new StdioClientTransport({
+      command: 'uv',
+      args: ['run', 'brain-cloud'],
+      cwd: brainCloudDir,
+      env: cleanEnv,
+    });
+
+    this.client = new Client(
+      { name: 'neurow-desktop', version: '0.1.0' },
+      { capabilities: {} },
+    ) as MCPClientLike;
+
+    await this.client.connect(transport);
+    console.log('MCPClientManager: connected to Brain Cloud server');
+  }
+
+  async getTools(): Promise<AnthropicToolDef[]> {
+    if (this.toolCache) return this.toolCache;
+    await this.ensureConnected();
+    const { tools } = await this.client!.listTools();
+    this.toolCache = tools
+      .filter(t => BRAIN_CLOUD_TOOLS.has(t.name))
+      .map(t => ({
+        name: t.name,
+        description: t.description || '',
+        input_schema: t.inputSchema,
+      }));
+    console.log(`MCPClientManager: cached ${this.toolCache.length} tools`);
+    return this.toolCache;
+  }
+
+  async callTool(name: string, args: Record<string, unknown>): Promise<string> {
+    await this.ensureConnected();
+    const result = await this.client!.callTool({ name, arguments: args });
+    return result.content
+      .filter(c => c.type === 'text' && c.text)
+      .map(c => c.text!)
+      .join('');
+  }
+
+  async close(): Promise<void> {
+    if (this.client) {
+      try { await this.client.close(); } catch (err) {
+        console.warn('MCPClientManager: close error:', err);
+      }
+      this.client = null;
+      this.toolCache = null;
+    }
+  }
+}
+
+const mcpManager = new MCPClientManager();
+
+export async function cleanupMCPClient(): Promise<void> {
+  await mcpManager.close();
+}
+
+// ---------------------------------------------------------------------------
+// sendMessageAPI — Direct Anthropic API path
+// Same signature and StreamEmitter contract as sendMessage().
+// Uses Anthropic Messages API with streaming + MCP client for tool routing.
+// ---------------------------------------------------------------------------
+
+interface ConversationState {
+  systemPrompt: string;
+  messages: Anthropic.MessageParam[];
+  provider: 'anthropic' | 'openai';
+  lastAccessedAt: number;
+}
+
+const conversations = new Map<string, ConversationState>();
+
+// Periodic cleanup of stale sessions (1 hour TTL)
+const SESSION_TTL_MS = 3_600_000;
+function cleanupStaleSessions(): void {
+  const now = Date.now();
+  for (const [sid, convo] of conversations) {
+    if (now - convo.lastAccessedAt > SESSION_TTL_MS) {
+      conversations.delete(sid);
+    }
+  }
+}
+// Run cleanup every 15 minutes
+setInterval(cleanupStaleSessions, 900_000);
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-6';
+const MAX_TOOL_ITERATIONS = 20;
+
+// Convert MCP/Anthropic tool definitions to OpenAI function-calling format
+function mcpToolsToOpenAI(tools: AnthropicToolDef[]): OpenAI.ChatCompletionTool[] {
+  return tools.map(t => ({
+    type: 'function' as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.input_schema as Record<string, unknown>,
+    },
+  }));
+}
+
+export async function sendMessageAPI(
+  window: BrowserWindow,
+  prompt: string,
+  sessionId?: string,
+  userContext?: UserContext,
+  options?: { apiKey?: string; model?: string },
+): Promise<string> {
+  const apiKey = options?.apiKey || process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('No Anthropic API key configured');
+
+  // Session management
+  const sid = sessionId || randomUUID();
+  let convo = conversations.get(sid);
+  if (!convo) {
+    convo = {
+      systemPrompt: buildSystemPrompt(userContext),
+      messages: [],
+      provider: 'anthropic',
+      lastAccessedAt: Date.now(),
+    };
+    conversations.set(sid, convo);
+  }
+  convo.lastAccessedAt = Date.now();
+
+  // Append user message
+  convo.messages.push({ role: 'user', content: prompt });
+
+  // Emitter (same safeSend pattern as sendMessage)
+  function safeSend(channel: string, data: unknown) {
+    if (!window.isDestroyed()) {
+      window.webContents.send(channel, data);
+    }
+  }
+
+  const emit: StreamEmitter = {
+    chatStream: (data) => safeSend('chat_stream', data),
+    chatActivity: (data) => safeSend('chat_activity', data),
+    sessionComplete: (data) => safeSend('session_complete', data),
+    chatComplete: (data) => safeSend('chat_complete', data),
+    chatError: (data) => safeSend('chat_error', data),
+  };
+
+  const startTime = Date.now();
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+
+  try {
+    const tools = await mcpManager.getTools();
+    const client = new Anthropic({ apiKey });
+
+    let iterations = 0;
+
+    while (iterations < MAX_TOOL_ITERATIONS) {
+      iterations++;
+
+      const stream = client.messages.stream({
+        model: options?.model || DEFAULT_ANTHROPIC_MODEL,
+        max_tokens: 4096,
+        system: convo.systemPrompt,
+        messages: convo.messages,
+        tools: tools as Anthropic.Tool[],
+      });
+
+      let accumulatedText = '';
+
+      stream.on('text', (delta: string) => {
+        accumulatedText += delta;
+        if (accumulatedText.trim()) {
+          emit.chatStream({
+            session_id: sid,
+            content: accumulatedText,
+            is_partial: true,
+          });
+        }
+      });
+
+      stream.on('contentBlock', (block: Anthropic.ContentBlock) => {
+        if (block.type === 'tool_use') {
+          emit.chatActivity({
+            session_id: sid,
+            tool_name: block.name,
+            summary: summarizeToolUse(block.name, block.input as Record<string, unknown>),
+          });
+        }
+      });
+
+      const message = await stream.finalMessage();
+
+      totalInputTokens += message.usage?.input_tokens || 0;
+      totalOutputTokens += message.usage?.output_tokens || 0;
+
+      // Finalize text (is_partial: false)
+      if (accumulatedText.trim()) {
+        emit.chatStream({
+          session_id: sid,
+          content: accumulatedText,
+          is_partial: false,
+        });
+      }
+
+      // Append assistant message to conversation history
+      convo.messages.push({
+        role: 'assistant',
+        content: message.content as Anthropic.ContentBlock[],
+      });
+
+      // If no tool calls, we're done
+      if (message.stop_reason !== 'tool_use') break;
+
+      // Execute tool calls
+      const toolUseBlocks = message.content.filter(
+        (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use',
+      );
+
+      const toolResults: Anthropic.ToolResultBlockParam[] = [];
+
+      for (const toolBlock of toolUseBlocks) {
+        try {
+          const resultText = await mcpManager.callTool(
+            toolBlock.name,
+            toolBlock.input as Record<string, unknown>,
+          );
+
+          // Detect session completion from coaching_store_turn
+          if (toolBlock.name === 'coaching_store_turn') {
+            try {
+              const parsed = JSON.parse(resultText);
+              if (parsed.session_complete === true && parsed.goal_cascade) {
+                emit.sessionComplete({
+                  session_id: sid,
+                  goal_cascade: parsed.goal_cascade,
+                });
+              }
+            } catch {
+              // Not JSON or no session_complete — fine
+            }
+          }
+
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: toolBlock.id,
+            content: resultText,
+          });
+        } catch (err) {
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: toolBlock.id,
+            content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+            is_error: true,
+          });
+        }
+      }
+
+      // Append tool results as a user message
+      convo.messages.push({ role: 'user', content: toolResults });
+    }
+
+    if (iterations >= MAX_TOOL_ITERATIONS) {
+      console.warn(`sendMessageAPI: hit max tool iterations (${MAX_TOOL_ITERATIONS})`);
+    }
+
+    const durationMs = Date.now() - startTime;
+    // Model-aware cost estimate (per MTok: input / output)
+    const MODEL_PRICING: Record<string, [number, number]> = {
+      'claude-sonnet-4-6': [3, 15],
+      'claude-opus-4-6': [15, 75],
+      'claude-haiku-4-5-20251001': [0.8, 4],
+    };
+    const activeModel = options?.model || DEFAULT_ANTHROPIC_MODEL;
+    const [inputRate, outputRate] = MODEL_PRICING[activeModel] ?? [3, 15];
+    const costUsd = (totalInputTokens * inputRate + totalOutputTokens * outputRate) / 1_000_000;
+
+    emit.chatComplete({
+      session_id: sid,
+      cost_usd: costUsd,
+      duration_ms: durationMs,
+    });
+
+    return sid;
+  } catch (err) {
+    emit.chatError({
+      session_id: sid,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// checkChatAvailable — Returns which chat mode is available
+// ---------------------------------------------------------------------------
+
+export async function checkChatAvailable(byokKey?: string): Promise<ChatAvailableResult> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return { mode: 'api', detail: 'Anthropic API key configured (.env)' };
+  }
+  if (byokKey) {
+    return { mode: 'api', detail: 'API key configured (BYOK)' };
+  }
+  if (await checkClaudeInstalled()) {
+    return { mode: 'cli', detail: 'Claude Code CLI detected' };
+  }
+  return {
+    mode: 'none',
+    detail: 'Add your API key in Settings \u203a Model Configuration, or add ANTHROPIC_API_KEY to desktop/.env',
+  };
+}
+
+// ---------------------------------------------------------------------------
+// sendMessageOpenAI — OpenAI-compatible API path (NVIDIA NIM, Custom, DGX Spark)
+// Non-streaming tool calls (BK-D-008). Same MCPClientManager + StreamEmitter contract.
+// ---------------------------------------------------------------------------
+
+export async function sendMessageOpenAI(
+  window: BrowserWindow,
+  prompt: string,
+  sessionId?: string,
+  userContext?: UserContext,
+  options?: { apiKey: string; model: string; endpoint: string },
+): Promise<string> {
+  if (!options?.apiKey) throw new Error('No API key configured for OpenAI-compatible provider');
+
+  const sid = sessionId || randomUUID();
+  let convo = conversations.get(sid);
+  if (!convo) {
+    convo = {
+      systemPrompt: buildSystemPrompt(userContext),
+      messages: [],
+      provider: 'openai',
+      lastAccessedAt: Date.now(),
+    };
+    conversations.set(sid, convo);
+  }
+  convo.lastAccessedAt = Date.now();
+
+  // Append user message
+  convo.messages.push({ role: 'user', content: prompt });
+
+  function safeSend(channel: string, data: unknown) {
+    if (!window.isDestroyed()) {
+      window.webContents.send(channel, data);
+    }
+  }
+
+  const emit: StreamEmitter = {
+    chatStream: (data) => safeSend('chat_stream', data),
+    chatActivity: (data) => safeSend('chat_activity', data),
+    sessionComplete: (data) => safeSend('session_complete', data),
+    chatComplete: (data) => safeSend('chat_complete', data),
+    chatError: (data) => safeSend('chat_error', data),
+  };
+
+  const startTime = Date.now();
+
+  try {
+    const mcpTools = await mcpManager.getTools();
+    const openaiTools = mcpToolsToOpenAI(mcpTools);
+
+    const client = new OpenAI({
+      apiKey: options.apiKey,
+      baseURL: options.endpoint,
+    });
+
+    // Build OpenAI message array — system prompt + conversation history
+    const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
+      { role: 'system' as const, content: convo.systemPrompt },
+    ];
+
+    // Convert stored messages to OpenAI format (extract text from ContentBlock[])
+    for (const m of convo.messages) {
+      let textContent: string;
+      if (typeof m.content === 'string') {
+        textContent = m.content;
+      } else if (Array.isArray(m.content)) {
+        textContent = (m.content as Array<{ type: string; text?: string }>)
+          .filter(b => b.type === 'text' && b.text)
+          .map(b => b.text!)
+          .join('') || '';
+      } else {
+        textContent = String(m.content);
+      }
+      openaiMessages.push({
+        role: m.role as 'user' | 'assistant',
+        content: textContent,
+      });
+    }
+
+    let iterations = 0;
+
+    while (iterations < MAX_TOOL_ITERATIONS) {
+      iterations++;
+
+      // Non-streaming for tool calls (BK-D-008 — NVIDIA NIM streaming edge case)
+      const response = await client.chat.completions.create({
+        model: options.model,
+        messages: openaiMessages,
+        tools: openaiTools.length > 0 ? openaiTools : undefined,
+        tool_choice: openaiTools.length > 0 ? 'auto' : undefined,
+      });
+
+      const choice = response.choices[0];
+      const message = choice.message;
+
+      // Emit text content (arrives at once — non-streaming)
+      if (message.content) {
+        emit.chatStream({
+          session_id: sid,
+          content: message.content,
+          is_partial: false,
+        });
+      }
+
+      // Append assistant message to OpenAI history
+      openaiMessages.push(message);
+
+      // Store in conversation state for session resume
+      convo.messages.push({
+        role: 'assistant',
+        content: message.content || '',
+      });
+
+      // If no tool calls, done
+      if (!message.tool_calls || message.tool_calls.length === 0) break;
+
+      // Execute tool calls via MCP
+      for (const toolCall of message.tool_calls) {
+        // Guard: openai v6 union type includes custom tool calls without .function
+        if (toolCall.type !== 'function') continue;
+        const toolName = toolCall.function.name;
+        let args: Record<string, unknown> = {};
+        try {
+          args = JSON.parse(toolCall.function.arguments);
+        } catch {
+          // Malformed arguments — pass empty
+        }
+
+        emit.chatActivity({
+          session_id: sid,
+          tool_name: toolName,
+          summary: summarizeToolUse(toolName, args),
+        });
+
+        try {
+          const resultText = await mcpManager.callTool(toolName, args);
+
+          // Detect session completion from coaching_store_turn
+          if (toolName === 'coaching_store_turn') {
+            try {
+              const parsed = JSON.parse(resultText);
+              if (parsed.session_complete === true && parsed.goal_cascade) {
+                emit.sessionComplete({
+                  session_id: sid,
+                  goal_cascade: parsed.goal_cascade,
+                });
+              }
+            } catch { /* Not JSON — fine */ }
+          }
+
+          openaiMessages.push({
+            role: 'tool' as const,
+            tool_call_id: toolCall.id,
+            content: resultText,
+          });
+        } catch (err) {
+          openaiMessages.push({
+            role: 'tool' as const,
+            tool_call_id: toolCall.id,
+            content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+          });
+        }
+      }
+    }
+
+    if (iterations >= MAX_TOOL_ITERATIONS) {
+      console.warn(`sendMessageOpenAI: hit max tool iterations (${MAX_TOOL_ITERATIONS})`);
+    }
+
+    const durationMs = Date.now() - startTime;
+
+    emit.chatComplete({
+      session_id: sid,
+      cost_usd: 0, // NVIDIA NIM pricing varies; skip cost estimate
+      duration_ms: durationMs,
+    });
+
+    return sid;
+  } catch (err) {
+    emit.chatError({
+      session_id: sid,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
   }
 }

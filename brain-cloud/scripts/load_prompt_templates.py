@@ -1,17 +1,18 @@
 """
 Load 17 prompt templates into Supabase prompt_templates table.
 
-Reads coaching scripts from BUILD_SPECS, extracts content between markers,
-and upserts into prompt_templates. Idempotent: safe to re-run.
+Reads coaching scripts from the coaching_scripts directory, extracts content
+between markers, and upserts into prompt_templates. Idempotent: safe to re-run.
 
 Run from brain-cloud/:
   uv run python scripts/load_prompt_templates.py
 
-Source: Wave 3 S1 spec
+Set COACHING_SCRIPTS_DIR to override the default path (data/coaching_scripts/).
 """
 
 import asyncio
 import logging
+import os
 import re
 from pathlib import Path
 
@@ -22,10 +23,14 @@ from brain_cloud.config import Settings
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("load_prompt_templates")
 
-# Source directory for coaching scripts
-SCRIPTS_DIR = Path.home() / (
-    "LIFE_OS/_0_Neurow_Org/Engineering/Mission_Control/Active_Projects/"
-    "Hackathon_Sprint/BUILD_SPECS/Coaching_Design/Coaching_Scripts"
+# Source directory for coaching scripts.
+# Set COACHING_SCRIPTS_DIR in your environment, or default to data/coaching_scripts/
+# relative to the repo root.
+SCRIPTS_DIR = Path(
+    os.environ.get(
+        "COACHING_SCRIPTS_DIR",
+        str(Path(__file__).resolve().parent.parent.parent / "data" / "coaching_scripts"),
+    )
 )
 
 

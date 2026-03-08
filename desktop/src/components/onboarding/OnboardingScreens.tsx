@@ -530,7 +530,7 @@ function Chip({
     <button
       type="button"
       onClick={onToggle}
-      className={`flex h-10 items-center gap-2 rounded-lg border bg-white px-3 py-1.5 text-sm text-[#1e1e1e] transition-all duration-150 ${
+      className={`flex min-h-10 items-center gap-2 rounded-lg border bg-white px-3 py-2.5 text-left text-sm text-[#1e1e1e] transition-all duration-150 ${
         selected
           ? "border-[#e6e5e3] shadow-[0px_0px_0px_2px_white,0px_0px_0px_4px_#1e1e1e]"
           : "border-[#e6e5e3] hover:border-[#c9c8c6]"

@@ -8,23 +8,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  House,
   CalendarCheck,
   Cards,
   Note,
-  BookOpen,
-  Headphones,
-  Question,
   PlusCircle,
   Chat,
   CaretDoubleLeft,
   SignOut,
-  Brain,
   GearSix,
+  CalendarPlus,
+  ListPlus,
   type IconProps,
 } from "@phosphor-icons/react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
-export type View = "home" | "daymap" | "chat" | "projects" | "notes" | "brain-cloud" | "settings";
+export type View = "home" | "daymap" | "chat" | "projects" | "notes" | "settings";
 
 interface NavItem {
   icon: React.ComponentType<IconProps> | (() => React.JSX.Element);
@@ -33,20 +37,13 @@ interface NavItem {
 }
 
 const mainNavItems: NavItem[] = [
-  { icon: House, label: "Neurow Center", viewId: "home" },
+  { icon: Chat, label: "Neurow Chat", viewId: "chat" },
   { icon: CalendarCheck, label: "Calendar", viewId: "daymap" },
   { icon: Cards, label: "Projects", viewId: "projects" },
   { icon: Note, label: "Notes", viewId: "notes" },
-  { icon: Chat, label: "Neurow Chat", viewId: "chat" },
-  { icon: Brain, label: "Brain Cloud", viewId: "brain-cloud" },
   { icon: GearSix, label: "Settings", viewId: "settings" },
 ];
 
-const resourceNavItems: NavItem[] = [
-  { icon: BookOpen, label: "Learn" },
-  { icon: Headphones, label: "Neurow RX" },
-  { icon: Question, label: "Help Center" },
-];
 
 interface MainNavSidebarProps {
   activeView: View;
@@ -143,24 +140,64 @@ export function MainNavSidebar({
 
       {/* Navigation */}
       <div className="flex flex-col gap-5">
-        {/* New Button */}
-        {sidebarOpen ? (
-          <button className="flex h-[36px] items-center gap-2 rounded-lg bg-[#2D2D2D] px-3 text-sm font-medium text-white hover:bg-[#3A3A3A] active:scale-95 transition-all duration-200">
-            <PlusCircle className="size-4 text-white" weight="fill" />
-            <span>New</span>
-          </button>
-        ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
+        {/* New Button — dropdown menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            {sidebarOpen ? (
+              <button className="flex h-[36px] items-center gap-2 rounded-lg bg-[#2D2D2D] px-3 text-sm font-medium text-white hover:bg-[#3A3A3A] active:scale-95 transition-all duration-200">
+                <PlusCircle className="size-4 text-white" weight="fill" />
+                <span>New</span>
+              </button>
+            ) : (
               <button className="flex size-9 items-center justify-center rounded-lg bg-[#2D2D2D] hover:bg-[#3A3A3A] active:scale-95 transition-all duration-200">
                 <PlusCircle className="size-4 text-white" weight="fill" />
               </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <p>New</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            side={sidebarOpen ? "bottom" : "right"}
+            align="start"
+            sideOffset={8}
+            className="w-[180px]"
+          >
+            <DropdownMenuItem
+              onSelect={() => onViewChange("chat")}
+              className="gap-2.5 py-2"
+            >
+              <Chat className="size-4 text-[#80807d]" weight="regular" />
+              <span className="text-[13px]">New Chat</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem disabled className="gap-2.5 py-2">
+              <CalendarPlus className="size-4" weight="regular" />
+              <span className="text-[13px]">New Event</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled className="gap-2.5 py-2">
+              <ListPlus className="size-4" weight="regular" />
+              <span className="text-[13px]">New Task</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                onViewChange("notes");
+                // Wait for notes view to mount and attach listener before dispatching.
+                // Uses requestAnimationFrame + setTimeout for reliable mount timing.
+                requestAnimationFrame(() => {
+                  setTimeout(
+                    () =>
+                      window.dispatchEvent(
+                        new CustomEvent("neurow-create-note")
+                      ),
+                    100
+                  );
+                });
+              }}
+              className="gap-2.5 py-2"
+            >
+              <Note className="size-4 text-[#80807d]" weight="regular" />
+              <span className="text-[13px]">New Note</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <div className="h-px bg-[#E6E5E3]" />
 
@@ -179,22 +216,6 @@ export function MainNavSidebar({
           ))}
         </nav>
 
-        <div className="h-px bg-[#E6E5E3] mt-[17px]" />
-
-        {/* Resources */}
-        <nav className="flex flex-col gap-0">
-          {resourceNavItems.map((item) => (
-            <NavItemButton
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              viewId={item.viewId}
-              active={false}
-              expanded={sidebarOpen}
-              onViewChange={onViewChange}
-            />
-          ))}
-        </nav>
       </div>
 
       {/* Spacer to push sign out to bottom */}

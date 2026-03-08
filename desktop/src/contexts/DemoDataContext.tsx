@@ -19,6 +19,41 @@ import {
 } from "@/lib/demo-data";
 
 // ---------------------------------------------------------------------------
+// Dynamic Brain Cloud event for new users
+// ---------------------------------------------------------------------------
+
+/** Creates a calendar event 30 min from now for non-Theo users, surfacing
+ *  the "sync coming soon" message directly on the timeline. */
+function createBrainCloudEvent(): CalendarEvent {
+  const now = new Date();
+  const start = new Date(now.getTime() + 30 * 60_000);
+  const end = new Date(now.getTime() + 60 * 60_000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    id: "brain-cloud-sync",
+    title: "Task & Calendar Sync \u2014 Coming Soon",
+    date: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
+    startTime: `${pad(start.getHours())}:${pad(start.getMinutes())}`,
+    endTime: `${pad(end.getHours())}:${pad(end.getMinutes())}`,
+    durationMin: 30,
+    category: "Coaching",
+  };
+}
+
+/** Returns calendar events for a user, appending the Brain Cloud sync event
+ *  for non-Theo users who have imported data. */
+function getEventsForUser(slug: string | undefined): CalendarEvent[] {
+  const base = getUserData(CALENDAR_EVENTS, slug);
+  if (slug && slug !== "theo" && typeof window !== "undefined") {
+    const hasImported = !!localStorage.getItem(`neurow_import_completed_${slug}`);
+    if (hasImported) {
+      return [...base, createBrainCloudEvent()];
+    }
+  }
+  return base;
+}
+
+// ---------------------------------------------------------------------------
 // Modal types
 // ---------------------------------------------------------------------------
 
@@ -54,6 +89,8 @@ interface DemoDataContextType {
   ) => void;
   updateEvent: (id: string, updates: Partial<CalendarEvent>) => void;
   addTask: (task: Task) => void;
+  addTopPriority: (task: TopPriority, index: number) => void;
+  materializeTopPriorities: (priorities: TopPriority[]) => void;
   deleteTask: (index: number, source: "tasks" | "topPriorities") => void;
   deleteEvent: (id: string) => void;
 
@@ -64,7 +101,7 @@ interface DemoDataContextType {
     index: number,
     source: "tasks" | "topPriorities",
   ) => void;
-  openNewTaskModal: () => void;
+  openNewTaskModal: (source?: "tasks" | "topPriorities", index?: number) => void;
   openEventModal: (event: CalendarEvent) => void;
   openNewEventModal: (date: string, startTime: string) => void;
   addEvent: (event: CalendarEvent) => void;
@@ -88,7 +125,7 @@ export function DemoDataProvider({ children }: { children: ReactNode }) {
     getUserData(TOP_PRIORITIES, slug),
   );
   const [events, setEvents] = useState<CalendarEvent[]>(() =>
-    getUserData(CALENDAR_EVENTS, slug),
+    getEventsForUser(slug),
   );
   const [modalData, setModalData] = useState<ModalData | null>(null);
 
@@ -98,7 +135,7 @@ export function DemoDataProvider({ children }: { children: ReactNode }) {
     setPrevSlug(slug);
     setTasks(getUserData(TASKS, slug));
     setTopPriorities(getUserData(TOP_PRIORITIES, slug));
-    setEvents(getUserData(CALENDAR_EVENTS, slug));
+    setEvents(getEventsForUser(slug));
     setModalData(null);
   }
 
@@ -134,6 +171,20 @@ export function DemoDataProvider({ children }: { children: ReactNode }) {
     setTasks((prev) => [...prev, task]);
   }, []);
 
+  const materializeTopPriorities = useCallback((priorities: TopPriority[]) => {
+    setTopPriorities(priorities);
+  }, []);
+
+  const addTopPriority = useCallback((task: TopPriority, index: number) => {
+    setTopPriorities((prev) => {
+      const next = [...prev];
+      // Clamp index to valid range (non-negative, within array bounds)
+      const insertAt = Math.max(0, Math.min(index, next.length));
+      next.splice(insertAt, 0, task);
+      return next.slice(0, 3);
+    });
+  }, []);
+
   const deleteTask = useCallback(
     (index: number, source: "tasks" | "topPriorities") => {
       if (source === "tasks") {
@@ -160,12 +211,12 @@ export function DemoDataProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const openNewTaskModal = useCallback(() => {
+  const openNewTaskModal = useCallback((source: "tasks" | "topPriorities" = "tasks", index = -1) => {
     setModalData({
       mode: "task",
       task: { name: "", priority: "None", due: "", project: "" },
-      index: -1,
-      source: "tasks",
+      index,
+      source,
       isNew: true,
     });
   }, []);
@@ -215,6 +266,8 @@ export function DemoDataProvider({ children }: { children: ReactNode }) {
         updateTask,
         updateEvent,
         addTask,
+        addTopPriority,
+        materializeTopPriorities,
         deleteTask,
         deleteEvent,
         modalData,

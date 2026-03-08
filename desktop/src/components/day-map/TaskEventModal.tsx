@@ -217,7 +217,7 @@ function InlineDropdown({
 // ---------------------------------------------------------------------------
 
 export function TaskEventModal() {
-  const { modalData, closeModal, updateTask, updateEvent, addTask, addEvent, deleteTask, deleteEvent } = useDemoData();
+  const { modalData, closeModal, updateTask, updateEvent, addTask, addTopPriority, addEvent, deleteTask, deleteEvent } = useDemoData();
 
   // Local editing state
   const [mode, setMode] = useState<ModalMode>("task");
@@ -265,7 +265,12 @@ export function TaskEventModal() {
     // Save changes before closing
     if (modalData.mode === "task") {
       if (modalData.isNew && name.trim()) {
-        addTask({ name: name.trim(), priority, due: due || "Today", project: project || "Personal" });
+        const newTask = { name: name.trim(), priority, due: due || "Today", project: project || "Personal", ...(timeEstimate ? { timeEstimate } : {}) };
+        if (modalData.source === "topPriorities") {
+          addTopPriority(newTask, modalData.index);
+        } else {
+          addTask(newTask);
+        }
       } else if (!modalData.isNew) {
         const updates: Record<string, string> = { name, priority, due, project };
         if (timeEstimate) (updates as Record<string, string>).timeEstimate = timeEstimate;

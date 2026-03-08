@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 const QUOTES = [
   { text: "To accomplish great things we must not only act but also dream; not only plan but also believe.", author: "Anatole France" },
+  { text: "Shatter your excuses and you\u2019ll reveal your own potential.", author: "Neurow" },
   { text: "Every action you take is a vote for the type of person you wish to become.", author: "James Clear" },
   { text: "Lack of time is actually lack of priorities.", author: "Tim Ferriss" },
   { text: "You have power over your mind \u2014 not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },

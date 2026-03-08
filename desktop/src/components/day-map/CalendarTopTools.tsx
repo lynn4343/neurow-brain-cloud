@@ -4,8 +4,6 @@ import { useState } from "react";
 import {
   CaretLeft,
   CaretRight,
-  SlidersHorizontal,
-  ArrowSquareOut,
 } from "@phosphor-icons/react";
 import { format, endOfWeek } from "date-fns";
 import { useDayMap } from "@/contexts/DayMapContext";
@@ -118,21 +116,17 @@ export function CalendarTopTools() {
 
         {/* Center: View Toggles */}
         <div className="flex items-center gap-[4px] rounded-full bg-white p-[3px]">
-          {(["Day", "Week", "Month", "Year"] as const).map((view) => {
+          {(["Day", "Week", "Month"] as const).map((view) => {
             const isActive = view === currentView;
-            const isDisabled = view === "Year";
 
             return (
               <button
                 key={view}
-                disabled={isDisabled}
-                onClick={() => !isDisabled && setCurrentView(view as CalendarView)}
+                onClick={() => setCurrentView(view as CalendarView)}
                 className={cn(
                   "rounded-full py-[1px] text-[12px] font-normal transition-all",
                   isActive
                     ? "bg-[#1E1E1E] px-[24px] text-white shadow-sm"
-                    : isDisabled
-                    ? "px-[21px] text-[#5F5E5B] opacity-40 cursor-not-allowed"
                     : "px-[21px] text-[#5F5E5B] hover:bg-[#F0EFED]"
                 )}
               >
@@ -142,18 +136,8 @@ export function CalendarTopTools() {
           })}
         </div>
 
-        {/* Right: Options + Separator + Open */}
-        <div className="flex items-center gap-[8px]">
-          <button className="flex h-[28px] items-center gap-[4px] rounded-[8px] p-[8px] text-[12px] font-normal text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors">
-            <SlidersHorizontal className="size-[12px]" weight="regular" />
-            Options
-          </button>
-          <div className="h-4 w-px bg-[#E6E5E3]" />
-          <button className="flex h-[28px] items-center gap-[4px] rounded-[8px] p-[8px] text-[12px] font-normal text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors">
-            <ArrowSquareOut className="size-[12px]" weight="regular" />
-            Open
-          </button>
-        </div>
+        {/* Spacer to balance the flex layout */}
+        <div />
       </div>
 
       {/* Month/Year Picker Modal */}

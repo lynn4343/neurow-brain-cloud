@@ -4,24 +4,25 @@ import { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import { ProfileCreation } from "./ProfileCreation";
 import { MemoryImportStep } from "./MemoryImportStep";
+import { ConsentScreen } from "./ConsentScreen";
 import { OnboardingScreens, type OnboardingData } from "./OnboardingScreens";
 import { ProfileUpdateLoader } from "./ProfileUpdateLoader";
 import type { UserProfile } from "@/contexts/UserContext";
 
-// profile → import → screens → updating_profile
-type OnboardingStep = "profile" | "import" | "screens" | "updating_profile";
+// profile → import → consent → screens → updating_profile
+type OnboardingStep = "profile" | "import" | "consent" | "screens" | "updating_profile";
 
 interface OnboardingFlowProps {
   onComplete: (profile: UserProfile) => void;
 }
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const { activeUser } = useUser();
+  const { activeUser, updateProfile } = useUser();
 
   // If we already have an active profile (e.g., switching to an incomplete profile),
-  // skip directly to onboarding screens. Otherwise start with profile creation.
+  // skip to consent step. Otherwise start with profile creation.
   const [step, setStep] = useState<OnboardingStep>(() =>
-    activeUser ? "screens" : "profile",
+    activeUser ? "consent" : "profile",
   );
 
   // Hold onboarding data between screens completion and profile update
@@ -36,8 +37,26 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     case "import":
       return (
         <MemoryImportStep
-          onComplete={() => setStep("screens")}
-          onSkip={() => setStep("screens")}
+          onComplete={() => setStep("consent")}
+          onSkip={() => setStep("consent")}
+        />
+      );
+
+    case "consent":
+      return (
+        <ConsentScreen
+          onConsent={async (consented) => {
+            try {
+              await updateProfile({
+                pattern_consent: consented,
+                pattern_consent_at: new Date().toISOString(),
+              });
+              setStep("screens");
+            } catch (error) {
+              console.error("Failed to save consent:", error);
+            }
+          }}
+          onBack={() => setStep("import")}
         />
       );
 

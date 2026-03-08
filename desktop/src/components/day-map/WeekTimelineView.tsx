@@ -38,6 +38,9 @@ export function WeekTimelineView() {
 
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
+  // Labels sit at the bottom of each row, so offset +1 to align indicator
+  // with the correct visual hour band (see TimelineView for full explanation).
+  const currentHourRow = currentHour + 1;
   const minuteOffset = (currentMinute / 60) * hourRowHeight;
 
   // Only highlight current day if we're viewing the actual current week
@@ -89,7 +92,7 @@ export function WeekTimelineView() {
                 </span>
 
                 {/* Dotted line — only at current hour, only if viewing current week */}
-                {hourIndex === currentHour && isCurrentWeek && (
+                {hourIndex === currentHourRow && isCurrentWeek && (
                   <div
                     className="absolute left-0 right-0 z-[5] h-[2px] border-t border-dashed border-[#D1D1D1]"
                     style={{ top: `${minuteOffset}px` }}
@@ -118,7 +121,7 @@ export function WeekTimelineView() {
                   )}
                 >
                   {/* Current time indicator — solid line across all columns, dot only on current day */}
-                  {hourIndex === currentHour && isCurrentWeek && (
+                  {hourIndex === currentHourRow && isCurrentWeek && (
                     <div
                       className="absolute left-0 right-0 z-[5] flex items-center"
                       style={{ top: `${minuteOffset}px` }}

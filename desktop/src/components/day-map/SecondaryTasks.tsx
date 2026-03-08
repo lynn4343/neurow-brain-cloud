@@ -1,62 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CaretDown, CaretUp, Check, Plus, WarningCircle } from "@phosphor-icons/react";
+import { CaretDown, CaretUp, Check, Plus } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { useDemoData } from "@/contexts/DemoDataContext";
 import { type Task, type Priority, TASKS, PROJECT_COLORS, DEFAULT_PROJECT_COLOR, getUserData } from "@/lib/demo-data";
-
-/* Priority Bars — matches web app PriorityBars component */
-const NUM_BARS = 3;
-
-const BARS_FILLED: Record<Priority, number> = {
-  Urgent: 0, // Icon only
-  High: 3,
-  Medium: 2,
-  Low: 1,
-  None: 0,
-};
-
-const ACTIVE_COLORS: Record<Priority, string> = {
-  Urgent: "bg-red-600",
-  High: "bg-red-700",
-  Medium: "bg-amber-500",
-  Low: "bg-yellow-500",
-  None: "bg-gray-100",
-};
-
-const INACTIVE_COLORS: Record<Priority, string> = {
-  Urgent: "bg-red-200",
-  High: "bg-red-200",
-  Medium: "bg-orange-100",
-  Low: "bg-yellow-100",
-  None: "bg-gray-100",
-};
-
-function PriorityBars({ priority }: { priority: Priority }) {
-  const barsToFill = BARS_FILLED[priority];
-  const activeColor = ACTIVE_COLORS[priority];
-  const inactiveColor = INACTIVE_COLORS[priority];
-
-  return (
-    <div className="flex items-center gap-0.5">
-      {priority === "Urgent" && (
-        <WarningCircle size={22} weight="fill" className="text-red-700" />
-      )}
-      {priority !== "Urgent" &&
-        Array.from({ length: NUM_BARS }).map((_, index) => (
-          <div
-            key={index}
-            className={cn(
-              "h-3 w-1 rounded-full",
-              index < barsToFill ? activeColor : inactiveColor
-            )}
-          />
-        ))}
-    </div>
-  );
-}
+import { PriorityBars } from "@/components/ui/PriorityBars";
 
 const getProjectPillClasses = (project: string): string => {
   return PROJECT_COLORS[project] || DEFAULT_PROJECT_COLOR;
@@ -197,7 +147,7 @@ export function SecondaryTasks() {
       {isExpanded && (
         <div className="mt-3 relative">
           <div className={cn(
-            "overflow-y-auto scrollbar-thin max-h-[248px]",
+            "overflow-y-auto scrollbar-thin max-h-[248px] pb-6",
             tasks.length >= 6 && "pb-10"
           )}>
             {/* Column Headers - Sticky inside scroll container for alignment */}
@@ -325,18 +275,6 @@ export function SecondaryTasks() {
                 })}
               </div>
 
-            {/* "+ New Task" pill CTA — shown when card has room, hidden once full */}
-            {tasks.length < 6 && (
-              <div className="flex justify-center py-4">
-                <button
-                  onClick={() => demoData.openNewTaskModal()}
-                  className="flex items-center gap-1.5 rounded-full border border-[#E6E5E3] px-10 py-1.5 text-xs text-[#949494] hover:text-[#1E1E1E] hover:border-[#C8C7C5] transition-colors"
-                >
-                  <Plus className="size-3" weight="bold" />
-                  New Task
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Bottom fade mask */}

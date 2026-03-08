@@ -126,7 +126,7 @@ function todayISO(): string {
 }
 
 /** Today's date formatted for notes (e.g. "Mar 6, 2026"). */
-function todayFormatted(): string {
+export function todayFormatted(): string {
   const d = new Date();
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;

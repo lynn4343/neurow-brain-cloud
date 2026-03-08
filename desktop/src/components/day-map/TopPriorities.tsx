@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CaretDown, Check, WarningCircle } from "@phosphor-icons/react";
+import { CaretDown, Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/UserContext";
 import { useDemoData } from "@/contexts/DemoDataContext";
@@ -11,61 +11,14 @@ import {
   PROJECT_COLORS,
   DEFAULT_PROJECT_COLOR,
 } from "@/lib/demo-data";
+import { PriorityBars } from "@/components/ui/PriorityBars";
 
-/* Priority Bars — matches SecondaryTasks */
-const NUM_BARS = 3;
-
-const BARS_FILLED: Record<Priority, number> = {
-  Urgent: 0,
-  High: 3,
-  Medium: 2,
-  Low: 1,
-  None: 0,
-};
-
-const ACTIVE_COLORS: Record<Priority, string> = {
-  Urgent: "bg-red-600",
-  High: "bg-red-700",
-  Medium: "bg-amber-500",
-  Low: "bg-yellow-500",
-  None: "bg-gray-100",
-};
-
-const INACTIVE_COLORS: Record<Priority, string> = {
-  Urgent: "bg-red-200",
-  High: "bg-red-200",
-  Medium: "bg-orange-100",
-  Low: "bg-yellow-100",
-  None: "bg-gray-100",
-};
-
-function PriorityBars({ priority }: { priority: Priority }) {
-  const barsToFill = BARS_FILLED[priority];
-  const activeColor = ACTIVE_COLORS[priority];
-  const inactiveColor = INACTIVE_COLORS[priority];
-
+function PlaceholderSlot({ onDoubleClick }: { onDoubleClick?: () => void }) {
   return (
-    <div className="flex items-center gap-0.5">
-      {priority === "Urgent" && (
-        <WarningCircle size={22} weight="fill" className="text-red-700" />
-      )}
-      {priority !== "Urgent" &&
-        Array.from({ length: NUM_BARS }).map((_, index) => (
-          <div
-            key={index}
-            className={cn(
-              "h-3 w-1 rounded-full",
-              index < barsToFill ? activeColor : inactiveColor,
-            )}
-          />
-        ))}
-    </div>
-  );
-}
-
-function PlaceholderSlot() {
-  return (
-    <div className="flex items-center gap-3 rounded-lg border border-dashed border-[#E6E5E3] bg-[#FAF8F8] px-4 py-3">
+    <div
+      onDoubleClick={onDoubleClick}
+      className="flex items-center gap-3 rounded-lg border border-dashed border-[#E6E5E3] bg-[#FAF8F8] px-4 py-3 cursor-pointer"
+    >
       <div className="h-[18px] w-[18px] shrink-0 rounded-full border-2 border-[#E6E5E3]" />
       <span className="text-sm text-[#949494]">
         Set today&apos;s priorities
@@ -94,17 +47,23 @@ export function TopPriorities() {
   const demoData = useDemoData();
   const staticPriorities = demoData.topPriorities;
 
-  // Synthesize #1 priority from goal_cascade when static data is empty (new users)
+  // Tag first priority as "Priority Goal" when it matches the clarity session next action.
+  // For new users with no static data, synthesize from goal_cascade.
+  const gc = activeUser?.goal_cascade;
   const priorities: TopPriority[] =
     staticPriorities.length > 0
-      ? staticPriorities
-      : activeUser?.goal_cascade?.next_action_step
+      ? staticPriorities.map((p, i) =>
+          i === 0 && gc?.next_action_step && p.name === gc.next_action_step
+            ? { ...p, project: "Priority Goal" }
+            : p,
+        )
+      : gc?.next_action_step
         ? [
             {
-              name: activeUser.goal_cascade.next_action_step,
+              name: gc.next_action_step,
               priority: "High" as Priority,
-              due: activeUser.goal_cascade.next_action_due
-                ? formatDueDate(activeUser.goal_cascade.next_action_due)
+              due: gc.next_action_due
+                ? formatDueDate(gc.next_action_due)
                 : "This week",
               project: "Priority Goal",
             },
@@ -156,7 +115,15 @@ export function TopPriorities() {
           ))}
 
           {Array.from({ length: placeholderCount }).map((_, i) => (
-            <PlaceholderSlot key={`ph-${i}`} />
+            <PlaceholderSlot key={`ph-${i}`} onDoubleClick={() => {
+              // Materialize synthesized priorities into state so addTopPriority
+              // sees the correct array (fixes off-by-one when goal_cascade creates
+              // a display-only priority that isn't in state yet).
+              if (staticPriorities.length < priorities.length) {
+                demoData.materializeTopPriorities(priorities);
+              }
+              demoData.openNewTaskModal("topPriorities", priorities.length + i);
+            }} />
           ))}
         </div>
       )}
@@ -181,7 +148,7 @@ function PriorityCard({
     <div
       onDoubleClick={onDoubleClick}
       className={cn(
-        "relative flex flex-col rounded-lg border border-[#E6E5E3] bg-white px-4 pt-2.5 pb-1.5 transition-opacity duration-300 cursor-pointer",
+        "relative flex flex-col overflow-hidden rounded-lg border border-[#E6E5E3] bg-white px-4 pt-2.5 pb-1.5 transition-opacity duration-300 cursor-pointer",
         done && "opacity-55",
       )}
     >
@@ -225,31 +192,26 @@ function PriorityCard({
         </span>
       </div>
 
-      {/* Line 2: due + time estimate | priority | project */}
-      <div className="ml-[30px] mt-0.5 flex items-center">
-        <div className="min-w-0 flex-1 flex items-center gap-1.5 text-xs text-[#949494]">
-          <span>{task.due === "Today" ? "Due today" : task.due === "Overdue" ? "Overdue" : `Due ${task.due}`}</span>
-          {task.timeEstimate && (
-            <span className="rounded-full border border-[#E6E5E3] bg-[#FAF8F8] px-2 py-0.5 text-[11px] text-[#949494] whitespace-nowrap">
-              Est: {task.timeEstimate}
-            </span>
-          )}
-        </div>
-
-        <div className="flex shrink-0 items-center">
-          <div className="flex w-[40px] items-center justify-center">
-            <PriorityBars priority={task.priority} />
-          </div>
-          <div className="flex w-[80px] items-center justify-start">
-            <span
-              className={cn(
-                "rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap",
-                PROJECT_COLORS[task.project] || DEFAULT_PROJECT_COLOR,
-              )}
-            >
-              {task.project}
-            </span>
-          </div>
+      {/* Line 2: due + time estimate | priority | project — wraps gracefully at narrow widths */}
+      <div className="ml-[30px] mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+        <span className="whitespace-nowrap text-xs text-[#949494]">
+          {task.due === "Today" ? "Due today" : task.due === "Overdue" ? "Overdue" : `Due ${task.due}`}
+        </span>
+        {task.timeEstimate && (
+          <span className="rounded-full border border-[#E6E5E3] bg-[#FAF8F8] px-2 py-0.5 text-[11px] text-[#949494] whitespace-nowrap">
+            Est: {task.timeEstimate}
+          </span>
+        )}
+        <div className="ml-auto flex w-[130px] shrink-0 items-center gap-1.5">
+          <PriorityBars priority={task.priority} />
+          <span
+            className={cn(
+              "rounded-full border px-2 py-0.5 text-xs font-semibold truncate",
+              PROJECT_COLORS[task.project] || DEFAULT_PROJECT_COLOR,
+            )}
+          >
+            {task.project}
+          </span>
         </div>
       </div>
     </div>

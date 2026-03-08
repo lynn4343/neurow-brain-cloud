@@ -107,6 +107,7 @@ function loadBYOK(): BYOKConfig {
 export function BYOKSection() {
   const [config, setConfig] = useState<BYOKConfig>(DEFAULT_CONFIG);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time SSR hydration from localStorage */
@@ -129,9 +130,32 @@ export function BYOKSection() {
     }));
   }
 
-  function handleSave() {
+  async function handleSave() {
+    // Persist to localStorage (survives reload)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    setSaved(true);
+
+    // Bridge to main process (activates for current session)
+    if (typeof window !== "undefined" && window.neurow?.setBYOKConfig) {
+      try {
+        const result = await window.neurow.setBYOKConfig({
+          provider: config.provider,
+          endpoint: config.endpoint,
+          apiKey: config.apiKey,
+          model: config.model,
+        });
+        // Broadcast availability change so AppShell can update chatMode
+        window.dispatchEvent(
+          new CustomEvent("neurow-chat-mode-change", { detail: result })
+        );
+        setSaved(true);
+        setError(null);
+      } catch {
+        setError("Failed to configure API key");
+      }
+    } else {
+      setSaved(true);
+    }
+
     setTimeout(() => setSaved(false), 2000);
   }
 
@@ -147,11 +171,11 @@ export function BYOKSection() {
       </h2>
       <p className="text-sm text-muted-foreground mb-3">
         Connect your API key to use Neurow with any model. Neurow is
-        model-agnostic — your coaching, memories, and knowledge graph
+        model-agnostic — your insights, memories, and knowledge graph
         work with any AI.
       </p>
       <p className="text-xs text-muted-foreground mb-5 leading-relaxed">
-        For the best coaching experience, we recommend sticking with our
+        For the best executive intelligence experience, we recommend sticking with our
         carefully curated model. Stronger reasoning, planning, and behavioral synthesis
         produce better insights. But the choice is always yours.
       </p>
@@ -249,10 +273,36 @@ export function BYOKSection() {
           />
         </div>
 
-        {/* Save */}
-        <Button onClick={handleSave} variant="outline" size="sm">
-          {saved ? "Saved" : "Save"}
-        </Button>
+        {/* Save + status */}
+        <div className="flex items-center gap-3">
+          <Button onClick={handleSave} variant="outline" size="sm">
+            {saved ? (
+              <span className="flex items-center gap-1.5">
+                <Check size={14} weight="bold" className="text-emerald-600" />
+                Saved
+              </span>
+            ) : (
+              "Save"
+            )}
+          </Button>
+
+          {/* Connection status */}
+          {config.apiKey && saved && config.provider !== "openai" && (
+            <span className="flex items-center gap-1.5 text-xs text-emerald-600">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Connected — coaching ready
+            </span>
+          )}
+          {config.provider === "openai" && config.apiKey && (
+            <span className="flex items-center gap-1.5 text-xs text-amber-600">
+              <Info size={14} />
+              OpenAI support coming soon
+            </span>
+          )}
+          {error && (
+            <span className="text-xs text-destructive">{error}</span>
+          )}
+        </div>
       </div>
     </section>
   );

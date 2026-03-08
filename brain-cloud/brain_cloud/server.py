@@ -200,6 +200,60 @@ async def _write_goal_cascade(slug, captured_data, stores, session_id):
     await write_pipeline(content, slug, stores, session_id=session_id)
 
 
+async def _generate_goal_headline(quarterly_goal: str, settings) -> str | None:
+    """Generate a short first-person dashboard headline from the quarterly goal.
+
+    Tries Anthropic (Haiku) first, falls back to OpenAI, returns None on failure.
+    This is backend infrastructure — not the coaching model.
+    """
+    if not quarterly_goal:
+        return None
+
+    system_prompt = (
+        "Convert this quarterly goal into a short first-person headline for a dashboard card. "
+        'Rules: 12 words max. First person (use "my", "I" — not the person\'s name). '
+        'Headline style — no "This quarter" prefix. Return ONLY the headline, nothing else.'
+    )
+
+    # 1. Try Anthropic (default for judges)
+    if settings.anthropic_api_key:
+        try:
+            from anthropic import AsyncAnthropic
+            client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+            resp = await client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=50,
+                system=system_prompt,
+                messages=[{"role": "user", "content": quarterly_goal}],
+            )
+            headline = resp.content[0].text.strip().strip('"')
+            if headline:
+                return headline
+        except Exception as e:
+            logger.warning(f"Anthropic headline generation failed: {e}")
+
+    # 2. Fallback: OpenAI
+    if settings.openai_api_key:
+        try:
+            from openai import AsyncOpenAI
+            client = AsyncOpenAI(api_key=settings.openai_api_key)
+            resp = await client.chat.completions.create(
+                model="gpt-4o-mini",
+                max_tokens=50,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": quarterly_goal},
+                ],
+            )
+            headline = resp.choices[0].message.content.strip().strip('"')
+            if headline:
+                return headline
+        except Exception as e:
+            logger.warning(f"OpenAI headline generation failed: {e}")
+
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Coaching MCP Tools
 # ---------------------------------------------------------------------------
@@ -528,6 +582,14 @@ async def coaching_store_turn(
             "next_action_step": existing_data.get("next_action_step", ""),
             "next_action_due": due_date,
         }
+
+        # Generate short headline for dashboard display
+        headline = await _generate_goal_headline(
+            goal_cascade_data["quarterly_goal"], stores.settings
+        )
+        if headline:
+            goal_cascade_data["quarterly_goal_headline"] = headline
+
         response["goal_cascade"] = goal_cascade_data
 
         # Server-authoritative: persist goal cascade to user profile

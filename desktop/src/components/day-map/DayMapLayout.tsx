@@ -2,18 +2,16 @@
 
 import { useRef, useCallback, useEffect } from "react";
 import { DayMapProvider, useDayMap } from "@/contexts/DayMapContext";
-import { DemoDataProvider } from "@/contexts/DemoDataContext";
 import { DayMapSidebar } from "./DayMapSidebar";
 import { CalendarTopTools } from "./CalendarTopTools";
 import { TimelineView } from "./TimelineView";
 import { WeekTimelineView } from "./WeekTimelineView";
 import { MonthCalendarView } from "./MonthCalendarView";
 import { DayMapRightPanel } from "./DayMapRightPanel";
-import { TaskEventModal } from "./TaskEventModal";
 
 const TIMELINE_MIN_WIDTH = 300;
 const TIMELINE_MAX_RATIO = 0.7;
-const RIGHT_PANEL_MIN_WIDTH = 350;
+const RIGHT_PANEL_MIN_WIDTH = 320;
 
 function DayViewContent() {
   const { timelineWidth, setTimelineWidth } = useDayMap();
@@ -79,7 +77,12 @@ function DayViewContent() {
       {/* Left: Timeline */}
       <div
         className="flex flex-col overflow-hidden bg-[#FAF8F8]"
-        style={{ width: `${timelineWidth}px`, flexShrink: 0 }}
+        style={{
+          width: `${timelineWidth}px`,
+          minWidth: `${TIMELINE_MIN_WIDTH}px`,
+          maxWidth: `calc(100% - ${RIGHT_PANEL_MIN_WIDTH}px)`,
+          flexShrink: 0,
+        }}
       >
         <div className="mt-4 mb-4 ml-4 flex flex-1 flex-col overflow-hidden rounded-[8px] border border-[#F1F0F0]">
           <TimelineView />
@@ -183,10 +186,7 @@ function DayMapContent() {
 export function DayMapLayout() {
   return (
     <DayMapProvider>
-      <DemoDataProvider>
-        <DayMapContent />
-        <TaskEventModal />
-      </DemoDataProvider>
+      <DayMapContent />
     </DayMapProvider>
   );
 }

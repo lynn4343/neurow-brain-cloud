@@ -36,7 +36,10 @@ export function TimelineView() {
 
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
-  const currentHourIndex = currentHour;
+  // Labels sit at the bottom of each row (straddling the border), so the visual
+  // region users read as "11 AM" is row 12. Offset by +1 to align the indicator
+  // with the correct visual hour band.
+  const currentHourIndex = currentHour + 1;
   const minuteOffset = (currentMinute / 60) * hourRowHeight;
 
   // Event data for current day
@@ -48,7 +51,7 @@ export function TimelineView() {
   // Auto-scroll to current time on mount
   useEffect(() => {
     if (scrollRef.current) {
-      const scrollTarget = Math.max(0, currentHour * hourRowHeight - 100);
+      const scrollTarget = Math.max(0, currentHourIndex * hourRowHeight - 100);
       scrollRef.current.scrollTop = scrollTarget;
     }
   }, [currentHour, hourRowHeight]);

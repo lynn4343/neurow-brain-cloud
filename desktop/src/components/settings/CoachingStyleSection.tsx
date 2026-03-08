@@ -11,7 +11,7 @@ export function CoachingStyleSection() {
   return (
     <section>
       <h2 className="text-sm font-medium uppercase tracking-wider text-[#1E1E1E] mb-1">
-        Coaching Style
+        Communication Style
       </h2>
       <p className="text-sm text-muted-foreground mb-5">
         How Neurow communicates with you.

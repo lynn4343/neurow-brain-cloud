@@ -299,9 +299,20 @@ export function ClaritySessionFlow() {
   return (
     <div className="flex h-screen flex-col">
       {/* Header */}
-      <div className="flex flex-col items-center border-b bg-white px-4 pb-3 pt-3">
-        <NeurowLogo className="h-6 w-[17px]" />
-        <div className="mt-1 inline-flex flex-col">
+      <div className="relative flex flex-col items-center overflow-hidden border-b bg-[#faf8f8] px-4 pb-3 pt-3">
+        {/* Background ellipse — matches onboarding screens */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 z-0 -translate-x-1/2 rounded-full"
+          style={{
+            width: 607,
+            height: 607,
+            background:
+              "linear-gradient(313deg, rgba(178,160,232,0.2) 0%, rgba(178,200,255,0.2) 50%, rgba(232,178,220,0.2) 100%)",
+            filter: "blur(80px)",
+          }}
+        />
+        <NeurowLogo className="relative z-10 h-6 w-[17px]" />
+        <div className="relative z-10 mt-1 inline-flex flex-col">
           <h1 className="font-albra-sans text-2xl font-normal uppercase tracking-wide text-black">
             The Clarity Flow
           </h1>
@@ -312,7 +323,7 @@ export function ClaritySessionFlow() {
             Vision. Focus. Action.
           </p>
         </div>
-        <p className="mt-1 text-center text-sm text-black">
+        <p className="relative z-10 mt-1 text-center text-sm text-black">
           We&apos;ll help you get <span className="font-extrabold italic">clear</span> about your <span className="font-extrabold italic">vision</span>, and help you <span className="font-extrabold italic">stay aligned</span> with <span className="font-extrabold italic">what to do next</span>. (Even when life gets &ldquo;life-y&rdquo;)
         </p>
       </div>

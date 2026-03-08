@@ -8,11 +8,13 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
 import { DayMapLayout } from "@/components/day-map/DayMapLayout";
 import { NotesLayout } from "@/components/notes/NotesLayout";
 import { SettingsView } from "@/components/settings/SettingsView";
-import { GraphView } from "@/components/graph/GraphView";
-import { checkClaudeInstalled } from "@/lib/electron";
+import { ProjectsLayout } from "@/components/projects/ProjectsLayout";
+import { checkChatAvailable, setBYOKConfig, type ChatAvailableResult } from "@/lib/electron";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AssistantButton } from "./AssistantButton";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { DemoDataProvider } from "@/contexts/DemoDataContext";
+import { TaskEventModal } from "@/components/day-map/TaskEventModal";
 import { cn } from "@/lib/utils";
 
 const headerTitles: Record<View, string> = {
@@ -21,23 +23,57 @@ const headerTitles: Record<View, string> = {
   chat: "NEUROW CHAT",
   projects: "PROJECTS",
   notes: "NOTES",
-  "brain-cloud": "BRAIN CLOUD",
   settings: "SETTINGS",
 };
 
 export function AppShell() {
   const [activeView, setActiveView] = useState<View>("daymap");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [claudeInstalled, setClaudeInstalled] = useState<boolean | null>(null);
+  const [chatMode, setChatMode] = useState<'api' | 'cli' | 'none' | null>(null);
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
 
   const sidebarWidth = sidebarOpen ? 210 : 68;
   const toggleSidebar = useCallback(() => setSidebarOpen((prev) => !prev), []);
 
+  // Hydrate BYOK config from localStorage on startup, then check availability
   useEffect(() => {
-    checkClaudeInstalled()
-      .then(setClaudeInstalled)
-      .catch(() => setClaudeInstalled(false));
+    const hydrateBYOK = async () => {
+      try {
+        const raw = localStorage.getItem('neurow_byok');
+        if (raw) {
+          const config = JSON.parse(raw);
+          if (config.apiKey && typeof window !== 'undefined' && window.neurow) {
+            await setBYOKConfig({
+              provider: config.provider,
+              endpoint: config.endpoint,
+              apiKey: config.apiKey,
+              model: config.model,
+            });
+          }
+        }
+      } catch {
+        // Invalid localStorage — ignore
+      }
+
+      // Now check availability (will see BYOK key if hydrated)
+      checkChatAvailable()
+        .then((result) => setChatMode(result.mode))
+        .catch(() => setChatMode('none'));
+    };
+
+    hydrateBYOK();
+  }, []);
+
+  // Listen for BYOK config changes from Settings
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as ChatAvailableResult;
+      if (detail?.mode) {
+        setChatMode(detail.mode);
+      }
+    };
+    window.addEventListener('neurow-chat-mode-change', handler);
+    return () => window.removeEventListener('neurow-chat-mode-change', handler);
   }, []);
 
   // Open chat panel: collapse main nav + signal DayMap sidebar
@@ -72,6 +108,7 @@ export function AppShell() {
   return (
     <TooltipProvider delayDuration={0}>
       <ChatProvider>
+        <DemoDataProvider>
         <div className="relative flex h-screen w-screen overflow-hidden bg-background">
           {/* Curved corner at sidebar/header junction */}
           <div
@@ -110,14 +147,25 @@ export function AppShell() {
           <main className="flex-1 flex flex-col overflow-hidden">
             <GlobalHeader title={headerTitles[activeView]} onViewChange={handleViewChange} />
 
-            {/* Claude not installed warning */}
-            {claudeInstalled === false && (
-              <div className="bg-destructive/10 border-b border-destructive/20 px-4 py-2 text-sm text-destructive">
-                Claude Code is not installed. Install it from{" "}
-                <span className="font-mono">
-                  npm install -g @anthropic-ai/claude-code
-                </span>{" "}
-                and ensure you&apos;re authenticated.
+            {/* Chat not available warning */}
+            {chatMode === 'none' && (
+              <div
+                className="border-b px-4 py-2.5 text-sm"
+                style={{
+                  backgroundColor: 'rgba(101, 121, 238, 0.08)',
+                  borderColor: 'rgba(101, 121, 238, 0.15)',
+                  color: '#4f5bb3',
+                }}
+              >
+                Connect your AI to get started. Add your API key in{" "}
+                <button
+                  onClick={() => handleViewChange('settings')}
+                  className="font-medium underline underline-offset-2 hover:opacity-80"
+                  style={{ color: '#6579EE' }}
+                >
+                  Settings &gt; Model Configuration
+                </button>
+                .
               </div>
             )}
 
@@ -162,14 +210,11 @@ export function AppShell() {
                 <div
                   className={
                     activeView === "projects"
-                      ? "flex-1 flex items-center justify-center"
+                      ? "flex-1 flex flex-col overflow-hidden"
                       : "hidden"
                   }
                 >
-                  <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-semibold">Projects</h2>
-                    <p className="text-muted-foreground">Coming soon</p>
-                  </div>
+                  <ProjectsLayout />
                 </div>
 
                 <div
@@ -180,16 +225,6 @@ export function AppShell() {
                   }
                 >
                   <NotesLayout />
-                </div>
-
-                <div
-                  className={
-                    activeView === "brain-cloud"
-                      ? "flex-1 flex flex-col overflow-hidden"
-                      : "hidden"
-                  }
-                >
-                  <GraphView isActive={activeView === "brain-cloud"} />
                 </div>
 
                 <div
@@ -220,7 +255,11 @@ export function AppShell() {
 
           {/* Global Floating Assistant Button */}
           <AssistantButton onClick={openChatPanel} visible={fabVisible} />
+
+          {/* Global Task/Event Modal */}
+          <TaskEventModal />
         </div>
+        </DemoDataProvider>
       </ChatProvider>
     </TooltipProvider>
   );

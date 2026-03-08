@@ -39,6 +39,9 @@ contextBridge.exposeInMainWorld('neurow', {
   checkClaudeInstalled: () => {
     return ipcRenderer.invoke('check-claude-installed');
   },
+  checkChatAvailable: () => {
+    return ipcRenderer.invoke('check-chat-available');
+  },
   // --- Direct Data API (model-agnostic, no AI in the loop) ---
   createProfile: (displayName: string) => {
     return ipcRenderer.invoke('create-profile', displayName);
@@ -51,6 +54,12 @@ contextBridge.exposeInMainWorld('neurow', {
   },
   exportData: (userId: string) => {
     return ipcRenderer.invoke('export-data', userId);
+  },
+  openBrainCloud: (slug?: string) => {
+    return ipcRenderer.invoke('open-brain-cloud', slug);
+  },
+  setBYOKConfig: (config: { provider: string; endpoint: string; apiKey: string; model: string } | null) => {
+    return ipcRenderer.invoke('set-byok-config', config);
   },
   onChatStream: (callback: (data: ChatStreamPayload) => void) => {
     const handler = (_event: IpcRendererEvent, data: ChatStreamPayload) => callback(data);
