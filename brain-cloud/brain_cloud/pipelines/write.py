@@ -20,20 +20,61 @@ RULES:
 - Each fact must be atomic (one claim per fact)
 - Each fact must be specific enough to be useful without surrounding context
 - Classify confidence: explicit (stated directly), implied (strongly suggested), inferred (deduced from context)
-- Classify category using ONLY these values: goal, health, career, pattern, belief, insight, behavior, session, calendar, financial, social, daily
+- Classify category using ONLY these values:
+
+Life domains (personal): home, finance, health, mindset, family, spirituality, recreation, community, love
+Life domains (professional): career, business, education
+Cross-domain types: goal, pattern, insight, belief, behavior, identity, preference, instruction
+Infrastructure: calendar, daily, session, social
+
+Category definitions:
+- home: living situation, housing, home environment
+- finance: personal money — income, budgeting, personal debt, savings, investments, rent, spending
+- health: fitness, nutrition, sleep, medical, physical wellbeing
+- mindset: stress, self-talk, therapy, emotional patterns, personal growth, inner world
+- family: parents, siblings, children, parenting, family dynamics
+- spirituality: meditation, meaning, faith, journaling, philosophical reflection
+- recreation: hobbies, leisure, travel, play, creative pursuits outside work
+- community: friendships, social groups, networking, local community
+- love: romantic relationships, dating, partnership dynamics
+- career: employment, roles, advancement, workplace dynamics (employees)
+- business: business operations AND business finances — clients, revenue, expenses, invoicing, pricing, pipeline, cash flow, strategy (founders, freelancers, entrepreneurs, side hustles)
+- education: courses, degrees, certifications, structured learning, skill development
+- goal: goals, milestones, aspirations in any domain
+- pattern: behavioral patterns, recurring themes
+- insight: realizations, learnings, aha moments
+- belief: core beliefs, values, identity statements
+- behavior: specific actions, habits, activities
+- identity: personal facts (name, age, location, demographics)
+- preference: opinions, tastes, working-style preferences, tool choices
+- instruction: rules the user has set for AI behavior (tone, format, "always/never" rules)
+- calendar: calendar events, scheduling, appointments
+- daily: routine items, daily activities, low-importance items
+- session: coaching session metadata
+- social: social media posts, public sharing
+
+- Assign an importance score (0.0 to 1.0) to each fact based on how central it is to understanding this person:
+  - 0.8-1.0: Identity-defining (name, location, relationships, life roles, core identity)
+  - 0.7-0.9: Goals, values, deeply held beliefs, life vision
+  - 0.5-0.7: Behavioral patterns, recurring habits, skills, expertise areas
+  - 0.3-0.5: Specific project details, one-time events, tool preferences
+  - 0.1-0.3: Trivial details, formatting preferences, transient observations
+- NEVER start a fact with "User", "The user", or "the user". Write facts as standalone statements about the person. Example: "Has a friend who is a neurosurgeon" NOT "User has a friend who is a neurosurgeon".
+- When processing imported data from another AI (structured with headers like "Instructions", "Identity", "Career", "Projects", "Preferences"), map: Instructions → instruction, Identity → identity, Career → career or business (employment → career, freelance/founder → business), Projects → career/business/education or goal, Preferences → preference
+- If the input contains dates (e.g. [2024-06-15], "June 2024", "last March"), extract them into a "date" field per fact in ISO 8601 format (YYYY-MM-DD). Use partial dates if only month/year is known (YYYY-MM or YYYY). If no date is associated with a fact, omit the "date" field.
 - Identify ALL named entities (people, places, goals, projects, concepts, behaviors, beliefs, patterns)
 - Identify relationships between entities as (subject, predicate, object) triples
 - Predicates: RELATES_TO, BLOCKS, SUPPORTS, PRODUCED, TRACKS, DEMONSTRATES, PART_OF, ADDRESSES
 
-EXAMPLE INPUT: "I pulled an all-nighter finishing a brand identity project I quoted too low. Delivered it. Client loved it. Charged $600. Should've been $2,200."
+EXAMPLE INPUT: "[2024-06-15] I pulled an all-nighter finishing a brand identity project I quoted too low. Delivered it. Client loved it. Charged $600. Should've been $2,200."
 
 EXAMPLE OUTPUT:
 {
   "facts": [
-    {"text": "Completed a brand identity project by working through the night", "confidence": "explicit", "category": "behavior"},
-    {"text": "Charged $600 for a brand identity project worth $2,200", "confidence": "explicit", "category": "career"},
-    {"text": "Client was satisfied with brand identity deliverable", "confidence": "explicit", "category": "career"},
-    {"text": "Tends to undercharge for design work", "confidence": "inferred", "category": "pattern"}
+    {"text": "Completed a brand identity project by working through the night", "confidence": "explicit", "category": "behavior", "date": "2024-06-15", "importance": 0.4},
+    {"text": "Charged $600 for a brand identity project worth $2,200", "confidence": "explicit", "category": "business", "date": "2024-06-15", "importance": 0.5},
+    {"text": "Client was satisfied with brand identity deliverable", "confidence": "explicit", "category": "business", "date": "2024-06-15", "importance": 0.3},
+    {"text": "Tends to undercharge for design work", "confidence": "inferred", "category": "pattern", "importance": 0.8}
   ],
   "entities": [
     {"name": "brand identity project", "type": "project"},
@@ -42,13 +83,24 @@ EXAMPLE OUTPUT:
   "relationships": [
     {"subject": "brand identity project", "predicate": "DEMONSTRATES", "object": "undercharging pattern"}
   ],
-  "categories": ["career", "pattern", "behavior"],
+  "categories": ["business", "pattern", "behavior"],
   "sentiment": "mixed"
 }"""
 
 ALLOWED_CATEGORIES = {
-    "goal", "health", "career", "pattern", "belief", "insight",
-    "behavior", "session", "calendar", "financial", "social", "daily",
+    # Life domains — Personal (9)
+    "home", "finance", "health", "mindset",
+    "family", "spirituality", "recreation", "community", "love",
+    # Life domains — Professional (3)
+    "career", "business", "education",
+    # Cross-domain types (8)
+    "goal", "pattern", "insight", "belief", "behavior",
+    "identity", "preference", "instruction",
+    # Infrastructure (4)
+    "calendar", "daily", "session", "social",
+    # Backward compat (1) — Theo's 53 bank records use this; new data uses "finance"
+    "financial",
+    # Fallback (1) — not listed in extraction prompt
     "uncategorized",
 }
 
@@ -60,7 +112,7 @@ CONFIDENCE_MAP = {
 
 
 async def _extract(content: str, stores: StoreManager) -> ParsedMemory:
-    """Extract facts, entities, and relationships from natural language via GPT-4o-mini."""
+    """Extract facts, entities, and relationships via configured extraction model."""
     response = await openai_with_retry(
         lambda: stores.openai.chat.completions.create(
             model=stores.settings.extraction_model,
@@ -116,6 +168,38 @@ async def _extract(content: str, stores: StoreManager) -> ParsedMemory:
             )
 
 
+def _resolve_date(date_str: str | None, fallback: str) -> str:
+    """Parse an extracted date string into ISO 8601 timestamp.
+    Returns fallback (now) if date_str is None, empty, or unparseable."""
+    if not date_str or date_str.strip().lower() in ("unknown", "none", ""):
+        return fallback
+
+    cleaned = date_str.strip()
+
+    # Try full date: YYYY-MM-DD
+    try:
+        dt = datetime.strptime(cleaned[:10], "%Y-%m-%d")
+        return dt.replace(tzinfo=timezone.utc).isoformat()
+    except ValueError:
+        pass
+
+    # Try year-month: YYYY-MM
+    try:
+        dt = datetime.strptime(cleaned[:7], "%Y-%m")
+        return dt.replace(tzinfo=timezone.utc).isoformat()
+    except ValueError:
+        pass
+
+    # Try year only: YYYY
+    try:
+        dt = datetime.strptime(cleaned[:4], "%Y")
+        return dt.replace(tzinfo=timezone.utc).isoformat()
+    except ValueError:
+        pass
+
+    return fallback
+
+
 def _quality_gate(facts: list[ParsedFact]) -> list[ParsedFact]:
     """Tier 1 quality filter — lightweight, no LLM call."""
     passed = []
@@ -124,9 +208,24 @@ def _quality_gate(facts: list[ParsedFact]) -> list[ParsedFact]:
         if not fact.text or not fact.text.strip():
             rejected += 1
             continue
-        if len(fact.text) < 15:
+        if len(fact.text) < 10:
             rejected += 1
             continue
+        # Strip impersonal "User" prefix from extracted facts
+        for prefix in ("The user ", "the user ", "User ", "user "):
+            if fact.text.startswith(prefix):
+                fact.text = fact.text[len(prefix):]
+                if fact.text:
+                    fact.text = fact.text[0].upper() + fact.text[1:]
+                break
+        # Validate and normalize importance
+        if fact.importance is not None:
+            fact.importance = max(0.0, min(1.0, fact.importance))
+        else:
+            fact.importance = 0.5
+        # Normalize case — catches LLM variants like "Mindset", "HEALTH"
+        if fact.category:
+            fact.category = fact.category.strip().lower()
         if not fact.category or fact.category not in ALLOWED_CATEGORIES:
             rejected += 1
             continue
@@ -143,11 +242,12 @@ async def write_pipeline(
     *,
     structured: dict | None = None,
     session_id: str | None = None,
+    source: str = "coaching_session",
 ) -> WriteResult:
     """Write a memory across all four cognitive stores.
 
     Mode 1 (structured): Bypass LLM extraction, map fields directly.
-    Mode 2 (natural language): Extract via GPT-4o-mini, then write.
+    Mode 2 (natural language): Extract via configured extraction model, then write.
     """
     user_uuid = await stores.resolve_user_id(user_id)
     now_iso = datetime.now(timezone.utc).isoformat()
@@ -162,11 +262,28 @@ async def write_pipeline(
 
     if structured:
         # Mode 1: Structured bypass — single record, no extraction
+        # Lightweight validation (no LLM, no full quality gate)
+        content_text = structured.get("content", content)
+        if not content_text or not content_text.strip():
+            logger.warning("Structured write rejected: empty content")
+            return WriteResult(memory_ids=[], stores=store_status,
+                               facts_extracted=0, facts_stored=0)
+        if len(content_text.strip()) < 10:
+            logger.warning(f"Structured write rejected: content too short ({len(content_text.strip())} chars)")
+            return WriteResult(memory_ids=[], stores=store_status,
+                               facts_extracted=0, facts_stored=0)
+        category = structured.get("category", "uncategorized")
+        if category:
+            category = category.strip().lower()
+        if not category or category not in ALLOWED_CATEGORIES:
+            logger.warning(f"Structured write: unknown category '{category}', falling back to 'uncategorized'")
+            category = "uncategorized"
+
         facts = [
             ParsedFact(
-                text=structured.get("content", content),
+                text=content_text,
                 confidence="explicit",
-                category=structured.get("category", "uncategorized"),
+                category=category,
             )
         ]
         entities = []
@@ -191,13 +308,13 @@ async def write_pipeline(
             "content": fact.text,
             "category": fact.category,
             "subcategory": None,
-            "source": structured.get("source", "coaching_session") if structured else "coaching_session",
+            "source": structured.get("source", source) if structured else source,
             "source_type": structured.get("source_type", "natural_language") if structured else "natural_language",
-            "importance": structured.get("importance", 0.5) if structured else 0.5,
+            "importance": structured.get("importance", 0.5) if structured else (fact.importance if fact.importance is not None else 0.5),
             "confidence": CONFIDENCE_MAP.get(fact.confidence, 0.7),
             "strength": 1.0,
             "sentiment": sentiment if not structured else structured.get("sentiment"),
-            "original_ts": structured.get("original_ts") if structured else now_iso,
+            "original_ts": _resolve_date(structured.get("original_ts"), now_iso) if structured else _resolve_date(fact.date, now_iso),
             "session_id": session_id,
             "metadata": structured.get("metadata", {}) if structured else {},
             "neo4j_sync_status": "pending",

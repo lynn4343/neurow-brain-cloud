@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
 import { OnboardingLayout } from "./OnboardingLayout";
 import { MemoryImportModal } from "@/components/memory/MemoryImportModal";
@@ -24,19 +24,21 @@ export function MemoryImportStep({ onComplete, onSkip }: MemoryImportStepProps) 
   const [memoryImportOpen, setMemoryImportOpen] = useState(false);
   const [fileImportOpen, setFileImportOpen] = useState(false);
   const { activeUser } = useUser();
+  const filesImportedRef = useRef(false);
 
   const handleMemoryImport = useCallback(
     (text: string) => {
-      const key = `neurow_pending_import_${activeUser?.slug ?? "unknown"}`;
-      localStorage.setItem(
-        key,
-        JSON.stringify({
-          slug: activeUser?.slug,
-          text,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      window.dispatchEvent(new Event("neurow-import-ready"));
+      const slug = activeUser?.slug ?? "unknown";
+      const key = `neurow_pending_import_${slug}`;
+      try {
+        localStorage.setItem(
+          key,
+          JSON.stringify({ slug, text, timestamp: new Date().toISOString() }),
+        );
+        window.dispatchEvent(new Event("neurow-import-ready"));
+      } catch (err) {
+        console.error("Failed to store import data:", err);
+      }
       setMemoryImportOpen(false);
       onComplete();
     },
@@ -45,20 +47,67 @@ export function MemoryImportStep({ onComplete, onSkip }: MemoryImportStepProps) 
 
   const handleFileImport = useCallback(
     (content: string, fileName: string, recordCount: number) => {
-      const key = `neurow_pending_file_import_${activeUser?.slug ?? "unknown"}`;
-      localStorage.setItem(
-        key,
-        JSON.stringify({
-          slug: activeUser?.slug,
-          content,
-          fileName,
-          recordCount,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      window.dispatchEvent(new Event("neurow-import-ready"));
-      setFileImportOpen(false);
-      onComplete();
+      const slug = activeUser?.slug ?? "unknown";
+      const key = `neurow_pending_file_import_${slug}`;
+
+      const newEntry = {
+        content,
+        fileName,
+        recordCount,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Accumulate: read existing array, append new entry
+      let files: Array<typeof newEntry> = [];
+      try {
+        const existing = localStorage.getItem(key);
+        if (existing) {
+          const parsed = JSON.parse(existing);
+          if (Array.isArray(parsed)) {
+            files = parsed;
+          } else if (parsed.content) {
+            files = [parsed];
+          }
+        }
+      } catch {
+        files = [];
+      }
+
+      files.push(newEntry);
+
+      try {
+        localStorage.setItem(key, JSON.stringify(files));
+        filesImportedRef.current = true;
+      } catch (err) {
+        console.error("Failed to store file import:", err);
+        // Surface the failure so the user knows data wasn't persisted
+        alert("Import failed to save. Your browser storage may be full. Please try a smaller file or clear some space.");
+      }
+
+      // Modal stays open for more files — event dispatched on modal close
+    },
+    [activeUser?.slug],
+  );
+
+  // When file import modal closes AND files were imported this session, advance onboarding
+  const handleFileModalClose = useCallback(
+    (open: boolean) => {
+      setFileImportOpen(open);
+      if (!open && filesImportedRef.current) {
+        try {
+          const slug = activeUser?.slug ?? "unknown";
+          const key = `neurow_pending_file_import_${slug}`;
+          const existing = localStorage.getItem(key);
+          if (existing) {
+            window.dispatchEvent(new Event("neurow-import-ready"));
+            onComplete();
+          }
+        } catch (err) {
+          console.error("Failed to read file import data:", err);
+        } finally {
+          filesImportedRef.current = false;
+        }
+      }
     },
     [activeUser?.slug, onComplete],
   );
@@ -101,7 +150,7 @@ export function MemoryImportStep({ onComplete, onSkip }: MemoryImportStepProps) 
                 boxShadow: "-4px 5px 30px rgba(101, 121, 238, 0.5)",
               }}
             >
-              Import file (DTP exports, Google Takeout, etc.)
+              Import .json or .jsonl file (Google Takeout, etc.)
             </button>
             <button
               onClick={onSkip}
@@ -123,7 +172,7 @@ export function MemoryImportStep({ onComplete, onSkip }: MemoryImportStepProps) 
       />
       <FileImportModal
         open={fileImportOpen}
-        onOpenChange={setFileImportOpen}
+        onOpenChange={handleFileModalClose}
         onImport={handleFileImport}
       />
     </>

@@ -82,7 +82,7 @@ export function FileImportModal({
   const [isDragging, setIsDragging] = useState(false);
   const [parsedFile, setParsedFile] = useState<ParsedFile | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [added, setAdded] = useState(false);
+  const [importedFiles, setImportedFiles] = useState<Array<{ name: string; recordCount: number }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (file: File) => {
@@ -105,6 +105,10 @@ export function FileImportModal({
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
+      if (e.dataTransfer.files.length > 1) {
+        setError("Please drop one file at a time — you can import more after each one.");
+        return;
+      }
       const file = e.dataTransfer.files[0];
       if (file) handleFile(file);
     },
@@ -112,11 +116,23 @@ export function FileImportModal({
   );
 
   const handleImport = useCallback(() => {
-    if (!parsedFile || added) return;
+    if (!parsedFile) return;
+
+    // Duplicate file detection — prevent importing the same file twice
+    if (importedFiles.some((f) => f.name === parsedFile.name)) {
+      setError(`${parsedFile.name} has already been imported.`);
+      setParsedFile(null);
+      return;
+    }
+
     onImport(parsedFile.content, parsedFile.name, parsedFile.recordCount);
-    setAdded(true);
+    setImportedFiles((prev) => [
+      ...prev,
+      { name: parsedFile.name, recordCount: parsedFile.recordCount },
+    ]);
     setParsedFile(null);
-  }, [parsedFile, added, onImport]);
+    setError(null);
+  }, [parsedFile, onImport, importedFiles]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -124,7 +140,7 @@ export function FileImportModal({
         setParsedFile(null);
         setError(null);
         setIsDragging(false);
-        setAdded(false);
+        setImportedFiles([]);
       }
       onOpenChange(nextOpen);
     },
@@ -141,11 +157,11 @@ export function FileImportModal({
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-[#1E1E1E]">
-            Import file to your Brain Cloud
+            Import files to your Brain Cloud
           </DialogTitle>
           <DialogDescription className="text-sm text-[#5f5e5b]">
-            Brain Cloud accepts DTP exports, Google Takeout, and structured data
-            files.
+            Supports .json and .jsonl exports from Google Takeout, ChatGPT,
+            Meta, and other services that let you download your data.
           </DialogDescription>
         </DialogHeader>
 
@@ -166,7 +182,9 @@ export function FileImportModal({
               }`}
             >
               <p className="text-sm text-[#5f5e5b]">
-                Drop a .json or .jsonl file here
+                {importedFiles.length > 0
+                  ? "Drop another .json or .jsonl file here"
+                  : "Drop one .json or .jsonl file here at a time"}
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -216,27 +234,42 @@ export function FileImportModal({
           {error && (
             <p className="text-sm text-red-500">{error}</p>
           )}
+
+          {/* Imported files summary */}
+          {importedFiles.length > 0 && (
+            <div className="rounded-lg border border-[#E6E5E3] bg-[#FAF8F8]/50 p-3">
+              <p className="text-xs font-medium text-[#5f5e5b]">
+                {importedFiles.length} {importedFiles.length === 1 ? "file" : "files"} added
+                {" · "}
+                {importedFiles.reduce((sum, f) => sum + f.recordCount, 0)} total records
+              </p>
+              <div className="mt-1.5 space-y-1">
+                {importedFiles.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs text-[#5f5e5b]">
+                    <Check className="size-3 text-green-600" weight="bold" />
+                    <span className="truncate">{f.name}</span>
+                    <span className="shrink-0">({f.recordCount})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
-            Cancel
+            {importedFiles.length > 0 ? "Done" : "Cancel"}
           </Button>
           <Button
             onClick={handleImport}
-            disabled={!parsedFile || added}
+            disabled={!parsedFile}
             className="bg-[#1E1E1E] text-white hover:bg-[#1E1E1E]/90"
           >
-            {added ? (
-              <>
-                <Check className="size-3.5" weight="bold" />
-                Added!
-              </>
-            ) : parsedFile ? (
-              `Import ${parsedFile.recordCount} ${parsedFile.recordCount === 1 ? "record" : "records"} to your Brain Cloud`
-            ) : (
-              "Import to your Brain Cloud"
-            )}
+            {parsedFile
+              ? `Import ${parsedFile.recordCount} ${parsedFile.recordCount === 1 ? "record" : "records"}`
+              : importedFiles.length > 0
+                ? "Drop another file"
+                : "Import to your Brain Cloud"}
           </Button>
         </DialogFooter>
       </DialogContent>

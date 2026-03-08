@@ -51,6 +51,13 @@ export function AppShell() {
     setChatPanelOpen(false);
   }, []);
 
+  // Listen for cross-context request to open chat panel (e.g. import processing)
+  useEffect(() => {
+    const handleOpenPanel = () => openChatPanel();
+    window.addEventListener("neurow-open-chat-panel", handleOpenPanel);
+    return () => window.removeEventListener("neurow-open-chat-panel", handleOpenPanel);
+  }, [openChatPanel]);
+
   // View change: auto-close panel when switching to full chat view
   const handleViewChange = useCallback((view: View) => {
     setActiveView(view);

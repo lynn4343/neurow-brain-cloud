@@ -381,6 +381,13 @@ For coaching conversations:
 When the user shares something important (a decision, a realization, progress on a goal, a new challenge):
 - Call brain_remember(user_id="${slug}", content="<what to store>") to add it to their Brain Cloud
 
+When the user imports memories from another AI (a structured block of entries, often with dates and categories):
+- Call brain_remember once per category section or meaningful group of entries \u2014 not the entire block as a single call
+- Pass source="ai_import" to brain_remember for all import calls
+- Preserve the user\u2019s original words verbatim in each brain_remember call \u2014 do not summarize or rephrase
+- Include any dates from the entries in your brain_remember content (e.g. \u201c[2024-06-15] Started new design project\u201d)
+- After importing, briefly confirm what was stored and how many memories were added
+
 You have access to their full coaching history, goals, patterns, and insights. Reference them naturally \u2014 don\u2019t ask questions you already know the answer to.`;
 }
 

@@ -10,8 +10,14 @@ import {
   type ReactNode,
 } from "react";
 import { useUser } from "@/contexts/UserContext";
+import { useSessions } from "@/contexts/SessionContext";
 import { type Message } from "@/components/chat/ChatMessage";
 import { type ActivityItem } from "@/components/chat/ActivityIndicator";
+import {
+  inferSessionType,
+  generateSessionTitle,
+  type ChatSession,
+} from "@/types/sessions";
 import {
   sendMessage,
   onChatStream,
@@ -38,13 +44,15 @@ interface ChatContextType {
   sessionId: string | null;
   activities: ActivityItem[];
   handleSend: (text: string, modeOverride?: string) => Promise<void>;
-  resetChat: () => void;
+  resetChat: (skipSave?: boolean) => void;
+  loadMessages: (messages: Message[]) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { activeUser, appPhase } = useUser();
+  const { saveSession: saveSessionToContext } = useSessions();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,17 +74,47 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Reset chat state when user or mode changes
-  const resetChat = useCallback(() => {
-    setMessages([]);
+  // Reset chat state. skipSave=true prevents saving on profile switch
+  // (where the slug has already changed to the new user).
+  const resetChat = useCallback(
+    (skipSave?: boolean) => {
+      // Save current conversation before clearing (if it has content)
+      if (!skipSave && messagesRef.current.length > 1) {
+        const type = inferSessionType(messagesRef.current);
+        const session: ChatSession = {
+          id: `${type}-${Date.now()}`,
+          type,
+          title: generateSessionTitle(messagesRef.current, type),
+          messages: [...messagesRef.current],
+          createdAt: messagesRef.current[0]?.timestamp || new Date().toISOString(),
+          updatedAt:
+            messagesRef.current[messagesRef.current.length - 1]?.timestamp ||
+            new Date().toISOString(),
+          personaId: activeUser?.slug || "unknown",
+        };
+        saveSessionToContext(session);
+      }
+      setMessages([]);
+      setSessionId(null);
+      sessionIdRef.current = null;
+      setActivities([]);
+      setIsLoading(false);
+    },
+    [activeUser?.slug, saveSessionToContext],
+  );
+
+  // Load a past session's messages into the chat view (visual replay)
+  const loadMessages = useCallback((msgs: Message[]) => {
+    setMessages(msgs);
     setSessionId(null);
     sessionIdRef.current = null;
     setActivities([]);
     setIsLoading(false);
   }, []);
 
+  // Reset on user or phase change — skipSave because slug has already changed
   useEffect(() => {
-    resetChat();
+    resetChat(true);
   }, [activeUser?.slug, appPhase, resetChat]);
 
   // --- IPC listeners (single registration, shared across all consumers) ---
@@ -249,7 +287,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           const pending = JSON.parse(aiRaw);
           if (pending.text?.trim()) {
             parts.push(
-              `I want to import memories from my other AI into Brain Cloud. Here is the export from my other AI:\n\n${pending.text}`,
+              `I just finished onboarding and I'd like to import memories from my other AI into my Brain Cloud. Here is the export:\n\n${pending.text}\n\nPlease process these into my Brain Cloud. While you're working on that, I'll explore my Day Map.`,
             );
           }
         } catch {
@@ -259,10 +297,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       if (fileRaw) {
         try {
-          const pending = JSON.parse(fileRaw);
-          if (pending.content?.trim()) {
+          const parsed = JSON.parse(fileRaw);
+
+          // Handle both old single-file format and new array format
+          const files: Array<{ content: string; fileName: string; recordCount: number }> =
+            Array.isArray(parsed) ? parsed : [parsed];
+
+          const validFiles = files.filter((f) => f.content?.trim());
+
+          if (validFiles.length > 0) {
+            const totalRecords = validFiles.reduce((sum, f) => sum + (f.recordCount || 0), 0);
+            const fileList = validFiles
+              .map((f) => `${f.fileName} (${f.recordCount} records)`)
+              .join(", ");
+
+            const fileContents = validFiles
+              .map(
+                (f) =>
+                  `--- File: ${f.fileName} (${f.recordCount} records) ---\n${f.content}`,
+              )
+              .join("\n\n");
+
             parts.push(
-              `I have a data file to import into Brain Cloud. File: ${pending.fileName} (${pending.recordCount} records):\n\n${pending.content}`,
+              `I have ${validFiles.length} data ${validFiles.length === 1 ? "file" : "files"} to import into my Brain Cloud (${totalRecords} total records: ${fileList}):\n\n${fileContents}\n\nPlease process all of these records into my Brain Cloud.`,
             );
           }
         } catch {
@@ -274,16 +331,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       const importMessage = parts.join("\n\n---\n\n");
 
+      // Signal AppShell to open the chat panel before the message sends
+      window.dispatchEvent(new Event("neurow-open-chat-panel"));
+
       importTimerRef.current = setTimeout(() => {
         importTimerRef.current = null;
         if (handleSendRef.current) {
           handleSendRef.current(importMessage);
           if (aiRaw) localStorage.removeItem(aiKey);
           if (fileRaw) localStorage.removeItem(fileKey);
+          // Track import completion for BrainCloudCard
+          const completionSource = aiRaw && fileRaw ? "both" : aiRaw ? "ai" : "file";
+          localStorage.setItem(
+            `neurow_import_completed_${activeUser.slug}`,
+            JSON.stringify({ timestamp: new Date().toISOString(), source: completionSource }),
+          );
         } else {
           console.warn("ChatContext: import message dropped — handleSend not available");
         }
-      }, 200);
+      }, 500);
     };
 
     // Path 1: mount check (onboarding → main app transition)
@@ -310,6 +376,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         activities,
         handleSend,
         resetChat,
+        loadMessages,
       }}
     >
       {children}

@@ -120,14 +120,17 @@ async def brain_remember(
     user_id: str,
     ctx: Context,
     session_id: str | None = None,
+    source: str = "coaching_session",
 ) -> str:
     """Store a memory across all four cognitive stores (Supabase, Neo4j, Mem0,
     Qdrant). Extracts facts, entities, and relationships from natural language
     input. user_id is the slug (e.g. 'theo') — create a profile first with
     brain_create_profile if the user doesn't exist yet.
+    source identifies where the memory came from: 'coaching_session' (default),
+    'ai_import' (imported from another AI), 'file_import' (from DTP/Takeout file).
     Returns memory IDs and per-store sync status."""
     stores: StoreManager = ctx.request_context.lifespan_context
-    result = await write_pipeline(content, user_id, stores, session_id=session_id)
+    result = await write_pipeline(content, user_id, stores, session_id=session_id, source=source)
     return result.model_dump_json(indent=2)
 
 
@@ -177,8 +180,8 @@ def format_recall_for_prompt(recall_result) -> str:
 
 async def _write_goal_cascade(slug, captured_data, stores, session_id):
     """Write coaching outputs to all 4 Brain Cloud stores (Turn 9)."""
-    vision = captured_data.get("one_year_vision_refined", "")
-    goal = captured_data.get("quarterly_goal_refined", "")
+    vision = captured_data.get("one_year_vision_refined") or captured_data.get("one_year_vision_raw", "")
+    goal = captured_data.get("quarterly_goal_refined") or captured_data.get("quarterly_goal_raw", "")
     traits = captured_data.get("identity_traits", [])
     releases = captured_data.get("release_items", [])
     action = captured_data.get("next_action_step", "")
@@ -517,8 +520,8 @@ async def coaching_store_turn(
     if turn_number == 9 and is_complete:
         due_date = compute_action_due_date(datetime.now(timezone.utc))
         goal_cascade_data = {
-            "vision": existing_data.get("one_year_vision_refined", ""),
-            "quarterly_goal": existing_data.get("quarterly_goal_refined", ""),
+            "vision": existing_data.get("one_year_vision_refined") or existing_data.get("one_year_vision_raw", ""),
+            "quarterly_goal": existing_data.get("quarterly_goal_refined") or existing_data.get("quarterly_goal_raw", ""),
             "goal_why": existing_data.get("goal_why", ""),
             "identity_traits": existing_data.get("identity_traits", []),
             "release_items": existing_data.get("release_items", []),

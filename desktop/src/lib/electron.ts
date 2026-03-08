@@ -77,9 +77,6 @@ export interface BrainExportData {
   user: Record<string, unknown>;
   metadata: Record<string, unknown>;
   episodic: Record<string, unknown>[];
-  graph: Record<string, unknown>;
-  semantic: Record<string, unknown>[];
-  associative: Record<string, unknown>[];
   coaching_sessions: Record<string, unknown>[];
 }
 

@@ -43,12 +43,8 @@ export interface BrainExportData {
     stores: number;
     categories: string[];
     export_source: string;
-    incomplete_stores: string[];
   };
   episodic: Record<string, unknown>[];
-  graph: { nodes: never[]; edges: never[]; note: string };
-  semantic: never[];
-  associative: never[];
   coaching_sessions: Record<string, unknown>[];
 }
 
@@ -216,7 +212,7 @@ export async function exportDataDirect(
   const [profileRes, memoriesRes, sessionsRes] = await Promise.all([
     fetch(`${config.url}/rest/v1/user_profiles?id=eq.${userId}&select=*`, { headers: h, signal }),
     fetch(`${config.url}/rest/v1/memories?user_id=eq.${userId}&select=*&order=created_at.desc`, { headers: h, signal }),
-    fetch(`${config.url}/rest/v1/coaching_sessions?user_id=eq.${userId}&select=*&order=created_at.desc`, { headers: h, signal }),
+    fetch(`${config.url}/rest/v1/coaching_sessions?user_id=eq.${userId}&select=*&order=started_at.desc`, { headers: h, signal }),
   ]);
 
   // Validate responses before parsing
@@ -230,15 +226,28 @@ export async function exportDataDirect(
     sessionsRes.json() as Promise<Record<string, unknown>[]>,
   ]);
 
-  const profile = profiles[0] || {};
+  const rawProfile = profiles[0] || {};
+
+  // Strip internal-only fields from profile (same pattern as memory sync status stripping)
+  const INTERNAL_PROFILE_FIELDS = ['is_demo_user'];
+  const profile: Record<string, unknown> = { ...rawProfile };
+  for (const field of INTERNAL_PROFILE_FIELDS) delete profile[field];
 
   // Filter memories with confidence >= 0.3 (same as export_pipeline.py line 53)
   const filtered = memories.filter((m) =>
     ((m.confidence as number) ?? 0.7) >= 0.3,
   );
 
+  // Strip internal sync metadata — not meaningful to users (BUG-005)
+  const INTERNAL_FIELDS = ['neo4j_sync_status', 'qdrant_sync_status', 'mem0_sync_status'];
+  const cleaned = filtered.map((m) => {
+    const record = { ...m };
+    for (const field of INTERNAL_FIELDS) delete record[field];
+    return record;
+  });
+
   const categories = [...new Set(
-    filtered.map((m) => m.category as string).filter(Boolean),
+    cleaned.map((m) => m.category as string).filter(Boolean),
   )];
 
   return {
@@ -246,16 +255,12 @@ export async function exportDataDirect(
     exported_at: new Date().toISOString(),
     user: profile,
     metadata: {
-      total_memories: filtered.length,
-      stores: 4,
+      total_memories: cleaned.length,
+      stores: 1,
       categories,
       export_source: 'direct_api',
-      incomplete_stores: ['neo4j', 'mem0', 'qdrant'],
     },
-    episodic: filtered,
-    graph: { nodes: [], edges: [], note: 'Graph data available via Brain Cloud MCP tools' },
-    semantic: [],
-    associative: [],
+    episodic: cleaned,
     coaching_sessions: sessions,
   };
 }

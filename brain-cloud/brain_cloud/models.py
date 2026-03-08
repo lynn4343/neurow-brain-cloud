@@ -8,12 +8,13 @@ class ParsedFact(BaseModel):
     text: str
     confidence: Literal["explicit", "implied", "inferred"]
     category: str
+    date: str | None = None  # ISO 8601 date or partial (e.g. "2024-06-15", "2024-06")
+    importance: float | None = None  # 0.0-1.0, extracted by LLM
 
 
 class ParsedEntity(BaseModel):
     name: str
-    type: Literal["person", "goal", "project", "place", "concept",
-                   "behavior", "belief", "pattern"]
+    type: str
 
 
 class ParsedRelationship(BaseModel):
@@ -45,6 +46,8 @@ class RecalledMemory(BaseModel):
     category: str
     source: str
     confidence: float
+    importance: float
+    semantic_similarity: float
     score: float
     age_days: int
 

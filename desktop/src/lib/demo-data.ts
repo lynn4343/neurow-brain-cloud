@@ -7,6 +7,8 @@
  * Decisions: W5-1A-D-004 (tasks), D-005 (targets), D-006 (notes), D-007 (architecture)
  */
 
+import type { ChatSession, Workspace } from "@/types/sessions";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -55,6 +57,7 @@ export const PROJECT_COLORS: Record<string, string> = {
   Learning: "bg-purple-100 text-purple-700 border-purple-200",
   Personal: "bg-indigo-100 text-indigo-700 border-indigo-200",
   "Getting Started": "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "Priority Goal": "bg-emerald-100 text-emerald-700 border-emerald-200",
   Home: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
@@ -413,4 +416,496 @@ export const CALENDAR_EVENTS: Record<string, CalendarEvent[]> = {
   default: [
     { id: "new-e01", title: "Welcome coaching session", date: todayISO(), startTime: "10:00", endTime: "10:30", durationMin: 30, category: "Coaching" },
   ],
+};
+
+// ---------------------------------------------------------------------------
+// Workspaces (W5-4B)
+// ---------------------------------------------------------------------------
+
+export const WORKSPACES: Record<string, Workspace[]> = {
+  theo: [
+    { id: "ws-theo-business",      name: "Business",      personaId: "theo", createdAt: "2026-02-10T10:00:00-06:00" },
+    { id: "ws-theo-freelance",     name: "Freelance",     personaId: "theo", createdAt: "2026-02-10T10:00:00-06:00" },
+    { id: "ws-theo-home",          name: "Home",          personaId: "theo", createdAt: "2026-02-10T10:00:00-06:00" },
+    { id: "ws-theo-health",        name: "Health",        personaId: "theo", createdAt: "2026-02-10T10:00:00-06:00" },
+    { id: "ws-theo-relationships", name: "Relationships", personaId: "theo", createdAt: "2026-02-10T10:00:00-06:00" },
+  ],
+  default: [],
+};
+
+// ---------------------------------------------------------------------------
+// Chat Sessions (W5-4B)
+// ---------------------------------------------------------------------------
+
+export const SESSIONS: Record<string, ChatSession[]> = {
+  theo: [
+    // --- Coaching: Clarity Session ---
+    {
+      id: "clarity-theo-demo",
+      type: "clarity",
+      title: "Clarity Session",
+      createdAt: "2026-02-10T10:00:00-06:00",
+      updatedAt: "2026-02-10T10:45:00-06:00",
+      personaId: "theo",
+      summary: "Vision: self-sustaining creative practice. Next action: send Meridian brand guide revisions.",
+      goalCascade: {
+        context_line: "Theo is a 23-year-old freelance graphic designer in East Austin, growing his creative practice.",
+        vision: "Self-sustaining creative practice \u2014 brand identity + motion design, debt cleared, recognized in Austin creative community",
+        quarterly_goal: "$100/hour for new clients, 3 concurrent projects, School of Motion modules 1-6",
+        goal_why: "I'm tired of the feast-or-famine cycle",
+        identity_traits: [
+          "bold with pricing",
+          "disciplined with the unsexy stuff",
+          "someone who finishes what he starts",
+        ],
+        release_items: [
+          "saying yes to underpriced projects",
+          "the barista survival story",
+          "putting off systems until later",
+        ],
+        next_action_step: "Send Meridian brand guide revisions",
+        next_action_due: "2026-03-12",
+        focus_area: "career-business",
+        declared_challenges: [
+          "inconsistent income",
+          "pricing and knowing my worth",
+          "following through on plans",
+          "managing finances",
+        ],
+      },
+      messages: [
+        // Turn 1: user opens
+        {
+          id: "clarity-demo-1",
+          role: "user",
+          content: "Just finished setting up my profile \u2014 ready to close the gap between vision and reality.",
+          timestamp: "2026-02-10T10:00:00-06:00",
+        },
+        // Turn 1: assistant (vision prompt)
+        {
+          id: "clarity-demo-2",
+          role: "assistant",
+          content: "Hey Theo. Nice to meet you.\n\nBefore we map out what\u2019s next, I want to understand where you\u2019re actually trying to go \u2014 not the safe answer, the real one.\n\n**If everything broke your way over the next year**, what would your life look like? Think about your work, your creative practice, how you spend your days. Don\u2019t edit yourself.",
+          timestamp: "2026-02-10T10:00:30-06:00",
+        },
+        // Turn 2: user shares vision
+        {
+          id: "clarity-demo-3",
+          role: "user",
+          content: "Honestly? I want to be fully self-sustaining as a designer. Not just scraping by with random logo jobs \u2014 I want a real practice. Brand identity work, maybe motion design too. I want to be the person small businesses in Austin call when they want their brand to feel like them. Debt cleared. No more barista shifts just to cover rent. Recognized in the Austin creative community as someone who does serious work.",
+          timestamp: "2026-02-10T10:03:00-06:00",
+        },
+        // Turn 2: assistant (quarterly goal extraction)
+        {
+          id: "clarity-demo-4",
+          role: "assistant",
+          content: "That\u2019s clear. You\u2019re not talking about a side hustle \u2014 you\u2019re talking about building a practice.\n\nLet\u2019s make this concrete. **In the next 90 days**, what would need to be true for you to feel like you\u2019re actually on track? Think about income, clients, skills \u2014 the measurable stuff.",
+          timestamp: "2026-02-10T10:03:30-06:00",
+        },
+        // Turn 3: user quarterly goal
+        {
+          id: "clarity-demo-5",
+          role: "user",
+          content: "I\u2019d need to be charging $100/hour for new clients and actually getting it. Three concurrent projects instead of the feast-or-famine thing. And I want to be through modules 1-6 of School of Motion so I can add motion design to my offerings.",
+          timestamp: "2026-02-10T10:06:00-06:00",
+        },
+        // Turn 3: assistant (goal why)
+        {
+          id: "clarity-demo-6",
+          role: "assistant",
+          content: "$100/hour, three projects, SoM through Module 6. Those are specific \u2014 good.\n\nNow the harder question: **Why does this matter to you right now?** Not why it makes logical sense. Why does it matter *to you*, personally, at this point in your life?",
+          timestamp: "2026-02-10T10:06:30-06:00",
+        },
+        // Turn 4: user goal why
+        {
+          id: "clarity-demo-7",
+          role: "user",
+          content: "Because I\u2019m tired of the feast-or-famine cycle. I\u2019m 23 and I\u2019ve been doing this long enough to know I\u2019m good at it, but I keep playing small. Every time I underprice a project or take a gig I don\u2019t care about just to pay rent, I\u2019m choosing survival over building something real. I don\u2019t want to be 25 still having this same conversation with myself.",
+          timestamp: "2026-02-10T10:09:00-06:00",
+        },
+        // Turn 4: assistant (identity traits)
+        {
+          id: "clarity-demo-8",
+          role: "assistant",
+          content: "\u201cChoosing survival over building something real.\u201d That\u2019s honest.\n\nHere\u2019s what I\u2019m hearing: you know you\u2019re capable. The gap isn\u2019t skill \u2014 it\u2019s how you show up around money, commitment, and follow-through.\n\n**Who do you need to become** to close that gap? Not what you need to *do* \u2014 who you need to *be*. What traits would the version of you who\u2019s running a real practice actually have?",
+          timestamp: "2026-02-10T10:09:30-06:00",
+        },
+        // Turn 5: user identity traits
+        {
+          id: "clarity-demo-9",
+          role: "user",
+          content: "Bold with pricing \u2014 stop apologizing for my rates. Disciplined with the unsexy stuff, like invoicing and follow-ups and bookkeeping. And honestly, just someone who finishes what he starts. I have too many 80%-done projects.",
+          timestamp: "2026-02-10T10:12:00-06:00",
+        },
+        // Turn 5: assistant (release items)
+        {
+          id: "clarity-demo-10",
+          role: "assistant",
+          content: "Bold. Disciplined. Finishes things. Those are real.\n\nNow the flip side: **What do you need to let go of** to become that person? What habits, stories, or patterns are you carrying that don\u2019t serve the version of you who charges $100/hour and runs three projects?",
+          timestamp: "2026-02-10T10:12:30-06:00",
+        },
+        // Turn 6: user release items
+        {
+          id: "clarity-demo-11",
+          role: "user",
+          content: "Saying yes to underpriced projects because I\u2019m afraid of having no work. The whole barista survival story \u2014 \u201cI need shifts to cover rent\u201d keeps me from going all in on design. And putting off systems until later. I keep telling myself I\u2019ll set up proper invoicing and bookkeeping \u201cwhen I have time\u201d but that day never comes.",
+          timestamp: "2026-02-10T10:15:00-06:00",
+        },
+        // Turn 6: assistant (next action commitment)
+        {
+          id: "clarity-demo-12",
+          role: "assistant",
+          content: "Three things to release: underpriced yeses, the survival story, and \u201clater\u201d for systems. All connected \u2014 they all protect you from the risk of going all in.\n\nLast question. We\u2019ve got the vision, the 90-day target, the identity shift, and what you\u2019re letting go of. Now: **What\u2019s the single next action** you can take in the next 48 hours that moves you toward $100/hour? One thing. Specific enough that you\u2019d know if you did it.",
+          timestamp: "2026-02-10T10:15:30-06:00",
+        },
+        // Turn 7: user next action
+        {
+          id: "clarity-demo-13",
+          role: "user",
+          content: "Send the Meridian brand guide revisions. I\u2019ve been sitting on them for a week because I keep second-guessing the color palette. It\u2019s done. I just need to send it.",
+          timestamp: "2026-02-10T10:18:00-06:00",
+        },
+        // Turn 7: assistant (close + summary)
+        {
+          id: "clarity-demo-14",
+          role: "assistant",
+          content: "Here\u2019s what you just built:\n\n**Vision:** Self-sustaining creative practice \u2014 brand identity + motion design, debt cleared, recognized in the Austin creative community.\n\n**90-Day Target:** $100/hour for new clients, 3 concurrent projects, School of Motion modules 1-6.\n\n**Why Now:** You\u2019re tired of the feast-or-famine cycle. You know you\u2019re good enough \u2014 the gap is commitment, not capability.\n\n**Who You\u2019re Becoming:** Bold with pricing. Disciplined with the unsexy stuff. Someone who finishes what he starts.\n\n**Releasing:** Underpriced yeses. The barista survival story. \u201CLater\u201d for systems.\n\n**Next Action:** Send the Meridian brand guide revisions.\n\nThis is your compass. Every decision runs through it: *does this move me toward the practice, or keep me in survival mode?*\n\nDon\u2019t worry about perfection \u2014 you\u2019ve already started. I\u2019ll check in on Meridian.",
+          timestamp: "2026-02-10T10:18:30-06:00",
+        },
+      ],
+    },
+
+    // --- Coaching: Morning Brief ---
+    {
+      id: "morning-theo-demo",
+      type: "morning_brief",
+      title: "Morning Brief \u2014 Mar 7",
+      createdAt: "2026-03-07T08:30:00-06:00",
+      updatedAt: "2026-03-07T08:40:00-06:00",
+      personaId: "theo",
+      summary: "Three priorities locked for the day. Discovery call prep is the high-leverage item.",
+      messages: [
+        {
+          id: "mb-demo-1",
+          role: "user",
+          content: "Give me my morning brief",
+          timestamp: "2026-03-07T08:30:00-06:00",
+        },
+        {
+          id: "mb-demo-2",
+          role: "assistant",
+          content: "Morning, Theo. Here\u2019s your day.\n\n**Today\u2019s calendar:**\n- 10:00 \u2014 Monthly review session (90 min)\n- Open afternoon\n\n**Top 3 priorities:**\n1. Prep questions for discovery call (due today, ~45 min)\n2. Send invoice follow-up \u2014 StartupCo (due today, ~20 min)\n3. Send Meridian brand guide revisions (due Mar 12, ~2 hrs)\n\n**Pattern I\u2019m noticing:** You\u2019ve got two revenue actions due today. The discovery call prep is the high-leverage item \u2014 that\u2019s a potential new $100/hr client. I\u2019d front-load it before the monthly review so your head is clear.\n\n**Open loop from last week:** You committed to no new projects until the invoice backlog is clear. StartupCo follow-up is the last one. Close that loop today.\n\nWhat do you want to tackle first?",
+          timestamp: "2026-03-07T08:30:30-06:00",
+        },
+        {
+          id: "mb-demo-3",
+          role: "user",
+          content: "Discovery call prep first. What should I make sure to cover?",
+          timestamp: "2026-03-07T08:33:00-06:00",
+        },
+        {
+          id: "mb-demo-4",
+          role: "assistant",
+          content: "Based on your Meridian debrief, three things to nail:\n\n1. **Ask about their budget range before quoting** \u2014 you flagged this as a miss last time. Simple question: \u201cWhat range are you working with for this project?\u201d\n2. **Lead with the feeling question** \u2014 \u201cWhat do you want someone to feel when they see your brand?\u201d worked well with Meridian.\n3. **Bring a printed leave-behind** \u2014 you noted this would have been more professional.\n\nAnd the big one: **quote at $100/hour.** No discount. No \u201cfirst project special.\u201d You committed to this in your Clarity Session. If they say no, that\u2019s data, not rejection.\n\nYou\u2019ve got this.",
+          timestamp: "2026-03-07T08:33:30-06:00",
+        },
+      ],
+    },
+
+    // --- Coaching: Weekly Review ---
+    {
+      id: "weekly-theo-demo",
+      type: "weekly",
+      title: "Weekly Review \u2014 Mar 2",
+      createdAt: "2026-03-02T10:00:00-06:00",
+      updatedAt: "2026-03-02T10:30:00-06:00",
+      personaId: "theo",
+      summary: "2 of 3 weekly targets hit. Invoicing still open. New target: close invoice backlog.",
+      messages: [
+        {
+          id: "wr-demo-1",
+          role: "user",
+          content: "Let\u2019s do my weekly review",
+          timestamp: "2026-03-02T10:00:00-06:00",
+        },
+        {
+          id: "wr-demo-2",
+          role: "assistant",
+          content: "Let\u2019s see how the week landed.\n\n**Your 3 targets were:**\n1. +1 $100/hr quote \u2014 **Done.** Meridian discovery call, quoted at full rate, they accepted.\n2. SoM Module 4 \u2014 **In progress.** You downloaded the files but haven\u2019t started the exercises.\n3. Follow up invoices \u2014 **Not done.** Three still outstanding ($2,400 total).\n\n**Score: 1.5 / 3.** The Meridian win is significant \u2014 that\u2019s the first time you quoted $100/hr and held it. That\u2019s identity-level.\n\nThe invoice follow-ups keep sliding. This is the third week they\u2019ve been on your list. **What\u2019s actually blocking you?**",
+          timestamp: "2026-03-02T10:00:30-06:00",
+        },
+        {
+          id: "wr-demo-3",
+          role: "user",
+          content: "I hate chasing people for money. It feels weird. Like I\u2019m being pushy.",
+          timestamp: "2026-03-02T10:05:00-06:00",
+        },
+        {
+          id: "wr-demo-4",
+          role: "assistant",
+          content: "That tracks with the pricing pattern. The same part of you that underprices projects is the part that won\u2019t follow up on invoices. It\u2019s the same story: *asking for what you\u2019re owed feels like too much*.\n\nBut here\u2019s the reality: you did the work. They owe you $2,400. Following up isn\u2019t pushy \u2014 it\u2019s professional. Every freelancer you admire sends invoice reminders. It\u2019s not personal.\n\n**For next week:**\n1. Close the invoice backlog (all 3 follow-ups, Monday morning)\n2. SoM Module 4 exercises\n3. Prep for Meridian Round 2 presentation\n\nThe invoice follow-ups go first because they\u2019re the easiest to keep dodging. Get them out of your head Monday morning. 20 minutes and it\u2019s done.",
+          timestamp: "2026-03-02T10:05:30-06:00",
+        },
+      ],
+    },
+
+    // --- Workspace: Freelance chats ---
+    {
+      id: "chat-theo-freelance-1",
+      type: "chat",
+      title: "Meridian brand strategy",
+      workspaceId: "ws-theo-freelance",
+      createdAt: "2026-03-01T14:00:00-06:00",
+      updatedAt: "2026-03-01T14:30:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "fl-1-1",
+          role: "user",
+          content: "I\u2019m prepping for the Meridian brand concepts review on Tuesday. They\u2019re a coffee roastery that wants to feel premium but approachable. I\u2019ve got three directions \u2014 can you help me think through which one to lead with?",
+          timestamp: "2026-03-01T14:00:00-06:00",
+        },
+        {
+          id: "fl-1-2",
+          role: "assistant",
+          content: "Let\u2019s think about this from Meridian\u2019s perspective. They said \u201cpremium but approachable\u201d \u2014 which usually means they\u2019re afraid of looking pretentious but also don\u2019t want to look cheap.\n\n**Lead with the direction that resolves that tension best.** Which of your three does that?\n\nAlso \u2014 remember your discovery call debrief: *lead with feeling, not features*. When you present, don\u2019t start with the logo. Start with: \u201cHere\u2019s how someone should feel when they walk into your shop and see this brand.\u201d\n\nWhich direction are you leaning toward?",
+          timestamp: "2026-03-01T14:00:30-06:00",
+        },
+        {
+          id: "fl-1-3",
+          role: "user",
+          content: "Direction B \u2014 warm earth tones, hand-drawn type, feels like a neighborhood spot but with craft quality. The other two are either too corporate or too hipster.",
+          timestamp: "2026-03-01T14:05:00-06:00",
+        },
+        {
+          id: "fl-1-4",
+          role: "assistant",
+          content: "Direction B sounds right for their brief. \u201cNeighborhood spot with craft quality\u201d *is* \u201cpremium but approachable\u201d translated into design language.\n\n**For the presentation:**\n1. Lead with B. Show it in context \u2014 on a cup, on the door, on their Instagram grid\n2. Show A and C as contrast options, not equals. \u201cHere\u2019s how we could go more minimal\u201d and \u201chere\u2019s how we could go more playful\u201d \u2014 but frame B as the recommendation\n3. Have a clear next step ready: \u201cIf this direction feels right, here\u2019s what the next phase looks like\u201d\n\nPresenting a recommendation shows confidence. Presenting three equal options signals you\u2019re not sure. You\u2019re the expert here \u2014 act like it.",
+          timestamp: "2026-03-01T14:05:30-06:00",
+        },
+      ],
+    },
+    {
+      id: "chat-theo-freelance-2",
+      type: "chat",
+      title: "Pricing for new clients",
+      workspaceId: "ws-theo-freelance",
+      createdAt: "2026-02-24T11:00:00-06:00",
+      updatedAt: "2026-02-24T11:20:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "fl-2-1",
+          role: "user",
+          content: "Got a DM from someone who wants a logo. They asked \u201cwhat\u2019s your rate?\u201d and I froze. My old rate was $40/hr but I committed to $100. What do I actually say?",
+          timestamp: "2026-02-24T11:00:00-06:00",
+        },
+        {
+          id: "fl-2-2",
+          role: "assistant",
+          content: "First: don\u2019t quote hourly for logo work. Quote project-based.\n\nHourly rates invite negotiation (\u201ccan you do it for less hours?\u201d). Project pricing frames the value differently: they\u2019re paying for *the outcome*, not your time.\n\n**A simple response:**\n\u201cThanks for reaching out! My brand identity packages start at $1,500 for logo + brand guidelines. Happy to hop on a quick call to learn more about your project and see if it\u2019s a fit.\u201d\n\nNotice: you named a number, didn\u2019t apologize, and offered a next step. If they ghost, that\u2019s data \u2014 they weren\u2019t your client. If they respond, you\u2019ve set the anchor at $1,500, not $40/hr.\n\nHow does that feel?",
+          timestamp: "2026-02-24T11:00:30-06:00",
+        },
+        {
+          id: "fl-2-3",
+          role: "user",
+          content: "Terrifying but right. I\u2019m going to send it before I talk myself out of it.",
+          timestamp: "2026-02-24T11:05:00-06:00",
+        },
+        {
+          id: "fl-2-4",
+          role: "assistant",
+          content: "Send it. Then close the app and go do something else. Don\u2019t refresh your DMs every 30 seconds.\n\nThis is the identity shift in action: *bold with pricing*. The old Theo would have said $300 and resented the work. This Theo names a real number and lets the client decide.\n\nLet me know how it goes.",
+          timestamp: "2026-02-24T11:05:30-06:00",
+        },
+      ],
+    },
+
+    // --- Workspace: Health chats ---
+    {
+      id: "chat-theo-health-1",
+      type: "chat",
+      title: "ADHD focus strategies",
+      workspaceId: "ws-theo-health",
+      createdAt: "2026-02-20T09:00:00-06:00",
+      updatedAt: "2026-02-20T09:25:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "hl-1-1",
+          role: "user",
+          content: "I\u2019ve been tracking my focus blocks and I can\u2019t get more than 45 minutes before I\u2019m checking my phone. It\u2019s killing my output.",
+          timestamp: "2026-02-20T09:00:00-06:00",
+        },
+        {
+          id: "hl-1-2",
+          role: "assistant",
+          content: "45 minutes is actually solid for ADHD \u2014 that\u2019s not the problem. The problem is what happens *after* you check your phone: you don\u2019t come back for another 20-30 minutes.\n\nTwo adjustments based on what\u2019s been working for you:\n\n1. **Phone in the backpack.** Not on the desk, not face-down \u2014 in the backpack, zipped. You identified this yourself in your focus experiments note. The data is clear.\n\n2. **Work in 45-minute blocks with intentional breaks.** Don\u2019t fight your attention span \u2014 design around it. 45 on, 10 off, repeat. During the 10, go outside. Not your phone.\n\nYour best work happens at the coffee shop between 10 AM and 1 PM. Three 45-minute blocks in that window = 2.25 hours of actual focused design time. That\u2019s more than most people get in an 8-hour day.\n\nStop trying to focus for 3 hours straight. You\u2019re not built for it, and you don\u2019t need to be.",
+          timestamp: "2026-02-20T09:00:30-06:00",
+        },
+        {
+          id: "hl-1-3",
+          role: "user",
+          content: "That reframe actually helps. I keep comparing myself to people who can grind for hours.",
+          timestamp: "2026-02-20T09:10:00-06:00",
+        },
+        {
+          id: "hl-1-4",
+          role: "assistant",
+          content: "Comparison is the wrong metric. Output is the right one. You finished the Meridian brand concepts in two focused sessions at the coffee shop. That\u2019s real work that\u2019s earning real money.\n\nThe question isn\u2019t \u201chow long can I focus?\u201d It\u2019s \u201cam I protecting my best hours for my best work?\u201d\n\nMorning = coffee shop + client work. Phone in the backpack. That\u2019s the system. Trust it.",
+          timestamp: "2026-02-20T09:10:30-06:00",
+        },
+      ],
+    },
+
+    // --- Workspace: Business chat ---
+    {
+      id: "chat-theo-business-1",
+      type: "chat",
+      title: "Q1 revenue planning",
+      workspaceId: "ws-theo-business",
+      createdAt: "2026-02-15T14:00:00-06:00",
+      updatedAt: "2026-02-15T14:20:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "bz-1-1",
+          role: "user",
+          content: "I want to figure out if $100/hr is realistic for Q1. Right now I\u2019m averaging maybe $50/hr when I factor in all the unbillable time.",
+          timestamp: "2026-02-15T14:00:00-06:00",
+        },
+        {
+          id: "bz-1-2",
+          role: "assistant",
+          content: "Let\u2019s do the math.\n\n**Current reality:** ~$50/hr effective rate, maybe 15 billable hours/week (rest is admin, prospecting, unpaid revisions). That\u2019s ~$3,000/month.\n\n**Target:** $100/hr, 3 concurrent projects. If each project averages 15-20 hours, that\u2019s $4,500-6,000/month from design work alone.\n\n**The gap isn\u2019t the rate \u2014 it\u2019s the unbillable time.** You\u2019re losing hours to:\n- Scope creep (adding extras they didn\u2019t ask for)\n- Invoice chasing (because you don\u2019t follow up promptly)\n- Prospecting inefficiently (saying yes to everything instead of targeting)\n\n**Three levers:**\n1. Quote project-based, not hourly \u2014 protects your margin on scope creep\n2. Send invoices the day you deliver, follow up at 7 and 14 days \u2014 systemize it\n3. Say no to sub-$1,000 projects \u2014 they eat the same admin time as $3,000 ones\n\n$100/hr is realistic. But it requires saying no to the work that keeps you at $50.",
+          timestamp: "2026-02-15T14:00:30-06:00",
+        },
+      ],
+    },
+
+    // --- Workspace: Relationships chat ---
+    {
+      id: "chat-theo-relationships-1",
+      type: "chat",
+      title: "Setting boundaries with family",
+      workspaceId: "ws-theo-relationships",
+      createdAt: "2026-02-18T19:00:00-06:00",
+      updatedAt: "2026-02-18T19:15:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "rel-1-1",
+          role: "user",
+          content: "My mom keeps asking when I\u2019m going to get a \u201creal job.\u201d I know she means well but it\u2019s draining. How do I handle this without blowing up?",
+          timestamp: "2026-02-18T19:00:00-06:00",
+        },
+        {
+          id: "rel-1-2",
+          role: "assistant",
+          content: "She\u2019s asking because she\u2019s worried, not because she doesn\u2019t believe in you. The barista shifts + inconsistent income look risky from a parent\u2019s perspective. She doesn\u2019t see the Meridian project or the $100/hr quote \u2014 she sees her kid hustling.\n\n**What might actually work:**\n- Share a win. Next time she asks, tell her about Meridian. \u201cI just landed a brand identity project for a coffee roastery. They\u2019re paying me $100/hour.\u201d Concrete beats abstract.\n- Set a boundary with warmth: \u201cI know you worry, and I appreciate that. But I need you to trust that I\u2019m building something real. Can I update you monthly instead of defending myself every dinner?\u201d\n\nYou don\u2019t need her permission. But you\u2019d probably like her support. Giving her evidence of progress is the fastest way to earn it.",
+          timestamp: "2026-02-18T19:00:30-06:00",
+        },
+      ],
+    },
+
+    // --- Workspace: Home chat ---
+    {
+      id: "chat-theo-home-1",
+      type: "chat",
+      title: "Studio setup on a budget",
+      workspaceId: "ws-theo-home",
+      createdAt: "2026-02-22T16:00:00-06:00",
+      updatedAt: "2026-02-22T16:15:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "hm-1-1",
+          role: "user",
+          content: "I want to set up a proper home studio for design work but I\u2019m on a tight budget. What\u2019s actually essential vs nice to have?",
+          timestamp: "2026-02-22T16:00:00-06:00",
+        },
+        {
+          id: "hm-1-2",
+          role: "assistant",
+          content: "You already have the most important thing \u2014 a laptop that runs your tools. Everything else is optimization.\n\n**Essential (invest now):**\n- External monitor \u2014 even a used 24\" 1080p ($80-120 on marketplace). Design on a 13\" screen is slow. This pays for itself in the first week.\n- Decent chair. Your back is a business asset. Check estate sales.\n\n**Nice to have (invest when revenue allows):**\n- Drawing tablet (Wacom Intuos, ~$80)\n- Ring light for client video calls ($25)\n- Cable management (makes the space feel professional, helps focus)\n\n**Skip for now:**\n- Standing desk (use a stack of books)\n- Second monitor (one external is enough)\n- Acoustic panels (you\u2019re doing design, not podcasting)\n\nThe goal isn\u2019t a showroom. It\u2019s a space where you can sit down and *start working* without friction. External monitor + good chair. That\u2019s it for now.",
+          timestamp: "2026-02-22T16:00:30-06:00",
+        },
+      ],
+    },
+
+    // --- Your Chats: unorganized ---
+    {
+      id: "chat-theo-unorg-1",
+      type: "chat",
+      title: "Help me brainstorm portfolio ideas",
+      createdAt: "2026-03-06T15:00:00-06:00",
+      updatedAt: "2026-03-06T15:15:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "uo-1-1",
+          role: "user",
+          content: "I need to update my portfolio site. Right now it\u2019s just a Notion page. What should I actually include?",
+          timestamp: "2026-03-06T15:00:00-06:00",
+        },
+        {
+          id: "uo-1-2",
+          role: "assistant",
+          content: "For where you are right now \u2014 transitioning from side hustle to real practice \u2014 your portfolio needs to do one thing: **prove you can solve a client\u2019s problem, not just make pretty things.**\n\n**Must-haves:**\n1. 3-4 case studies (not just images \u2014 show the brief, your process, the result)\n2. Clear services page: what you do, who it\u2019s for, how to start\n3. One testimonial (even from Meridian if they\u2019re happy)\n4. Contact form or booking link\n\n**The case study format that works:**\n- Client + their challenge (1 sentence)\n- What you did (2-3 sentences)\n- The result (screenshot + 1 sentence)\n\nKeep it tight. Clients spend 30 seconds on a portfolio. Make those 30 seconds count.",
+          timestamp: "2026-03-06T15:00:30-06:00",
+        },
+      ],
+    },
+    {
+      id: "chat-theo-unorg-2",
+      type: "chat",
+      title: "What\u2019s my schedule look like tomorrow?",
+      createdAt: "2026-03-05T20:00:00-06:00",
+      updatedAt: "2026-03-05T20:10:00-06:00",
+      personaId: "theo",
+      messages: [
+        {
+          id: "uo-2-1",
+          role: "user",
+          content: "What\u2019s my schedule look like tomorrow?",
+          timestamp: "2026-03-05T20:00:00-06:00",
+        },
+        {
+          id: "uo-2-2",
+          role: "assistant",
+          content: "Tomorrow (Thursday, Mar 6) looks open \u2014 no scheduled events on your calendar.\n\nThat\u2019s a deep work day. Based on your priorities:\n\n1. **Morning (10-1 PM at coffee shop):** Meridian brand guide revisions \u2014 this is your top priority, due Mar 12\n2. **Afternoon:** School of Motion Module 4 exercises\n3. **Evening:** Jog at Town Lake if the weather\u2019s good\n\nNo meetings to break up your focus blocks. Use it.",
+          timestamp: "2026-03-05T20:00:30-06:00",
+        },
+      ],
+    },
+  ],
+
+  // --- Jordan Lee (p01) ---
+  p01: [
+    {
+      id: "import-p01-demo",
+      type: "import",
+      title: "Calendar Import",
+      createdAt: "2026-03-06T14:00:00-06:00",
+      updatedAt: "2026-03-06T14:15:00-06:00",
+      personaId: "p01",
+      summary: "Calendar data imported \u2014 130 facts extracted across all four memory stores.",
+      messages: [
+        {
+          id: "imp-p01-1",
+          role: "user",
+          content: "I have 1 data file to import into my Brain Cloud (42 records: calendar_export.jsonl):\n\n--- File: calendar_export.jsonl (42 records) ---\nMeeting notes, appointments, and scheduled events from the past 3 months.\n\nPlease process all of these records into my Brain Cloud.",
+          timestamp: "2026-03-06T14:00:00-06:00",
+        },
+        {
+          id: "imp-p01-2",
+          role: "assistant",
+          content: "I\u2019m processing your calendar data now. Here\u2019s what I found across 42 records:\n\n**Stored to Brain Cloud:**\n- 130 facts extracted and stored across all four memory stores\n- 18 calendar events mapped to your schedule\n- 12 relationship connections identified (people you meet with regularly)\n- 8 recurring patterns detected (weekly standups, monthly reviews)\n\n**Key insights:**\n- You have a consistent Thursday coaching cadence\n- Most of your creative meetings happen Tuesday/Wednesday\n- Your calendar shows a shift toward more client-facing time in the last month\n\nAll data is now searchable in your Brain Cloud and will inform future coaching sessions. You can export it anytime via `brain_export`.",
+          timestamp: "2026-03-06T14:05:00-06:00",
+        },
+      ],
+    },
+  ],
+
+  default: [],
 };

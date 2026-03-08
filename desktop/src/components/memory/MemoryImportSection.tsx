@@ -41,13 +41,34 @@ export function MemoryImportSection() {
     (content: string, fileName: string, recordCount: number) => {
       const slug = activeUser?.slug ?? "unknown";
       const key = `neurow_pending_file_import_${slug}`;
-      const payload = JSON.stringify({
-        slug,
+
+      const newEntry = {
         content,
         fileName,
         recordCount,
         timestamp: new Date().toISOString(),
-      });
+      };
+
+      // Accumulate: read existing array, append new entry
+      let files: Array<typeof newEntry> = [];
+      try {
+        const existing = localStorage.getItem(key);
+        if (existing) {
+          const parsed = JSON.parse(existing);
+          if (Array.isArray(parsed)) {
+            files = parsed;
+          } else if (parsed.content) {
+            // Old format: single object → wrap in array
+            files = [parsed];
+          }
+        }
+      } catch {
+        files = [];
+      }
+
+      files.push(newEntry);
+
+      const payload = JSON.stringify(files);
 
       if (payload.length > 4 * 1024 * 1024) {
         console.warn(
@@ -57,12 +78,28 @@ export function MemoryImportSection() {
 
       try {
         localStorage.setItem(key, payload);
-        window.dispatchEvent(new Event("neurow-import-ready"));
       } catch (err) {
         console.error("Failed to store file import:", err);
         return;
       }
-      setFileImportOpen(false);
+
+      // Modal stays open for more files — event dispatched on modal close
+    },
+    [activeUser?.slug],
+  );
+
+  // When file import modal closes AND files were imported, trigger processing
+  const handleFileModalClose = useCallback(
+    (open: boolean) => {
+      setFileImportOpen(open);
+      if (!open) {
+        const slug = activeUser?.slug ?? "unknown";
+        const key = `neurow_pending_file_import_${slug}`;
+        const existing = localStorage.getItem(key);
+        if (existing) {
+          window.dispatchEvent(new Event("neurow-import-ready"));
+        }
+      }
     },
     [activeUser?.slug],
   );
@@ -114,8 +151,8 @@ export function MemoryImportSection() {
             </h3>
             <div className="mt-1 flex items-start justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Import DTP exports, Google Takeout, or structured data files
-                (.json, .jsonl) directly into Brain Cloud.
+                Import .json and .jsonl files from Google Takeout, ChatGPT,
+                Meta, and other services directly into Brain Cloud.
               </p>
               <Button
                 variant="outline"
@@ -137,7 +174,7 @@ export function MemoryImportSection() {
       />
       <FileImportModal
         open={fileImportOpen}
-        onOpenChange={setFileImportOpen}
+        onOpenChange={handleFileModalClose}
         onImport={handleFileImport}
       />
     </>

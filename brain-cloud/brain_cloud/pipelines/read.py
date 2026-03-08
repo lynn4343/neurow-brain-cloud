@@ -74,16 +74,17 @@ def _ensure_aware(dt: datetime) -> datetime:
 def _compute_score(
     semantic_similarity: float,
     confidence: float,
+    importance: float,
     effective_ts: datetime | None,
     now: datetime,
 ) -> float:
-    """Recency-weighted relevance scoring (Tier 1)."""
+    """Recency-weighted relevance scoring (Tier 1 + importance)."""
     if effective_ts:
         days_since = max((now - _ensure_aware(effective_ts)).days, 0)
     else:
         days_since = 0
     recency_decay = exp(-0.01 * days_since)
-    return semantic_similarity * confidence * recency_decay
+    return semantic_similarity * confidence * importance * recency_decay
 
 
 def _fuse_results(
@@ -108,6 +109,7 @@ def _fuse_results(
             "category": item.get("category", ""),
             "source": item.get("source", ""),
             "confidence": item.get("confidence", 0.7),
+            "importance": item.get("importance", 0.5),
             "semantic_similarity": item.get("score", 0.5),
             "original_ts": item.get("original_ts"),
             "created_at": item.get("created_at"),
@@ -122,6 +124,7 @@ def _fuse_results(
             # Enrich with Supabase fields if missing
             existing = candidates[mid]
             existing["confidence"] = item.get("confidence", existing["confidence"])
+            existing["importance"] = item.get("importance", existing.get("importance", 0.5))
             existing["original_ts"] = item.get("original_ts") or existing.get("original_ts")
             existing["created_at"] = item.get("created_at") or existing.get("created_at")
         else:
@@ -131,6 +134,7 @@ def _fuse_results(
                 "category": item.get("category", ""),
                 "source": item.get("source", ""),
                 "confidence": item.get("confidence", 0.7),
+                "importance": item.get("importance", 0.5),
                 "semantic_similarity": 0.3,  # lower default for non-vector results
                 "original_ts": item.get("original_ts"),
                 "created_at": item.get("created_at"),
@@ -149,6 +153,7 @@ def _fuse_results(
                 "category": item.get("metadata", {}).get("category", "") if isinstance(item, dict) else "",
                 "source": "mem0",
                 "confidence": 0.7,
+                "importance": item.get("metadata", {}).get("importance", 0.5) if isinstance(item, dict) else 0.5,
                 "semantic_similarity": item.get("score", 0.5) if isinstance(item, dict) else 0.5,
                 "original_ts": item.get("metadata", {}).get("original_ts") if isinstance(item, dict) else None,
                 "created_at": None,
@@ -166,6 +171,7 @@ def _fuse_results(
                 "category": item.get("metadata", {}).get("category", ""),
                 "source": item.get("metadata", {}).get("source", "mem0"),
                 "confidence": 0.7,
+                "importance": item.get("metadata", {}).get("importance", 0.5) if isinstance(item, dict) else 0.5,
                 "semantic_similarity": item.get("score", 0.5),
                 "original_ts": item.get("metadata", {}).get("original_ts"),
                 "created_at": None,
@@ -216,9 +222,11 @@ def _fuse_results(
     scored = []
     for mid, data in candidates.items():
         effective_ts = _parse_ts(data.get("original_ts")) or _parse_ts(data.get("created_at"))
+        importance = data.get("importance", 0.5)
         score = _compute_score(
             data["semantic_similarity"],
             data["confidence"],
+            importance,
             effective_ts,
             now,
         )
@@ -230,6 +238,8 @@ def _fuse_results(
                 category=data["category"],
                 source=data["source"],
                 confidence=data["confidence"],
+                importance=importance,
+                semantic_similarity=round(data["semantic_similarity"], 4),
                 score=round(score, 4),
                 age_days=age_days,
             )

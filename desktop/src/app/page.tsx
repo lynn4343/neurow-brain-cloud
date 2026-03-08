@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { UserProvider, useUser } from "@/contexts/UserContext";
+import { SessionProvider } from "@/contexts/SessionContext";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { ClaritySessionFlow } from "@/components/onboarding/ClaritySessionFlow";
@@ -19,8 +20,10 @@ const AppShell = dynamic(
 export default function Home() {
   return (
     <UserProvider>
-      <AppRouter />
-      <DevPhaseSwitcher />
+      <SessionProvider>
+        <AppRouter />
+        <DevPhaseSwitcher />
+      </SessionProvider>
     </UserProvider>
   );
 }

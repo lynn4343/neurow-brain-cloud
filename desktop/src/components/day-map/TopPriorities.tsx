@@ -8,10 +8,8 @@ import { useDemoData } from "@/contexts/DemoDataContext";
 import {
   type TopPriority,
   type Priority,
-  TOP_PRIORITIES,
   PROJECT_COLORS,
   DEFAULT_PROJECT_COLOR,
-  getUserData,
 } from "@/lib/demo-data";
 
 /* Priority Bars — matches SecondaryTasks */
@@ -76,10 +74,43 @@ function PlaceholderSlot() {
   );
 }
 
+/** Format ISO date to display-friendly string for priority cards. */
+function formatDueDate(isoDate: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(isoDate + "T00:00:00");
+  const diffDays = Math.round(
+    (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  if (diffDays < 0) return "Overdue";
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
+  if (diffDays <= 7) return "This week";
+  return due.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export function TopPriorities() {
   const { activeUser } = useUser();
   const demoData = useDemoData();
-  const priorities = demoData.topPriorities;
+  const staticPriorities = demoData.topPriorities;
+
+  // Synthesize #1 priority from goal_cascade when static data is empty (new users)
+  const priorities: TopPriority[] =
+    staticPriorities.length > 0
+      ? staticPriorities
+      : activeUser?.goal_cascade?.next_action_step
+        ? [
+            {
+              name: activeUser.goal_cascade.next_action_step,
+              priority: "High" as Priority,
+              due: activeUser.goal_cascade.next_action_due
+                ? formatDueDate(activeUser.goal_cascade.next_action_due)
+                : "This week",
+              project: "Priority Goal",
+            },
+          ]
+        : [];
+
   const [isExpanded, setIsExpanded] = useState(true);
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
 
@@ -197,7 +228,7 @@ function PriorityCard({
       {/* Line 2: due + time estimate | priority | project */}
       <div className="ml-[30px] mt-0.5 flex items-center">
         <div className="min-w-0 flex-1 flex items-center gap-1.5 text-xs text-[#949494]">
-          <span>{task.due === "Today" ? "Due today" : `Due ${task.due}`}</span>
+          <span>{task.due === "Today" ? "Due today" : task.due === "Overdue" ? "Overdue" : `Due ${task.due}`}</span>
           {task.timeEstimate && (
             <span className="rounded-full border border-[#E6E5E3] bg-[#FAF8F8] px-2 py-0.5 text-[11px] text-[#949494] whitespace-nowrap">
               Est: {task.timeEstimate}

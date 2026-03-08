@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
 
     # Model configuration
-    extraction_model: str = "gpt-4o-mini"
+    extraction_model: str = "gpt-5-mini"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 

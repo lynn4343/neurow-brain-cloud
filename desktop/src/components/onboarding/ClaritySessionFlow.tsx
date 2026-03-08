@@ -20,6 +20,8 @@ import {
   type ToolActivityEvent,
 } from "@/lib/electron";
 import type { GoalCascade } from "@/contexts/UserContext";
+import { useSessions } from "@/contexts/SessionContext";
+import { extractClaritySummary, type ChatSession } from "@/types/sessions";
 import { GoalCascadeFetcher } from "./GoalCascadeFetcher";
 
 // Close phrase from the Turn 9 verbatim close template.
@@ -35,6 +37,7 @@ const CLOSE_PHRASES = [
 
 export function ClaritySessionFlow() {
   const { activeUser, completeClaritySession } = useUser();
+  const { saveSession } = useSessions();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -253,6 +256,25 @@ export function ClaritySessionFlow() {
   // --- "Continue to Neurow" handler ---
 
   function handleComplete() {
+    // Save the Clarity Session transcript before transitioning
+    const claritySession: ChatSession = {
+      id: `clarity-${Date.now()}`,
+      type: "clarity",
+      title: "Clarity Session",
+      messages: [...messages],
+      createdAt: messages[0]?.timestamp || new Date().toISOString(),
+      updatedAt: messages[messages.length - 1]?.timestamp || new Date().toISOString(),
+      personaId: activeUser?.slug || "unknown",
+      summary: extractClaritySummary(messages),
+      goalCascade: goalCascadeRef.current ?? undefined,
+    };
+
+    try {
+      saveSession(claritySession);
+    } catch (err) {
+      console.error("Failed to save Clarity Session:", err);
+    }
+
     // Fast path: IPC already delivered goal_cascade
     if (goalCascadeRef.current) {
       completeClaritySession(goalCascadeRef.current);
@@ -276,9 +298,23 @@ export function ClaritySessionFlow() {
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Minimal header */}
-      <div className="flex h-[60px] items-center justify-center border-b bg-white">
+      {/* Header */}
+      <div className="flex flex-col items-center border-b bg-white px-4 pb-3 pt-3">
         <NeurowLogo className="h-6 w-[17px]" />
+        <div className="mt-1 inline-flex flex-col">
+          <h1 className="font-albra-sans text-2xl font-normal uppercase tracking-wide text-black">
+            The Clarity Flow
+          </h1>
+          <p
+            className="mt-0.5 self-stretch text-sm font-semibold uppercase text-black"
+            style={{ textAlignLast: "justify" }}
+          >
+            Vision. Focus. Action.
+          </p>
+        </div>
+        <p className="mt-1 text-center text-sm text-black">
+          We&apos;ll help you get <span className="font-extrabold italic">clear</span> about your <span className="font-extrabold italic">vision</span>, and help you <span className="font-extrabold italic">stay aligned</span> with <span className="font-extrabold italic">what to do next</span>. (Even when life gets &ldquo;life-y&rdquo;)
+        </p>
       </div>
 
       {/* Chat area */}

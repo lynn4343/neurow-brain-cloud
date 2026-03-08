@@ -40,6 +40,41 @@ INDEXES = [
 ]
 
 
+_MINOR_WORDS = {"a", "an", "the", "of", "in", "on", "at", "to", "for", "and", "or", "but"}
+_CORPORATE_SUFFIXES = (" inc", " inc.", " llc", " ltd", " ltd.", " corp", " corp.")
+
+
+def _normalize_entity_name(name: str) -> str:
+    """Normalize entity names for consistent graph merging.
+
+    Strips whitespace, removes common corporate suffixes, and title-cases
+    for display to prevent duplicate nodes for the same real-world entity.
+    """
+    if not name:
+        return name
+
+    lower = name.strip().lower()
+    if not lower:
+        return name.strip()
+
+    for suffix in _CORPORATE_SUFFIXES:
+        if lower.endswith(suffix):
+            lower = lower[: -len(suffix)].strip()
+            break
+
+    words = lower.split()
+    if not words:
+        return name.strip()
+
+    result = []
+    for i, word in enumerate(words):
+        if i == 0 or word not in _MINOR_WORDS:
+            result.append(word.capitalize())
+        else:
+            result.append(word)
+    return " ".join(result)
+
+
 def _sanitize_value(value):
     """Recursively convert Neo4j temporal types to ISO strings."""
     if hasattr(value, "isoformat"):
@@ -129,11 +164,12 @@ class Neo4jStore:
                 if not _SAFE_IDENTIFIER_RE.match(label):
                     logger.warning(f"Skipping entity with invalid label: {label}")
                     continue
+                normalized_name = _normalize_entity_name(entity["name"])
                 await session.run(
                     f"MERGE (e:{label} {{user_id: $user_id, name: $name}}) "
                     f"ON CREATE SET e.id = randomUUID(), e.type = $type",
                     user_id=user_id,
-                    name=entity["name"],
+                    name=normalized_name,
                     type=entity["type"],
                 )
 
@@ -147,8 +183,8 @@ class Neo4jStore:
                     "MATCH (s {name: $subject, user_id: $user_id}) "
                     "MATCH (o {name: $object, user_id: $user_id}) "
                     f"CREATE (s)-[:{predicate}]->(o)",
-                    subject=rel["subject"],
-                    object=rel["object"],
+                    subject=_normalize_entity_name(rel["subject"]),
+                    object=_normalize_entity_name(rel["object"]),
                     user_id=user_id,
                 )
 

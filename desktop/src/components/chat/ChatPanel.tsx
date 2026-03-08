@@ -52,7 +52,7 @@ export function ChatPanel({ open, onClose }: ChatPanelProps) {
         </div>
         <div className="flex items-center gap-1">
           <button
-            onClick={resetChat}
+            onClick={() => resetChat()}
             className="flex size-8 items-center justify-center rounded-lg hover:bg-[#FAF8F8] transition-colors"
             aria-label="New chat"
             title="New chat"

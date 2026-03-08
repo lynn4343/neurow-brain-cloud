@@ -102,17 +102,30 @@ class QdrantStore:
         ]
 
     async def get_all_points(self, user_id: str) -> list[dict]:
-        results, _offset = await self.client.scroll(
-            collection_name=self.collection,
-            scroll_filter=Filter(
-                must=[FieldCondition(key="user_id", match=MatchValue(value=user_id))]
-            ),
-            limit=1000,
+        """Retrieve all points for a user via paginated scroll."""
+        all_points = []
+        scroll_filter = Filter(
+            must=[FieldCondition(key="user_id", match=MatchValue(value=user_id))]
         )
-        return [
-            {**point.payload, "id": str(point.id)}
-            for point in results
-        ]
+        offset = None
+        page_size = 100
+
+        while True:
+            results, next_offset = await self.client.scroll(
+                collection_name=self.collection,
+                scroll_filter=scroll_filter,
+                limit=page_size,
+                offset=offset,
+            )
+            all_points.extend(
+                {**point.payload, "id": str(point.id)}
+                for point in results
+            )
+            if next_offset is None or len(results) < page_size:
+                break
+            offset = next_offset
+
+        return all_points
 
     async def close(self):
         await self.client.close()

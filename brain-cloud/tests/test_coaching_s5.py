@@ -498,8 +498,8 @@ async def test_turn_9_goal_cascade_includes_due_date(test_stores, test_user_id):
     # Build goal_cascade the same way server.py does
     cd = final.get("captured_data") or {}
     goal_cascade = {
-        "vision": cd.get("one_year_vision_refined", ""),
-        "quarterly_goal": cd.get("quarterly_goal_refined", ""),
+        "vision": cd.get("one_year_vision_refined") or cd.get("one_year_vision_raw", ""),
+        "quarterly_goal": cd.get("quarterly_goal_refined") or cd.get("quarterly_goal_raw", ""),
         "goal_why": cd.get("goal_why", ""),
         "identity_traits": cd.get("identity_traits", []),
         "release_items": cd.get("release_items", []),

@@ -12,38 +12,36 @@ import {
 } from "@/components/ui/dialog";
 
 // ---------------------------------------------------------------------------
-// Extraction prompt — 7 structured headers map to Brain Cloud's knowledge graph.
-// The modal shows a SHORT summary for clean UX. Copy sends the FULL prompt.
+// Extraction prompt — Anthropic's battle-tested format (5 categories, strict
+// date format). Proven at scale across ChatGPT, Gemini, etc. See W5-3A spec
+// for comparison with our original 7-header custom version.
 // ---------------------------------------------------------------------------
 
-const EXTRACTION_PROMPT = `I'm consolidating my data across AI services and need to export everything you know about me. List every memory you have stored about me, as well as any context you've learned from our conversations. Output everything in a single code block so I can easily copy it.
+const EXTRACTION_PROMPT = `Export all of my stored memories and any context you've learned about me from past conversations. Preserve my words verbatim where possible, especially for instructions and preferences.
 
-Organize entries under these headers:
+## Categories (output in this order):
 
-## My Instructions to You
-How I've asked you to respond — tone, format, style, recurring instructions, "always do X" or "never do Y" rules.
+1. **Instructions**: Rules I've explicitly asked you to follow going forward — tone, format, style, "always do X", "never do Y", and corrections to your behavior. Only include rules from stored memories, not from conversations.
 
-## Personal Details
-Name, location, job/role, family, relationships, key life facts.
+2. **Identity**: Name, age, location, education, family, relationships, languages, and personal interests.
 
-## Goals & Projects
-Active projects, goals I've mentioned, recurring topics, things I'm working toward.
+3. **Career**: Current and past roles, companies, and general skill areas.
 
-## Tools & Preferences
-Tools, apps, languages, frameworks, workflows I use or prefer.
+4. **Projects**: Projects I meaningfully built or committed to. Ideally ONE entry per project. Include what it does, current status, and any key decisions. Use the project name or a short descriptor as the first words of the entry.
 
-## Patterns & Insights
-Behavioral patterns you've noticed, recurring themes, things I tend to do or avoid, communication style, decision-making tendencies.
+5. **Preferences**: Opinions, tastes, and working-style preferences that apply broadly.
 
-## Corrections & Feedback
-Times I've corrected you, preferences I've stated, things you should or shouldn't do based on my feedback.
+## Format:
 
-## Everything Else
-Any stored context not covered above.
+Use section headers for each category. Within each category, list one entry per line, sorted by oldest date first. Format each line as:
 
-For each entry: preserve my exact words where possible. Include dates if available. Do not summarize, group, or omit any entries.
+[YYYY-MM-DD] - Entry content here.
 
-After the code block, confirm: is this the complete set, or are there more?`;
+If no date is known, use [unknown] instead.
+
+## Output:
+- Wrap the entire export in a single code block for easy copying.
+- After the code block, state whether this is the complete set or if more remain.`;
 
 export { EXTRACTION_PROMPT };
 

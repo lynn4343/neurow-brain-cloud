@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import {
-  Paperclip,
-  Microphone,
-  ArrowUp,
-} from "@phosphor-icons/react";
+import { ArrowUp } from "@phosphor-icons/react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -61,7 +57,7 @@ export function ChatInput({
 
   return (
     <div className={`w-full ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-      <div className={`flex w-full flex-col gap-2.5 border border-[#E6E5E3] bg-white ${
+      <div className={`flex w-full flex-col gap-2.5 border border-[#D4D2D0] bg-white ${
         compact
           ? "min-h-[48px] max-h-[200px] rounded-[16px] p-2"
           : "min-h-[125px] max-h-[300px] rounded-[20px] p-2 pt-4"
@@ -82,34 +78,9 @@ export function ChatInput({
         </div>
 
         {/* Bottom Toolbar */}
-        <div className="flex items-center justify-between">
-          {/* Left Tools */}
-          <div className="flex items-center gap-2">
-            {!compact && (
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
-                aria-label="Attach files"
-                onClick={() => console.log("Attach files clicked")}
-              >
-                <Paperclip className="size-4" weight="regular" />
-              </button>
-            )}
-          </div>
-
+        <div className="flex items-center justify-end">
           {/* Right Tools */}
           <div className="flex items-center gap-2">
-            {!compact && (
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-lg p-1 hover:bg-accent"
-                aria-label="Voice input"
-                onClick={() => console.log("Voice input clicked")}
-              >
-                <Microphone className="size-5" weight="regular" />
-              </button>
-            )}
-
             <button
               type="button"
               onClick={handleSubmit}
@@ -117,7 +88,7 @@ export function ChatInput({
               className={`flex size-8 items-center justify-center rounded-full p-1 transition-colors ${
                 !isSendDisabled
                   ? "bg-[#1e1e1e]"
-                  : "bg-[rgba(220,218,215,1)]"
+                  : "bg-[#CECACB]"
               }`}
               aria-label="Send message"
             >

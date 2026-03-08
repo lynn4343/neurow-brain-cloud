@@ -298,11 +298,10 @@ describe('exportDataDirect', () => {
     expect(result.coaching_sessions).toHaveLength(1);
     expect(result.metadata.total_memories).toBe(2);
     expect(result.metadata.export_source).toBe('direct_api');
-    expect(result.metadata.incomplete_stores).toEqual(['neo4j', 'mem0', 'qdrant']);
     expect(result.metadata.categories).toEqual(expect.arrayContaining(['goal', 'insight']));
-    expect(result.graph.note).toContain('Brain Cloud MCP tools');
-    expect(result.semantic).toEqual([]);
-    expect(result.associative).toEqual([]);
+    expect((result as Record<string, unknown>).graph).toBeUndefined();
+    expect((result as Record<string, unknown>).semantic).toBeUndefined();
+    expect((result as Record<string, unknown>).associative).toBeUndefined();
   });
 
   it('filters memories with confidence < 0.3', async () => {
