@@ -9,10 +9,18 @@ import {
 } from "react";
 import type { ComingUpSort } from "./types";
 
+export type ProjectsPage =
+  | "hub"
+  | "goal-1" | "goal-2" | "goal-3"
+  | `project-${string}`
+  | `workspace-${string}`;
+
 interface ProjectsContextValue {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
+  activePage: ProjectsPage;
+  setActivePage: (page: ProjectsPage) => void;
   workspacesFilter: "all" | "personal" | "professional";
   setWorkspacesFilter: (filter: "all" | "personal" | "professional") => void;
   comingUpFilter: "all" | "personal" | "professional";
@@ -34,6 +42,7 @@ export function useProjectsContext() {
 
 export function ProjectsProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activePage, setActivePage] = useState<ProjectsPage>("hub");
   const [workspacesFilter, setWorkspacesFilter] = useState<
     "all" | "personal" | "professional"
   >("all");
@@ -53,6 +62,8 @@ export function ProjectsProvider({ children }: { children: ReactNode }) {
         sidebarOpen,
         setSidebarOpen,
         toggleSidebar,
+        activePage,
+        setActivePage,
         workspacesFilter,
         setWorkspacesFilter,
         comingUpFilter,

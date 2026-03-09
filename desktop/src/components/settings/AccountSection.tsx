@@ -12,16 +12,19 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useUser } from "@/contexts/UserContext";
+import { deleteUserData, deleteAccount } from "@/lib/electron";
 
 // ---------------------------------------------------------------------------
 // AccountSection — Delete data + Delete account
 //
 // Danger zone for destructive account actions.
 // Both actions require explicit confirmation via dialog.
+// Deletes from Supabase (memories, coaching_sessions, user_profiles).
+// Neo4j/Qdrant/Mem0 deletion available via Brain Cloud MCP in production.
 // ---------------------------------------------------------------------------
 
 export function AccountSection() {
-  const { activeUser } = useUser();
+  const { activeUser, removeProfile } = useUser();
   const [deleteDataOpen, setDeleteDataOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -33,9 +36,7 @@ export function AccountSection() {
     setIsDeleting(true);
     setDeleteError(null);
     try {
-      // TODO: Wire to brain_cloud delete_all endpoint when available
-      // For now, show success state for demo
-      await new Promise((r) => setTimeout(r, 1000));
+      await deleteUserData(activeUser.id);
       setDeleteDataOpen(false);
       setDeleteSuccess("data");
       setTimeout(() => setDeleteSuccess(null), 3000);
@@ -52,12 +53,11 @@ export function AccountSection() {
     setIsDeleting(true);
     setDeleteError(null);
     try {
-      // TODO: Wire to full account deletion (profile + all 4 stores)
-      // For now, show success state for demo
-      await new Promise((r) => setTimeout(r, 1000));
+      await deleteAccount(activeUser.id);
       setDeleteAccountOpen(false);
       setDeleteSuccess("account");
-      setTimeout(() => setDeleteSuccess(null), 3000);
+      // Remove from local profiles and switch to next available
+      removeProfile(activeUser.slug);
     } catch (error) {
       console.error("Failed to delete account:", error);
       setDeleteError("Failed to delete account. Please try again.");

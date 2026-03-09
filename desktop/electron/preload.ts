@@ -55,6 +55,12 @@ contextBridge.exposeInMainWorld('neurow', {
   exportData: (userId: string) => {
     return ipcRenderer.invoke('export-data', userId);
   },
+  deleteUserData: (userId: string) => {
+    return ipcRenderer.invoke('delete-user-data', userId);
+  },
+  deleteAccount: (userId: string) => {
+    return ipcRenderer.invoke('delete-account', userId);
+  },
   openBrainCloud: (slug?: string) => {
     return ipcRenderer.invoke('open-brain-cloud', slug);
   },

@@ -147,8 +147,10 @@ export function AppShell() {
           <main className="flex-1 flex flex-col overflow-hidden">
             <GlobalHeader title={headerTitles[activeView]} onViewChange={handleViewChange} />
 
-            {/* Chat not available warning */}
-            {chatMode === 'none' && (
+            {/* BYOK banner disabled — key entry happens in onboarding flow before Clarity Session.
+               Judges land on onboarding first, never see the main app without a key.
+               Keeping code for post-hackathon (returning users who revoke key). */}
+            {/* chatMode === 'none' && (
               <div
                 className="border-b px-4 py-2.5 text-sm"
                 style={{
@@ -167,7 +169,7 @@ export function AppShell() {
                 </button>
                 .
               </div>
-            )}
+            ) */}
 
             {/* Content row: views + chat panel */}
             <div className="flex-1 flex overflow-hidden">

@@ -118,7 +118,7 @@ export function SecondaryTasks() {
   const sortedTasks = sortTasks(tasks, sort);
 
   return (
-    <div className="flex flex-col rounded-[12px] border border-[#E6E5E3] bg-white p-4">
+    <div className="@container flex flex-col rounded-[12px] border border-[#E6E5E3] bg-white p-4">
       <div className="flex items-center justify-between">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -137,7 +137,7 @@ export function SecondaryTasks() {
         </button>
         <button
           onClick={() => demoData.openNewTaskModal()}
-          className="flex items-center gap-1 text-xs text-[#5F5E5B] hover:text-[#1E1E1E] transition-colors"
+          className="flex items-center gap-1 rounded-full border border-[#E6E5E3] bg-[#FAF8F8] px-2.5 py-1 text-[11px] text-[#5F5E5B] hover:bg-[#F0EFED] hover:text-[#1E1E1E] transition-colors"
         >
           <Plus className="size-3" weight="bold" />
           New Task
@@ -151,42 +151,42 @@ export function SecondaryTasks() {
             tasks.length >= 6 && "pb-10"
           )}>
             {/* Column Headers - Sticky inside scroll container for alignment */}
-            <div className="flex items-center border-b border-[#E6E5E3] text-[11px] font-semibold uppercase tracking-wide text-[#949494] sticky top-0 bg-white z-10">
-              <div className="flex-[3_1_0%] min-w-0 px-2 pb-2 truncate">
+            <div className="flex items-center border-b border-[#E6E5E3] text-[10px] font-medium uppercase tracking-wide text-[#949494] sticky top-0 bg-white z-10">
+              <div className="flex-[3.5_1_0%] min-w-0 px-2 pb-2 truncate">
                 Task Name
               </div>
               <button
                 onClick={handlePrioritySort}
                 className={cn(
-                  "flex items-center gap-1 flex-[0.7_1_32px] max-w-[90px] min-w-0 border-l border-[#E6E5E3] px-1.5 pb-2 hover:text-[#1E1E1E] transition-colors overflow-hidden",
+                  "flex items-center gap-1 flex-[0.6_1_32px] min-w-[32px] max-w-[50px] @[500px]:max-w-[90px] @[700px]:max-w-[120px] border-l border-[#E6E5E3] px-1.5 pb-2 uppercase hover:text-[#1E1E1E] transition-colors overflow-hidden",
                   (sort === "priority-asc" || sort === "priority-desc") && "text-[#1E1E1E]"
                 )}
               >
-                <span className="truncate">Priority</span>
-                {sort === "priority-desc" && <CaretDown size={12} weight="fill" className="flex-shrink-0" />}
-                {sort === "priority-asc" && <CaretUp size={12} weight="fill" className="flex-shrink-0" />}
+                <span className="truncate">Prio</span>
+                {sort === "priority-desc" && <CaretDown size={10} weight="fill" className="flex-shrink-0" />}
+                {sort === "priority-asc" && <CaretUp size={10} weight="fill" className="flex-shrink-0" />}
               </button>
               <button
                 onClick={handleDueSort}
                 className={cn(
-                  "flex items-center gap-1 flex-[1_1_40px] max-w-[100px] min-w-0 border-l border-[#E6E5E3] px-1.5 pb-2 hover:text-[#1E1E1E] transition-colors overflow-hidden",
+                  "flex items-center gap-1 flex-[0.8_1_40px] min-w-[40px] max-w-[60px] @[500px]:max-w-[100px] @[700px]:max-w-[130px] border-l border-[#E6E5E3] px-1.5 pb-2 uppercase hover:text-[#1E1E1E] transition-colors overflow-hidden",
                   (sort === "due-asc" || sort === "due-desc") && "text-[#1E1E1E]"
                 )}
               >
                 Due
-                {sort === "due-asc" && <CaretDown size={12} weight="fill" className="flex-shrink-0" />}
-                {sort === "due-desc" && <CaretUp size={12} weight="fill" className="flex-shrink-0" />}
+                {sort === "due-asc" && <CaretDown size={10} weight="fill" className="flex-shrink-0" />}
+                {sort === "due-desc" && <CaretUp size={10} weight="fill" className="flex-shrink-0" />}
               </button>
               <button
                 onClick={handleProjectSort}
                 className={cn(
-                  "flex items-center gap-1 flex-[1.2_1_45px] max-w-[150px] min-w-0 border-l border-[#E6E5E3] px-1.5 pb-2 hover:text-[#1E1E1E] transition-colors overflow-hidden",
+                  "flex items-center gap-1 flex-[1_1_45px] min-w-[45px] max-w-[95px] @[500px]:max-w-[140px] @[700px]:max-w-[170px] border-l border-[#E6E5E3] px-1.5 pb-2 uppercase hover:text-[#1E1E1E] transition-colors overflow-hidden",
                   (sort === "project-asc" || sort === "project-desc") && "text-[#1E1E1E]"
                 )}
               >
                 <span className="truncate">Project</span>
-                {sort === "project-asc" && <CaretDown size={12} weight="fill" className="flex-shrink-0" />}
-                {sort === "project-desc" && <CaretUp size={12} weight="fill" className="flex-shrink-0" />}
+                {sort === "project-asc" && <CaretDown size={10} weight="fill" className="flex-shrink-0" />}
+                {sort === "project-desc" && <CaretUp size={10} weight="fill" className="flex-shrink-0" />}
               </button>
             </div>
               <div>
@@ -221,7 +221,7 @@ export function SecondaryTasks() {
                       />
 
                       {/* Task Name with animated circle */}
-                      <div className="flex items-center gap-2 flex-[3_1_0%] min-w-0 px-2 py-1.5">
+                      <div className="flex items-center gap-2 flex-[3.5_1_0%] min-w-0 px-2 py-1.5">
                         <button
                           onClick={() => toggleComplete(task.name)}
                           className="flex-shrink-0 flex items-center justify-center h-4 w-4 rounded-full transition-all duration-200"
@@ -247,7 +247,7 @@ export function SecondaryTasks() {
 
                       {/* Priority Bars */}
                       <div className={cn(
-                        "flex-[0.7_1_32px] max-w-[90px] min-w-0 border-l border-[#E6E5E3] px-1.5 py-1.5 flex items-center transition-opacity duration-300",
+                        "flex-[0.6_1_32px] min-w-[32px] max-w-[50px] @[500px]:max-w-[90px] @[700px]:max-w-[120px] border-l border-[#E6E5E3] px-1.5 py-1.5 flex items-center transition-opacity duration-300",
                         done && "opacity-40"
                       )}>
                         <PriorityBars priority={task.priority} />
@@ -255,16 +255,16 @@ export function SecondaryTasks() {
 
                       {/* Due Date */}
                       <div className={cn(
-                        "flex-[1_1_40px] max-w-[100px] min-w-0 border-l border-[#E6E5E3] px-1.5 py-1.5 text-xs truncate",
+                        "flex-[0.8_1_40px] min-w-[40px] max-w-[60px] @[500px]:max-w-[100px] @[700px]:max-w-[130px] border-l border-[#E6E5E3] px-1.5 py-1.5 text-xs truncate",
                         isPastDue(task.due) ? "font-semibold text-red-700" : task.due === "Today" ? "font-semibold text-[#1E1E1E]" : "text-[#949494]"
                       )}>
                         {shortDue(task.due)}
                       </div>
 
                       {/* Project Pill */}
-                      <div className="flex-[1.2_1_45px] max-w-[150px] min-w-0 border-l border-[#E6E5E3] px-1.5 py-1.5 flex items-center overflow-hidden">
+                      <div className="flex-[1_1_45px] min-w-[45px] max-w-[95px] @[500px]:max-w-[140px] @[700px]:max-w-[170px] border-l border-[#E6E5E3] px-1.5 py-1.5 flex items-center overflow-hidden">
                         <span className={cn(
-                          "block rounded-full border px-2 py-0.5 text-xs font-semibold truncate max-w-full",
+                          "block rounded-full border px-2 py-0.5 text-[11px] font-semibold truncate max-w-full",
                           getProjectPillClasses(task.project)
                         )}>
                           {task.project}

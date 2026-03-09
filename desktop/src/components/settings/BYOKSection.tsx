@@ -5,113 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Info } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-
-// ---------------------------------------------------------------------------
-// Provider presets — curated for demo, not technical gates.
-// Brain Cloud is model-agnostic: the MCP server doesn't know or care
-// which model calls its tools. These presets are UX convenience.
-// See: BUILD_SPECS/Model_Provider_Spec.md (Tier 3)
-// ---------------------------------------------------------------------------
-
-interface ProviderPreset {
-  id: string;
-  name: string;
-  tabLabel: string;
-  endpoint: string;
-  models: { value: string; label: string }[];
-  keyPlaceholder: string;
-}
-
-const PROVIDER_PRESETS: ProviderPreset[] = [
-  {
-    id: "anthropic",
-    name: "Anthropic",
-    tabLabel: "Anthropic",
-    endpoint: "https://api.anthropic.com/v1",
-    models: [
-      { value: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
-      { value: "claude-opus-4-6", label: "Claude Opus 4.6" },
-      { value: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
-    ],
-    keyPlaceholder: "sk-ant-...",
-  },
-  {
-    id: "openai",
-    name: "OpenAI",
-    tabLabel: "OpenAI",
-    endpoint: "https://api.openai.com/v1",
-    models: [
-      { value: "gpt-5.4", label: "GPT-5.4" },
-      { value: "gpt-5.4-pro", label: "GPT-5.4 Pro" },
-      { value: "gpt-5", label: "GPT-5" },
-    ],
-    keyPlaceholder: "sk-...",
-  },
-  {
-    id: "nvidia",
-    name: "NVIDIA Nemotron",
-    tabLabel: "NVIDIA",
-    endpoint: "https://integrate.api.nvidia.com/v1",
-    models: [
-      { value: "nvidia/nemotron-3-nano-30b-a3b", label: "Nemotron 3 Nano 30B (DGX Spark)" },
-      { value: "nvidia/nvidia-nemotron-nano-9b-v2", label: "Nemotron Nano 9B v2" },
-    ],
-    keyPlaceholder: "nvapi-...",
-  },
-  {
-    id: "custom",
-    name: "Custom Provider",
-    tabLabel: "Custom",
-    endpoint: "",
-    models: [],
-    keyPlaceholder: "Your API key",
-  },
-];
-
-const STORAGE_KEY = "neurow_byok";
-
-interface BYOKConfig {
-  provider: string;
-  endpoint: string;
-  model: string;
-  apiKey: string;
-}
-
-const DEFAULT_CONFIG: BYOKConfig = {
-  provider: "anthropic",
-  endpoint: "https://api.anthropic.com/v1",
-  model: "claude-sonnet-4-6",
-  apiKey: "",
-};
-
-function loadBYOK(): BYOKConfig {
-  if (typeof window === "undefined") return DEFAULT_CONFIG;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_CONFIG;
-    const parsed = JSON.parse(raw);
-    // Migration from old format (no provider field)
-    if (!parsed.provider) {
-      return {
-        ...DEFAULT_CONFIG,
-        apiKey: parsed.apiKey || "",
-        model: parsed.model || DEFAULT_CONFIG.model,
-      };
-    }
-    return { ...DEFAULT_CONFIG, ...parsed };
-  } catch {
-    return DEFAULT_CONFIG;
-  }
-}
+import {
+  PROVIDER_PRESETS,
+  STORAGE_KEY,
+  DEFAULT_CONFIG,
+  loadBYOK,
+  type BYOKConfig,
+} from "@/lib/byok-constants";
 
 export function BYOKSection() {
   const [config, setConfig] = useState<BYOKConfig>(DEFAULT_CONFIG);
   const [saved, setSaved] = useState(false);
+  const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time SSR hydration from localStorage */
-    setConfig(loadBYOK());
+    const loaded = loadBYOK();
+    setConfig(loaded);
+    setConnected(!!loaded.apiKey);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
@@ -148,12 +60,15 @@ export function BYOKSection() {
           new CustomEvent("neurow-chat-mode-change", { detail: result })
         );
         setSaved(true);
+        setConnected(!!config.apiKey);
         setError(null);
       } catch {
         setError("Failed to configure API key");
+        setConnected(false);
       }
     } else {
       setSaved(true);
+      setConnected(!!config.apiKey);
     }
 
     setTimeout(() => setSaved(false), 2000);
@@ -273,7 +188,7 @@ export function BYOKSection() {
           />
         </div>
 
-        {/* Save + status */}
+        {/* Save + Disconnect + status */}
         <div className="flex items-center gap-3">
           <Button onClick={handleSave} variant="outline" size="sm">
             {saved ? (
@@ -286,11 +201,42 @@ export function BYOKSection() {
             )}
           </Button>
 
-          {/* Connection status */}
-          {config.apiKey && saved && config.provider !== "openai" && (
+          {connected && config.apiKey && (
+            <Button
+              onClick={async () => {
+                if (window.neurow?.setBYOKConfig) {
+                  try {
+                    const result = await window.neurow.setBYOKConfig(null);
+                    const cleared = { ...config, apiKey: "" };
+                    setConfig(cleared);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(cleared));
+                    setConnected(false);
+                    setError(null);
+                    window.dispatchEvent(
+                      new CustomEvent("neurow-chat-mode-change", { detail: result })
+                    );
+                  } catch {
+                    setError("Failed to disconnect");
+                  }
+                } else {
+                  const cleared = { ...config, apiKey: "" };
+                  setConfig(cleared);
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(cleared));
+                  setConnected(false);
+                }
+              }}
+              variant="outline"
+              size="sm"
+            >
+              Disconnect
+            </Button>
+          )}
+
+          {/* Connection status — persists after save */}
+          {config.apiKey && connected && config.provider !== "openai" && (
             <span className="flex items-center gap-1.5 text-xs text-emerald-600">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Connected — coaching ready
+              Connected — cognitive intelligence ready
             </span>
           )}
           {config.provider === "openai" && config.apiKey && (

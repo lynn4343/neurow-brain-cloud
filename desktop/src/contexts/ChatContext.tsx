@@ -45,6 +45,7 @@ interface ChatContextType {
   activities: ActivityItem[];
   handleSend: (text: string, modeOverride?: string) => Promise<void>;
   resetChat: (skipSave?: boolean) => void;
+  startNewChat: () => void;
   loadMessages: (messages: Message[]) => void;
 }
 
@@ -52,7 +53,7 @@ const ChatContext = createContext<ChatContextType | null>(null);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { activeUser, appPhase } = useUser();
-  const { saveSession: saveSessionToContext } = useSessions();
+  const { saveSession: saveSessionToContext, setActiveSessionId: setActiveSessionIdInContext } = useSessions();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +65,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const messagesRef = useRef<Message[]>([]);
   const handleSendRef = useRef<((text: string, modeOverride?: string) => Promise<void>) | null>(null);
   const importTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeChatSessionRef = useRef<string | null>(null);
+  const isNewChatRef = useRef(false);
 
   // Keep refs in sync
   useEffect(() => {
@@ -82,7 +85,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (!skipSave && messagesRef.current.length > 1) {
         const type = inferSessionType(messagesRef.current);
         const session: ChatSession = {
-          id: `${type}-${Date.now()}`,
+          id: activeChatSessionRef.current || `${type}-${Date.now()}`,
           type,
           title: generateSessionTitle(messagesRef.current, type),
           messages: [...messagesRef.current],
@@ -99,9 +102,61 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       sessionIdRef.current = null;
       setActivities([]);
       setIsLoading(false);
+      activeChatSessionRef.current = null;
+      isNewChatRef.current = false;
     },
     [activeUser?.slug, saveSessionToContext],
   );
+
+  // Start a new chat: save current conversation, create placeholder session, reset state
+  const startNewChat = useCallback(() => {
+    const slug = activeUser?.slug || "unknown";
+
+    // If there's an active "New Chat" with no messages, don't create another
+    if (activeChatSessionRef.current && messagesRef.current.length === 0) {
+      return;
+    }
+
+    // Save current conversation if it has content
+    if (messagesRef.current.length > 1) {
+      const type = inferSessionType(messagesRef.current);
+      const session: ChatSession = {
+        id: activeChatSessionRef.current || `${type}-${Date.now()}`,
+        type,
+        title: generateSessionTitle(messagesRef.current, type),
+        messages: [...messagesRef.current],
+        createdAt: messagesRef.current[0]?.timestamp || new Date().toISOString(),
+        updatedAt:
+          messagesRef.current[messagesRef.current.length - 1]?.timestamp ||
+          new Date().toISOString(),
+        personaId: slug,
+      };
+      saveSessionToContext(session);
+    }
+
+    // Create new placeholder session
+    const newId = `chat-${Date.now()}`;
+    const newSession: ChatSession = {
+      id: newId,
+      type: "chat",
+      title: "New Chat",
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      personaId: slug,
+    };
+    saveSessionToContext(newSession);
+    setActiveSessionIdInContext(newId);
+    activeChatSessionRef.current = newId;
+    isNewChatRef.current = true;
+
+    // Reset chat state
+    setMessages([]);
+    setSessionId(null);
+    sessionIdRef.current = null;
+    setActivities([]);
+    setIsLoading(false);
+  }, [activeUser?.slug, saveSessionToContext, setActiveSessionIdInContext]);
 
   // Load a past session's messages into the chat view (visual replay)
   const loadMessages = useCallback((msgs: Message[]) => {
@@ -110,6 +165,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     sessionIdRef.current = null;
     setActivities([]);
     setIsLoading(false);
+    activeChatSessionRef.current = null;
+    isNewChatRef.current = false;
   }, []);
 
   // Reset on user or phase change — skipSave because slug has already changed
@@ -205,6 +262,38 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setActivities([]);
 
+      // Session management: ensure conversation has a trackable session
+      if (!activeChatSessionRef.current) {
+        // No active session — auto-create one with title from first message
+        const newId = `chat-${Date.now()}`;
+        activeChatSessionRef.current = newId;
+        isNewChatRef.current = false;
+        const title = text.trim().length > 40 ? text.trim().slice(0, 40) + "..." : text.trim();
+        saveSessionToContext({
+          id: newId,
+          type: "chat",
+          title: title || "Chat",
+          messages: [userMsg],
+          createdAt: userMsg.timestamp,
+          updatedAt: userMsg.timestamp,
+          personaId: activeUser?.slug || "unknown",
+        });
+        setActiveSessionIdInContext(newId);
+      } else if (isNewChatRef.current) {
+        // Active "New Chat" placeholder — update title with first message
+        isNewChatRef.current = false;
+        const title = text.trim().length > 40 ? text.trim().slice(0, 40) + "..." : text.trim();
+        saveSessionToContext({
+          id: activeChatSessionRef.current,
+          type: "chat",
+          title: title || "Chat",
+          messages: [userMsg],
+          createdAt: userMsg.timestamp,
+          updatedAt: userMsg.timestamp,
+          personaId: activeUser?.slug || "unknown",
+        });
+      }
+
       // Mode: modeOverride takes priority, otherwise "ongoing".
       // (appPhase is always "main" when AppShell/ChatProvider is mounted —
       // ClaritySessionFlow has its own independent streaming.)
@@ -241,6 +330,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         setIsLoading(false);
+        setActivities([]);
         setMessages((prev) => [
           ...prev,
           {
@@ -253,13 +343,31 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         ]);
       }
     },
-    [activeUser],
+    [activeUser, saveSessionToContext, setActiveSessionIdInContext],
   );
 
   // Keep handleSend ref in sync (for import processing)
   useEffect(() => {
     handleSendRef.current = handleSend;
   }, [handleSend]);
+
+  // Sync messages to active frontend session when a response completes (isLoading: true → false)
+  const prevIsLoadingRef = useRef(false);
+  useEffect(() => {
+    if (prevIsLoadingRef.current && !isLoading && activeChatSessionRef.current && messages.length > 0) {
+      const type = inferSessionType(messages);
+      saveSessionToContext({
+        id: activeChatSessionRef.current,
+        type,
+        title: generateSessionTitle(messages, type),
+        messages: [...messages],
+        createdAt: messages[0]?.timestamp || new Date().toISOString(),
+        updatedAt: messages[messages.length - 1]?.timestamp || new Date().toISOString(),
+        personaId: activeUser?.slug || "unknown",
+      });
+    }
+    prevIsLoadingRef.current = isLoading;
+  }, [isLoading, messages, saveSessionToContext, activeUser?.slug]);
 
   // --- Import processing (detects localStorage items from import modals) ---
 
@@ -376,6 +484,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         activities,
         handleSend,
         resetChat,
+        startNewChat,
         loadMessages,
       }}
     >

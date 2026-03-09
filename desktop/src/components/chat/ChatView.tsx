@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, Fragment } from "react";
+import { useEffect, useRef } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
@@ -8,9 +8,10 @@ import {
   Sun,
   ChartLineUp,
   Moon,
-  PencilSimple,
-  BookOpen,
+  ListChecks,
   Brain,
+  ClockCountdown,
+  Target,
 } from "@phosphor-icons/react";
 import { useUser } from "@/contexts/UserContext";
 import { useChat } from "@/contexts/ChatContext";
@@ -61,17 +62,18 @@ export function ChatView() {
                   ? { icon: ChartLineUp, label: "Strategize", prompt: "Let's strategize", mode: undefined as string | undefined }
                   : { icon: Moon, label: "Evening reflection", prompt: "Let's do an evening reflection on my day", mode: undefined as string | undefined },
                 // Static actions
-                { icon: PencilSimple, label: "Write", prompt: "Help me write", mode: undefined as string | undefined },
-                { icon: BookOpen, label: "Learn", prompt: "Help me learn something new", mode: undefined as string | undefined },
+                { icon: ClockCountdown, label: "Align my day", prompt: "Align my day — review my schedule against my priorities and tell me what needs to shift", mode: undefined as string | undefined },
+                { icon: Target, label: "Goal check-in", prompt: "Goal check-in — how am I tracking against my active goals?", mode: undefined as string | undefined },
                 { icon: Brain, label: "Brainstorm", prompt: "Let's brainstorm", mode: undefined as string | undefined },
+                { icon: ListChecks, label: "Review tasks", prompt: "Review my tasks for today", mode: undefined as string | undefined },
               ].map((item) => (
                 <button
                   key={item.label}
                   type="button"
                   onClick={() => handleSend(item.prompt, item.mode)}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#E6E5E3] bg-white px-3 py-1.5 text-sm text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors"
+                  className="flex items-center gap-1.5 rounded-full border border-[#E6E5E3] bg-white px-3 py-1.5 text-xs text-[#1E1E1E] hover:bg-[#FAF8F8] transition-colors"
                 >
-                  <item.icon className="size-4" weight="regular" />
+                  <item.icon className="size-3.5 flex-shrink-0 text-[#949494]" weight="regular" />
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -88,9 +90,7 @@ export function ChatView() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="w-full max-w-[767px] mx-auto flex flex-col gap-4 pt-6 pb-6 px-4">
           {messages.map((msg) => (
-            <Fragment key={msg.id}>
-              <ChatMessage message={msg} />
-            </Fragment>
+            <ChatMessage key={msg.id} message={msg} />
           ))}
           {activities.length > 0 && (
             <ActivityIndicator activities={activities} />

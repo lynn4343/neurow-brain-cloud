@@ -2,6 +2,7 @@
 
 import { PushPin } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
+import { useProjectsContext } from "./ProjectsContext";
 import { PROJECT_COLORS, type PinnedProject } from "./types";
 
 interface PinnedProjectCardProps {
@@ -9,6 +10,7 @@ interface PinnedProjectCardProps {
 }
 
 export function PinnedProjectCard({ project }: PinnedProjectCardProps) {
+  const { setActivePage } = useProjectsContext();
   const projectColorIndex =
     project.tag
       .split("")
@@ -16,7 +18,11 @@ export function PinnedProjectCard({ project }: PinnedProjectCardProps) {
     PROJECT_COLORS.length;
 
   return (
-    <div className="min-w-[280px] rounded-[8px] bg-white p-4 border border-[#E6E5E3] hover:shadow-sm transition-shadow relative">
+    <button
+      type="button"
+      className="min-w-[280px] rounded-[8px] bg-white p-4 border border-[#E6E5E3] hover:shadow-sm transition-shadow relative cursor-pointer text-left"
+      onClick={() => setActivePage(`project-${project.id}`)}
+    >
       <div className="absolute top-4 right-4">
         <PushPin size={16} weight="fill" className="text-[#5F5E5B]" />
       </div>
@@ -39,6 +45,6 @@ export function PinnedProjectCard({ project }: PinnedProjectCardProps) {
           <span className="truncate block">{project.tag}</span>
         </Badge>
       </div>
-    </div>
+    </button>
   );
 }

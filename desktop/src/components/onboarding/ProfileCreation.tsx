@@ -91,16 +91,18 @@ export function ProfileCreation({ onComplete }: ProfileCreationProps) {
       onCta={handleCreate}
     >
       <div className="flex flex-col items-center gap-6">
-        <NeurowLogo className="h-[69px] w-[49px]" />
+        <div className="flex flex-col items-center gap-0">
+          <NeurowLogo className="h-[69px] w-[49px] mb-3" />
+          <p className="text-lg font-light tracking-widest uppercase text-[#5f5e5b]">Welcome to Neurow</p>
+        </div>
 
-        <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="font-albra text-[28px] font-medium leading-8 text-[#1e1e1e]">
+        <div className="flex flex-col items-center gap-4 text-justify max-w-[500px]">
+          <h1 className="font-albra text-[28px] font-medium leading-8 text-[#1e1e1e] text-center -mt-2">
             Let&apos;s get you <em className="font-medium italic">set up.</em>
           </h1>
           <p className="text-sm leading-5 text-[#5f5e5b]">
-            We&apos;ll walk you through a quick setup,
-            <br />
-            then start your first coaching session.
+            Neurow is an AI life operating system and executive intelligence partner.
+            We&apos;ll walk you through a custom system designed to 10x your goal getting.
           </p>
         </div>
 

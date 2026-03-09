@@ -541,7 +541,7 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
       return 'Fetching web page...';
     default:
       // Brain Cloud tools — bare names (API mode via MCP client)
-      if (name === 'brain_recall') return 'Searching Brain Cloud...';
+      if (name === 'brain_recall') return 'Remembering from memories...';
       if (name === 'brain_remember') return 'Storing to memory...';
       if (name === 'brain_export') return 'Exporting your data...';
       if (name === 'brain_create_profile') return 'Creating profile...';
@@ -551,7 +551,7 @@ function summarizeToolUse(name: string, input?: Record<string, unknown>): string
       if (name === 'coaching_get_session_prompt') return 'Loading executive intelligence...';
 
       // Brain Cloud tools — namespaced names (CLI mode via Claude CLI)
-      if (name.startsWith('mcp__brain-cloud__brain_recall')) return 'Searching Brain Cloud...';
+      if (name.startsWith('mcp__brain-cloud__brain_recall')) return 'Remembering from memories...';
       if (name.startsWith('mcp__brain-cloud__brain_remember')) return 'Storing to memory...';
       if (name.startsWith('mcp__brain-cloud__brain_export')) return 'Exporting your data...';
       if (name.startsWith('mcp__brain-cloud__brain_create_profile')) return 'Creating profile...';
@@ -708,13 +708,9 @@ export function createNDJSONHandler(emit: StreamEmitter) {
 // --- Find Claude Binary (port of find_claude_binary from claude.rs) ---
 
 function findClaudeBinary(): string {
-  try {
-    const result = execSync('which claude', { encoding: 'utf-8' }).trim();
-    if (result) return result;
-  } catch {
-    // Not in PATH
-  }
-
+  // Check well-known paths FIRST — `which claude` can fail when claude is a
+  // shell function (e.g., zsh keychain wrapper) because `which` outputs the
+  // function body instead of a path, hanging or returning invalid results.
   const home = os.homedir();
   const candidates = [
     path.join(home, '.npm-global/bin/claude'),
@@ -725,6 +721,14 @@ function findClaudeBinary(): string {
 
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate;
+  }
+
+  try {
+    const result = execSync('which claude', { encoding: 'utf-8', timeout: 3000 }).trim();
+    // Only accept single-line paths (skip shell function definitions)
+    if (result && !result.includes('\n') && result.startsWith('/')) return result;
+  } catch {
+    // Not in PATH or timed out
   }
 
   return 'claude';

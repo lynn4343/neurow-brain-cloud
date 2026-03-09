@@ -182,6 +182,14 @@
   scrollbar-color: #E6E5E3 transparent;
 }
 
+/* Fix Radix ScrollArea: override display:table on content wrapper.
+   Radix applies inline style { display: table; min-width: 100% } to the
+   viewport's child div, which makes it grow to fit widest content (e.g.
+   horizontal flex rows), breaking CSS Grid layouts in sibling sections. */
+[data-radix-scroll-area-viewport] > div {
+  display: block !important;
+}
+
 /* Hide scrollbar for scroll wheel pickers */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

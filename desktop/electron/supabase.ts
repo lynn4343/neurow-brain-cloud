@@ -198,6 +198,77 @@ export async function getProfileDirect(
 }
 
 // ---------------------------------------------------------------------------
+// deleteUserDataDirect — Delete memories + coaching sessions, keep profile
+// ---------------------------------------------------------------------------
+
+export async function deleteUserDataDirect(
+  config: SupabaseConfig,
+  userId: string,
+): Promise<{ deleted: true; tables: string[] }> {
+  const h = headers(config.anonKey, false);
+  const signal = AbortSignal.timeout(config.timeoutMs);
+
+  // Delete memories and coaching sessions in parallel
+  const [memoriesRes, sessionsRes] = await Promise.all([
+    fetch(`${config.url}/rest/v1/memories?user_id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: h,
+      signal,
+    }),
+    fetch(`${config.url}/rest/v1/coaching_sessions?user_id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: h,
+      signal,
+    }),
+  ]);
+
+  if (!memoriesRes.ok) throw new Error(`Delete memories failed: ${memoriesRes.status}`);
+  if (!sessionsRes.ok) throw new Error(`Delete sessions failed: ${sessionsRes.status}`);
+
+  return { deleted: true, tables: ['memories', 'coaching_sessions'] };
+}
+
+// ---------------------------------------------------------------------------
+// deleteAccountDirect — Delete profile + all associated data
+// ---------------------------------------------------------------------------
+
+export async function deleteAccountDirect(
+  config: SupabaseConfig,
+  userId: string,
+): Promise<{ deleted: true; tables: string[] }> {
+  const h = headers(config.anonKey, false);
+  const signal = AbortSignal.timeout(config.timeoutMs);
+
+  // Delete data first (foreign key safety), then profile
+  const [memoriesRes, sessionsRes] = await Promise.all([
+    fetch(`${config.url}/rest/v1/memories?user_id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: h,
+      signal,
+    }),
+    fetch(`${config.url}/rest/v1/coaching_sessions?user_id=eq.${userId}`, {
+      method: 'DELETE',
+      headers: h,
+      signal,
+    }),
+  ]);
+
+  if (!memoriesRes.ok) throw new Error(`Delete memories failed: ${memoriesRes.status}`);
+  if (!sessionsRes.ok) throw new Error(`Delete sessions failed: ${sessionsRes.status}`);
+
+  // Now delete the profile (reuse the shared signal so total operation stays within timeoutMs)
+  const profileRes = await fetch(`${config.url}/rest/v1/user_profiles?id=eq.${userId}`, {
+    method: 'DELETE',
+    headers: h,
+    signal,
+  });
+
+  if (!profileRes.ok) throw new Error(`Delete profile failed: ${profileRes.status}`);
+
+  return { deleted: true, tables: ['memories', 'coaching_sessions', 'user_profiles'] };
+}
+
+// ---------------------------------------------------------------------------
 // exportDataDirect
 // ---------------------------------------------------------------------------
 

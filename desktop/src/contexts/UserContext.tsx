@@ -63,12 +63,9 @@ export interface UserContextType {
   activeUser: UserProfile | null;
   profiles: UserProfile[];
   appPhase: AppPhase;
-  pendingChatAction: string | null;
-
   // Low-level setters (use sparingly — prefer action methods)
   setActiveUser: (profile: UserProfile | null) => void;
   setAppPhase: (phase: AppPhase) => void;
-  setPendingChatAction: (action: string | null) => void;
 
   // Action methods (encapsulate state transitions — preferred API)
   switchProfile: (slug: string) => void;
@@ -77,6 +74,7 @@ export interface UserContextType {
   completeOnboarding: (profile: UserProfile) => void;
   completeClaritySession: (goalCascade?: GoalCascade) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  removeProfile: (slug: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -192,18 +190,19 @@ const DEFAULT_PROFILES = [THEO_PROFILE, AVERY_PROFILE];
 
 const STORAGE_KEY = "neurow_profiles";
 
-function loadProfiles(): UserProfile[] {
-  if (typeof window === "undefined") return DEFAULT_PROFILES;
+/** Returns { profiles, isFirstLaunch } — isFirstLaunch true when no localStorage exists (fresh clone). */
+function loadProfiles(): { profiles: UserProfile[]; isFirstLaunch: boolean } {
+  if (typeof window === "undefined") return { profiles: DEFAULT_PROFILES, isFirstLaunch: true };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_PROFILES;
+    if (!raw) return { profiles: DEFAULT_PROFILES, isFirstLaunch: true };
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_PROFILES;
-    return parsed;
+    if (!Array.isArray(parsed) || parsed.length === 0) return { profiles: DEFAULT_PROFILES, isFirstLaunch: true };
+    return { profiles: parsed, isFirstLaunch: false };
   } catch {
     // Corrupted localStorage — reset to defaults
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PROFILES));
-    return DEFAULT_PROFILES;
+    return { profiles: DEFAULT_PROFILES, isFirstLaunch: false };
   }
 }
 
@@ -244,18 +243,25 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<UserProfile[]>(DEFAULT_PROFILES);
   const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   const [appPhase, setAppPhase] = useState<AppPhase>("loading");
-  const [pendingChatAction, setPendingChatAction] = useState<string | null>(null);
-
   // Client-side initialization — loads profiles from localStorage, sets phase.
   // This is a one-time hydration effect: server renders 'loading', client reads
   // localStorage and transitions. Not a cascading render — fires once on mount.
+  // First launch (fresh clone): route to onboarding so judges enter their API key
+  // via Connect AI before anything else. Theo + Avery are in the profiles dropdown
+  // for exploration after onboarding completes.
   useEffect(() => {
-    const loaded = loadProfiles();
+    const { profiles: loaded, isFirstLaunch } = loadProfiles();
     /* eslint-disable react-hooks/set-state-in-effect -- one-time SSR hydration */
     setProfiles(loaded);
-    const first = loaded[0];
-    setActiveUser(first);
-    setAppPhase(phaseForProfile(first));
+    if (isFirstLaunch) {
+      // Fresh clone — judge creates their profile first, enters API key at Connect AI
+      setActiveUser(null);
+      setAppPhase("onboarding");
+    } else {
+      const first = loaded[0];
+      setActiveUser(first);
+      setAppPhase(phaseForProfile(first));
+    }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
@@ -347,22 +353,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setActiveUser(merged);
   }, [activeUser]);
 
+  const removeProfile = useCallback((slug: string) => {
+    setProfiles((prev) => {
+      const updated = prev.filter((p) => p.slug !== slug);
+      saveProfiles(updated);
+      // Switch to first remaining profile, or go to onboarding if none left
+      const next = updated[0] ?? null;
+      setActiveUser(next);
+      setAppPhase(next ? phaseForProfile(next) : "onboarding");
+      return updated;
+    });
+  }, []);
+
   return (
     <UserContext.Provider
       value={{
         activeUser,
         profiles,
         appPhase,
-        pendingChatAction,
         setActiveUser,
         setAppPhase,
-        setPendingChatAction,
         switchProfile,
         startNewProfile,
         addProfile,
         completeOnboarding,
         completeClaritySession,
         updateProfile,
+        removeProfile,
       }}
     >
       {children}

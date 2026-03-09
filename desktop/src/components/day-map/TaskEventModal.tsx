@@ -70,6 +70,8 @@ function PriorityDisplay({ priority }: { priority: Priority }) {
 // ---------------------------------------------------------------------------
 
 const TIME_OPTIONS = ["15 min", "30 min", "45 min", "1 hr", "2 hrs", "3 hrs"];
+const TRAVEL_TIME_OPTIONS = ["10 min", "15 min", "20 min", "35 min", "45 min", "1 hr"];
+const DURATION_OPTIONS = ["30 min", "45 min", "1 hr", "1.5 hrs", "2 hrs", "3 hrs"];
 
 // ---------------------------------------------------------------------------
 // Due date options
@@ -226,6 +228,8 @@ export function TaskEventModal() {
   const [due, setDue] = useState("");
   const [project, setProject] = useState("");
   const [timeEstimate, setTimeEstimate] = useState("");
+  const [travelTime, setTravelTime] = useState("");
+  const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
@@ -390,16 +394,6 @@ export function TaskEventModal() {
                   />
                 </div>
 
-                {/* Schedule it (placeholder) */}
-                <FieldRow icon={CalendarCheck} label="Schedule it" disabled>
-                  <span className="text-[#B0AFAD]">Task not scheduled</span>
-                </FieldRow>
-
-                {/* Repeat (placeholder) */}
-                <FieldRow icon={ArrowsClockwise} label="Repeat" disabled>
-                  <span className="text-[#B0AFAD]">Set recurrence</span>
-                </FieldRow>
-
                 {/* Priority */}
                 <div className="relative">
                   <FieldRow
@@ -475,24 +469,53 @@ export function TaskEventModal() {
                   </span>
                 </FieldRow>
 
-                {/* Duration (display only) */}
-                <FieldRow icon={Hourglass} label="Duration" isSet={modalData.mode === "event"} disabled>
-                  <span className="text-[#1E1E1E]">
-                    {modalData.mode === "event"
-                      ? `${formatEventTime(modalData.event.startTime)} – ${formatEventTime(modalData.event.endTime)}`
-                      : "Enter duration"}
-                  </span>
-                </FieldRow>
+                {/* Duration — read-only for existing events, dropdown for new */}
+                {modalData.mode === "event" && !modalData.isNew ? (
+                  <FieldRow icon={Hourglass} label="Duration" isSet disabled>
+                    <span className="text-[#1E1E1E]">
+                      {`${formatEventTime(modalData.event.startTime)} – ${formatEventTime(modalData.event.endTime)}`}
+                    </span>
+                  </FieldRow>
+                ) : (
+                  <div className="relative">
+                    <FieldRow
+                      icon={Hourglass}
+                      label="Duration"
+                      isSet={!!duration}
+                      onClick={() => setOpenDropdown(openDropdown === "duration" ? null : "duration")}
+                    >
+                      <span className={duration ? "text-[#1E1E1E]" : "text-[#B0AFAD]"}>
+                        {duration || "Enter duration"}
+                      </span>
+                    </FieldRow>
+                    <InlineDropdown
+                      options={DURATION_OPTIONS}
+                      isOpen={openDropdown === "duration"}
+                      onSelect={setDuration}
+                      onClose={() => setOpenDropdown(null)}
+                    />
+                  </div>
+                )}
 
-                {/* Repeat (placeholder) */}
-                <FieldRow icon={ArrowsClockwise} label="Repeat" disabled>
-                  <span className="text-[#B0AFAD]">Set recurrence</span>
-                </FieldRow>
-
-                {/* Travel time (placeholder) */}
-                <FieldRow icon={Car} label="Travel time" disabled>
-                  <span className="text-[#B0AFAD]">Enter travel time</span>
-                </FieldRow>
+                {/* Travel time */}
+                <div className="relative">
+                  <FieldRow
+                    icon={Car}
+                    label="Travel time"
+                    isSet={!!travelTime}
+                    onClick={() => setOpenDropdown(openDropdown === "travel" ? null : "travel")}
+                  >
+                    <span className={travelTime ? "text-[#1E1E1E]" : "text-[#B0AFAD]"}>
+                      {travelTime || "Enter travel time"}
+                    </span>
+                  </FieldRow>
+                  <InlineDropdown
+                    options={TRAVEL_TIME_OPTIONS}
+                    isOpen={openDropdown === "travel"}
+                    onSelect={setTravelTime}
+                    onClose={() => setOpenDropdown(null)}
+                  />
+                </div>
 
                 {/* Calendar / Category */}
                 <div className="relative">

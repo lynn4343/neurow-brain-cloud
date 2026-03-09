@@ -27,6 +27,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useChat } from "@/contexts/ChatContext";
+import { useDemoData } from "@/contexts/DemoDataContext";
+import { format } from "date-fns";
 
 export type View = "home" | "daymap" | "chat" | "projects" | "notes" | "settings";
 
@@ -58,10 +61,13 @@ export function MainNavSidebar({
   sidebarOpen,
   onToggleSidebar,
 }: MainNavSidebarProps) {
+  const { startNewChat } = useChat();
+  const { openNewTaskModal, openNewEventModal } = useDemoData();
+
   return (
     <aside
       className={cn(
-        "flex h-full flex-col gap-6 bg-white transition-all duration-300 ease-in-out",
+        "flex h-full flex-col gap-6 bg-white transition-all duration-300 ease-in-out shrink-0",
         sidebarOpen ? "w-[210px] px-4 pt-4 pb-6" : "w-[68px] px-4 pt-2 pb-4"
       )}
     >
@@ -161,19 +167,45 @@ export function MainNavSidebar({
             className="w-[180px]"
           >
             <DropdownMenuItem
-              onSelect={() => onViewChange("chat")}
+              onSelect={() => {
+                startNewChat();
+                onViewChange("chat");
+              }}
               className="gap-2.5 py-2"
             >
               <Chat className="size-4 text-[#80807d]" weight="regular" />
               <span className="text-[13px]">New Chat</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled className="gap-2.5 py-2">
-              <CalendarPlus className="size-4" weight="regular" />
+            <DropdownMenuItem
+              onSelect={() => {
+                onViewChange("daymap");
+                const now = new Date();
+                const minutes = now.getMinutes();
+                const snapped = minutes < 30 ? 30 : 0;
+                let hour = snapped === 0 ? now.getHours() + 1 : now.getHours();
+                let eventDate = now;
+                if (hour >= 24) {
+                  hour = 0;
+                  eventDate = new Date(now);
+                  eventDate.setDate(eventDate.getDate() + 1);
+                }
+                const startTime = `${String(hour).padStart(2, "0")}:${String(snapped).padStart(2, "0")}`;
+                openNewEventModal(format(eventDate, "yyyy-MM-dd"), startTime);
+              }}
+              className="gap-2.5 py-2"
+            >
+              <CalendarPlus className="size-4 text-[#80807d]" weight="regular" />
               <span className="text-[13px]">New Event</span>
             </DropdownMenuItem>
-            <DropdownMenuItem disabled className="gap-2.5 py-2">
-              <ListPlus className="size-4" weight="regular" />
+            <DropdownMenuItem
+              onSelect={() => {
+                onViewChange("daymap");
+                openNewTaskModal();
+              }}
+              className="gap-2.5 py-2"
+            >
+              <ListPlus className="size-4 text-[#80807d]" weight="regular" />
               <span className="text-[13px]">New Task</span>
             </DropdownMenuItem>
             <DropdownMenuItem

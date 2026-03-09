@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import { ProfileCreation } from "./ProfileCreation";
+import { ConnectAI } from "./ConnectAI";
 import { MemoryImportStep } from "./MemoryImportStep";
 import { ConsentScreen } from "./ConsentScreen";
 import { OnboardingScreens, type OnboardingData } from "./OnboardingScreens";
 import { ProfileUpdateLoader } from "./ProfileUpdateLoader";
 import type { UserProfile } from "@/contexts/UserContext";
 
-// profile → import → consent → screens → updating_profile
-type OnboardingStep = "profile" | "import" | "consent" | "screens" | "updating_profile";
+// profile → connect → import → consent → screens → updating_profile
+type OnboardingStep = "profile" | "connect" | "import" | "consent" | "screens" | "updating_profile";
 
 interface OnboardingFlowProps {
   onComplete: (profile: UserProfile) => void;
@@ -32,7 +33,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   switch (step) {
     case "profile":
-      return <ProfileCreation onComplete={() => setStep("import")} />;
+      return <ProfileCreation onComplete={() => setStep("connect")} />;
+
+    case "connect":
+      return <ConnectAI onComplete={() => setStep("import")} />;
 
     case "import":
       return (

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useProjectsContext, type ProjectsPage } from "./ProjectsContext";
 import type { PriorityGoal } from "./types";
 
 interface PriorityGoalCardProps {
@@ -17,12 +18,17 @@ const getIconPath = (position: number): string => {
 };
 
 export function PriorityGoalCard({ goal }: PriorityGoalCardProps) {
+  const { setActivePage } = useProjectsContext();
+  const pageId = `goal-${goal.position}` as ProjectsPage;
+
   return (
-    <div
-      className="rounded-[8px] p-6 min-h-[140px] min-w-0 flex flex-col"
+    <button
+      type="button"
+      className="rounded-[8px] p-6 min-h-[140px] min-w-0 flex flex-col cursor-pointer transition-shadow hover:shadow-md text-left"
       style={{ backgroundColor: goal.backgroundColor }}
+      onClick={() => setActivePage(pageId)}
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between w-full mb-4">
         <Image
           src={getIconPath(goal.position)}
           alt={`Goal ${goal.position}`}
@@ -30,7 +36,7 @@ export function PriorityGoalCard({ goal }: PriorityGoalCardProps) {
           height={27}
           className="object-contain"
         />
-        <span className="px-2.5 py-0.5 rounded-full border bg-emerald-100 text-emerald-700 border-emerald-200 text-[11px] font-semibold whitespace-nowrap">
+        <span className="ml-auto px-2.5 py-0.5 rounded-full border bg-emerald-100 text-emerald-700 border-emerald-200 text-[11px] font-semibold whitespace-nowrap">
           Priority Goal
         </span>
       </div>
@@ -47,6 +53,6 @@ export function PriorityGoalCard({ goal }: PriorityGoalCardProps) {
           {goal.nextMilestone}
         </p>
       </div>
-    </div>
+    </button>
   );
 }

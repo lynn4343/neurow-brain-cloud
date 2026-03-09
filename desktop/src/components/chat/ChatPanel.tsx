@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, Fragment } from "react";
-import { X, NotePencil, Sun, ChartLineUp, Moon, ListChecks, Brain, ClockCountdown } from "@phosphor-icons/react";
+import { useEffect, useRef } from "react";
+import { X, NotePencil, Sun, ChartLineUp, Moon, ListChecks, Brain, ClockCountdown, Target } from "@phosphor-icons/react";
 import { useUser } from "@/contexts/UserContext";
 import { useChat } from "@/contexts/ChatContext";
 import { ChatInput } from "./ChatInput";
@@ -21,7 +21,7 @@ interface ChatPanelProps {
 
 export function ChatPanel({ open, onClose }: ChatPanelProps) {
   const { activeUser } = useUser();
-  const { messages, isLoading, activities, handleSend, resetChat } = useChat();
+  const { messages, isLoading, activities, handleSend, startNewChat } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages or activities change
@@ -52,7 +52,7 @@ export function ChatPanel({ open, onClose }: ChatPanelProps) {
         </div>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => resetChat()}
+            onClick={() => startNewChat()}
             className="flex size-8 items-center justify-center rounded-lg hover:bg-[#FAF8F8] transition-colors"
             aria-label="New chat"
             title="New chat"
@@ -86,9 +86,10 @@ export function ChatPanel({ open, onClose }: ChatPanelProps) {
                 ? { icon: ChartLineUp, label: "Strategize", prompt: "Let's strategize", mode: undefined as string | undefined }
                 : { icon: Moon, label: "Evening reflection", prompt: "Let's do an evening reflection on my day", mode: undefined as string | undefined },
               // Static actions
-              { icon: ListChecks, label: "Review tasks", prompt: "Review my tasks for today", mode: undefined as string | undefined },
+              { icon: ClockCountdown, label: "Align my day", prompt: "Align my day — review my schedule against my priorities and tell me what needs to shift", mode: undefined as string | undefined },
+              { icon: Target, label: "Goal check-in", prompt: "Goal check-in — how am I tracking against my active goals?", mode: undefined as string | undefined },
               { icon: Brain, label: "Brainstorm", prompt: "Let's brainstorm", mode: undefined as string | undefined },
-              { icon: ClockCountdown, label: "Daily review", prompt: "Let's do a daily review", mode: undefined as string | undefined },
+              { icon: ListChecks, label: "Review tasks", prompt: "Review my tasks for today", mode: undefined as string | undefined },
             ].map((item) => (
               <button
                 key={item.label}
@@ -107,9 +108,7 @@ export function ChatPanel({ open, onClose }: ChatPanelProps) {
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
           <div className="flex flex-col gap-3 pt-4 pb-4 px-3">
             {messages.map((msg) => (
-              <Fragment key={msg.id}>
-                <ChatMessage message={msg} />
-              </Fragment>
+              <ChatMessage key={msg.id} message={msg} />
             ))}
             {activities.length > 0 && (
               <ActivityIndicator activities={activities} />

@@ -12,7 +12,7 @@ import { WORKSPACES } from "./mock-data";
 
 export function Workspaces() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { workspacesFilter, setWorkspacesFilter } = useProjectsContext();
+  const { workspacesFilter, setWorkspacesFilter, setActivePage } = useProjectsContext();
   const { activeUser } = useUser();
   const allWorkspaces = getUserData(WORKSPACES, activeUser?.slug);
 
@@ -52,7 +52,7 @@ export function Workspaces() {
               <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="flex gap-4">
                   {filteredWorkspaces.map((workspace) => (
-                    <WorkspaceCard key={workspace.id} workspace={workspace} />
+                    <WorkspaceCard key={workspace.id} workspace={workspace} onClick={() => setActivePage(`workspace-${workspace.id}`)} />
                   ))}
                 </div>
               </div>

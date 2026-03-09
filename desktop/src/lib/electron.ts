@@ -103,6 +103,8 @@ interface NeurowAPI {
   updateProfile: (userId: string, profileData: Record<string, unknown>) => Promise<UpdateProfileResult>;
   getProfile: (userId: string) => Promise<Record<string, unknown>>;
   exportData: (userId: string) => Promise<BrainExportData>;
+  deleteUserData: (userId: string) => Promise<{ deleted: true; tables: string[] }>;
+  deleteAccount: (userId: string) => Promise<{ deleted: true; tables: string[] }>;
   openBrainCloud: (slug?: string) => Promise<void>;
   setBYOKConfig: (config: { provider: string; endpoint: string; apiKey: string; model: string } | null) => Promise<ChatAvailableResult>;
 }
@@ -113,7 +115,7 @@ declare global {
   }
 }
 
-// --- Commands (same function signatures as tauri.ts) ---
+// --- Commands (renderer-to-main IPC wrappers) ---
 
 export async function sendMessage(
   prompt: string,
@@ -184,6 +186,14 @@ export async function getProfile(userId: string): Promise<Record<string, unknown
 
 export async function exportData(userId: string): Promise<BrainExportData> {
   return window.neurow.exportData(userId);
+}
+
+export async function deleteUserData(userId: string): Promise<{ deleted: true; tables: string[] }> {
+  return window.neurow.deleteUserData(userId);
+}
+
+export async function deleteAccount(userId: string): Promise<{ deleted: true; tables: string[] }> {
+  return window.neurow.deleteAccount(userId);
 }
 
 export async function openBrainCloud(slug?: string): Promise<void> {

@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { sendMessage, sendMessageAPI, sendMessageOpenAI, checkClaudeInstalled, checkChatAvailable, cleanupMCPClient, type UserContext, type ChatAvailableResult } from './claude';
-import { createProfileDirect, updateProfileDirect, getProfileDirect, exportDataDirect, type SupabaseConfig } from './supabase';
+import { createProfileDirect, updateProfileDirect, getProfileDirect, exportDataDirect, deleteUserDataDirect, deleteAccountDirect, type SupabaseConfig } from './supabase';
 
 // Load .env from desktop/ root (no dotenv dependency needed)
 // __dirname at runtime is electron-dist/, so ../ is desktop/
@@ -152,6 +152,20 @@ ipcMain.handle('export-data', (_event, userId: string) => {
     throw new Error('userId is required and must be a string');
   }
   return exportDataDirect(supabaseConfig, userId);
+});
+
+ipcMain.handle('delete-user-data', (_event, userId: string) => {
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId is required and must be a string');
+  }
+  return deleteUserDataDirect(supabaseConfig, userId);
+});
+
+ipcMain.handle('delete-account', (_event, userId: string) => {
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId is required and must be a string');
+  }
+  return deleteAccountDirect(supabaseConfig, userId);
 });
 
 // --- Brain Cloud Standalone Window ---

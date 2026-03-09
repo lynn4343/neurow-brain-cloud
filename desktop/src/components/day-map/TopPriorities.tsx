@@ -13,19 +13,46 @@ import {
 } from "@/lib/demo-data";
 import { PriorityBars } from "@/components/ui/PriorityBars";
 
+/* ── Shared column flex classes (container-query responsive) ──────────── */
+
+const COL_TASK = "flex-[3.5_1_0%] min-w-0";
+const COL_PRIO =
+  "flex-[0.6_1_32px] min-w-[32px] max-w-[50px] @[500px]:max-w-[90px] @[700px]:max-w-[120px]";
+const COL_DUE =
+  "flex-[0.8_1_40px] min-w-[40px] max-w-[60px] @[500px]:max-w-[100px] @[700px]:max-w-[130px]";
+const COL_PROJECT =
+  "flex-[1_1_45px] min-w-[45px] max-w-[95px] @[500px]:max-w-[140px] @[700px]:max-w-[170px]";
+
+/* ── Placeholder Slot ─────────────────────────────────────────────────── */
+
 function PlaceholderSlot({ onDoubleClick }: { onDoubleClick?: () => void }) {
   return (
     <div
       onDoubleClick={onDoubleClick}
-      className="flex items-center gap-3 rounded-lg border border-dashed border-[#E6E5E3] bg-[#FAF8F8] px-4 py-3 cursor-pointer"
+      className="rounded-lg bg-[#F0EFED] p-[3px] cursor-pointer"
     >
-      <div className="h-[18px] w-[18px] shrink-0 rounded-full border-2 border-[#E6E5E3]" />
-      <span className="text-sm text-[#949494]">
-        Set today&apos;s priorities
-      </span>
+      <div className="flex items-center rounded-md border border-dashed border-[#E6E5E3] bg-[#FAF8F8] overflow-hidden">
+        <div className={cn(COL_TASK, "flex items-center gap-2 px-2 py-2")}>
+          <div className="h-4 w-4 shrink-0 rounded-full border-2 border-[#E6E5E3]" />
+          <span className="text-sm text-[#949494]">
+            Set today&apos;s priorities
+          </span>
+        </div>
+        <div className={cn(COL_PRIO, "border-l border-[#E6E5E3] px-1.5 py-2 flex items-center")}>
+          <span className="text-xs text-[#D4D3D0]">&mdash;</span>
+        </div>
+        <div className={cn(COL_DUE, "border-l border-[#E6E5E3] px-1.5 py-2")}>
+          <span className="text-xs text-[#D4D3D0]">&mdash;</span>
+        </div>
+        <div className={cn(COL_PROJECT, "border-l border-[#E6E5E3] px-1.5 py-2")}>
+          <span className="text-xs text-[#D4D3D0]">&mdash;</span>
+        </div>
+      </div>
     </div>
   );
 }
+
+/* ── Date formatting ──────────────────────────────────────────────────── */
 
 /** Format ISO date to display-friendly string for priority cards. */
 function formatDueDate(isoDate: string): string {
@@ -38,9 +65,10 @@ function formatDueDate(isoDate: string): string {
   if (diffDays < 0) return "Overdue";
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Tomorrow";
-  if (diffDays <= 7) return "This week";
   return due.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
+
+/* ── Top Priorities (main export) ─────────────────────────────────────── */
 
 export function TopPriorities() {
   const { activeUser } = useUser();
@@ -85,10 +113,10 @@ export function TopPriorities() {
   const placeholderCount = Math.max(0, 3 - priorities.length);
 
   return (
-    <div className="flex flex-col rounded-[12px] border border-[#E6E5E3] bg-white p-4">
+    <div className="@container flex flex-col rounded-[12px] border border-[#E6E5E3] bg-white px-2 py-4">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 px-2"
       >
         <CaretDown
           className={cn(
@@ -103,35 +131,56 @@ export function TopPriorities() {
       </button>
 
       {isExpanded && (
-        <div className="mt-3 space-y-2">
-          {priorities.slice(0, 3).map((task, i) => (
-            <PriorityCard
-              key={i}
-              task={task}
-              done={completedTasks.has(task.name)}
-              onToggle={() => toggleComplete(task.name)}
-              onDoubleClick={() => demoData.openTaskModal(task, i, "topPriorities")}
-            />
-          ))}
+        <div className="mt-3">
+          {/* Column Headers */}
+          <div className="flex items-center px-1 pb-1 text-[10px] font-medium uppercase tracking-wide text-[#949494]">
+            <div className={cn(COL_TASK, "px-2 truncate")}>
+              Task Name
+            </div>
+            <div className={cn(COL_PRIO, "border-l border-[#E6E5E3] px-1.5")}>
+              Prio
+            </div>
+            <div className={cn(COL_DUE, "border-l border-[#E6E5E3] px-1.5")}>
+              Due
+            </div>
+            <div className={cn(COL_PROJECT, "border-l border-[#E6E5E3] px-1.5")}>
+              Project
+            </div>
+          </div>
 
-          {Array.from({ length: placeholderCount }).map((_, i) => (
-            <PlaceholderSlot key={`ph-${i}`} onDoubleClick={() => {
-              // Materialize synthesized priorities into state so addTopPriority
-              // sees the correct array (fixes off-by-one when goal_cascade creates
-              // a display-only priority that isn't in state yet).
-              if (staticPriorities.length < priorities.length) {
-                demoData.materializeTopPriorities(priorities);
-              }
-              demoData.openNewTaskModal("topPriorities", priorities.length + i);
-            }} />
-          ))}
+          <div className="space-y-2">
+            {priorities.slice(0, 3).map((task, i) => {
+              const taskKey = `${task.name}|${task.project}`;
+              return (
+                <PriorityCard
+                  key={taskKey}
+                  task={task}
+                  done={completedTasks.has(taskKey)}
+                  onToggle={() => toggleComplete(taskKey)}
+                  onDoubleClick={() => demoData.openTaskModal(task, i, "topPriorities")}
+                />
+              );
+            })}
+
+            {Array.from({ length: placeholderCount }).map((_, i) => (
+              <PlaceholderSlot key={`ph-${i}`} onDoubleClick={() => {
+                // Materialize synthesized priorities into state so addTopPriority
+                // sees the correct array (fixes off-by-one when goal_cascade creates
+                // a display-only priority that isn't in state yet).
+                if (staticPriorities.length < priorities.length) {
+                  demoData.materializeTopPriorities(priorities);
+                }
+                demoData.openNewTaskModal("topPriorities", priorities.length + i);
+              }} />
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-/* ── Priority Card ─────────────────────────────────────────────────────── */
+/* ── Priority Card ────────────────────────────────────────────────────── */
 
 function PriorityCard({
   task,
@@ -148,68 +197,77 @@ function PriorityCard({
     <div
       onDoubleClick={onDoubleClick}
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-lg border border-[#E6E5E3] bg-white px-4 pt-2.5 pb-1.5 transition-opacity duration-300 cursor-pointer",
+        "rounded-lg bg-[#F0EFED] p-[3px] transition-opacity duration-300 cursor-pointer",
         done && "opacity-55",
       )}
     >
-      {/* Strikethrough line */}
-      <div
-        className={cn(
-          "absolute left-[46px] right-16 top-[18px] h-[1.5px] bg-[#1E1E1E]/60 pointer-events-none origin-left transition-transform ease-out",
-          done ? "scale-x-100" : "scale-x-0",
-        )}
-        style={{
-          transitionDuration: "350ms",
-          transitionDelay: done ? "50ms" : "0ms",
-        }}
-      />
-
-      {/* Line 1: checkbox + name */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onToggle}
-          className="flex shrink-0 items-center justify-center h-[18px] w-[18px] rounded-full transition-all duration-200"
+      <div className="relative flex items-center rounded-md border border-[#E6E5E3] bg-white overflow-hidden">
+        {/* Strikethrough line — spans across the task name cell */}
+        <div
+          className={cn(
+            "absolute left-8 right-[calc(100%-var(--task-col-right))] top-1/2 h-[1.5px] bg-[#1E1E1E]/60 pointer-events-none origin-left transition-transform ease-out z-10",
+            done ? "scale-x-100" : "scale-x-0",
+          )}
           style={{
-            backgroundColor: done ? "#1E1E1E" : "transparent",
-            borderWidth: done ? "0px" : "2px",
-            borderColor: "#E6E5E3",
-            borderStyle: "solid",
+            transitionDuration: "350ms",
+            transitionDelay: done ? "50ms" : "0ms",
+            /* Approximate: span across the task name column only */
+            right: "40%",
           }}
-          aria-label={done ? "Mark as not done" : "Mark as done"}
-        >
-          <Check
-            size={11}
-            weight="bold"
-            className={cn(
-              "text-white transition-opacity duration-200",
-              done ? "opacity-100" : "opacity-0",
-            )}
-          />
-        </button>
+        />
 
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-[#1E1E1E]">
-          {task.name}
-        </span>
-      </div>
-
-      {/* Line 2: due + time estimate | priority | project — wraps gracefully at narrow widths */}
-      <div className="ml-[30px] mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-        <span className="whitespace-nowrap text-xs text-[#949494]">
-          {task.due === "Today" ? "Due today" : task.due === "Overdue" ? "Overdue" : `Due ${task.due}`}
-        </span>
-        {task.timeEstimate && (
-          <span className="rounded-full border border-[#E6E5E3] bg-[#FAF8F8] px-2 py-0.5 text-[11px] text-[#949494] whitespace-nowrap">
-            Est: {task.timeEstimate}
-          </span>
-        )}
-        <div className="ml-auto flex w-[130px] shrink-0 items-center gap-1.5">
-          <PriorityBars priority={task.priority} />
-          <span
-            className={cn(
-              "rounded-full border px-2 py-0.5 text-xs font-semibold truncate",
-              PROJECT_COLORS[task.project] || DEFAULT_PROJECT_COLOR,
-            )}
+        {/* Task Name column */}
+        <div className={cn(COL_TASK, "flex items-center gap-2 px-2 py-2")}>
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggle(); }}
+            className="flex shrink-0 items-center justify-center h-4 w-4 rounded-full transition-all duration-200"
+            style={{
+              backgroundColor: done ? "#1E1E1E" : "transparent",
+              borderWidth: done ? "0px" : "2px",
+              borderColor: "#E6E5E3",
+              borderStyle: "solid",
+            }}
+            aria-label={done ? "Mark as not done" : "Mark as done"}
           >
+            <Check
+              size={10}
+              weight="bold"
+              className={cn(
+                "text-white transition-opacity duration-200",
+                done ? "opacity-100" : "opacity-0",
+              )}
+            />
+          </button>
+
+          <span className="text-sm font-medium text-[#1E1E1E] truncate">
+            {task.name}
+          </span>
+        </div>
+
+        {/* Priority column */}
+        <div className={cn(
+          COL_PRIO,
+          "border-l border-[#E6E5E3] px-1.5 py-2 flex items-center transition-opacity duration-300",
+          done && "opacity-40",
+        )}>
+          <PriorityBars priority={task.priority} />
+        </div>
+
+        {/* Due column */}
+        <div className={cn(
+          COL_DUE,
+          "border-l border-[#E6E5E3] px-1.5 py-2",
+          task.due === "Overdue" ? "text-red-700 font-semibold" : task.due === "Today" ? "font-semibold text-[#1E1E1E]" : "text-[#949494]",
+        )}>
+          <span className="text-xs truncate">{task.due}</span>
+        </div>
+
+        {/* Project column */}
+        <div className={cn(COL_PROJECT, "border-l border-[#E6E5E3] px-1.5 py-2 flex items-center overflow-hidden")}>
+          <span className={cn(
+            "block rounded-full border px-2 py-0.5 text-[11px] font-semibold truncate max-w-full",
+            PROJECT_COLORS[task.project] || DEFAULT_PROJECT_COLOR,
+          )}>
             {task.project}
           </span>
         </div>

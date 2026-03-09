@@ -4,17 +4,12 @@ import { useSessions } from "@/contexts/SessionContext";
 import { useChat } from "@/contexts/ChatContext";
 
 export function ChatSubHeader() {
-  const { activeSessionId, sessions, clearActiveSession } = useSessions();
-  const { resetChat } = useChat();
+  const { activeSessionId, sessions } = useSessions();
+  const { startNewChat } = useChat();
 
   const activeSession = activeSessionId
     ? sessions.find((s) => s.id === activeSessionId)
     : null;
-
-  const handleNewChat = () => {
-    clearActiveSession();
-    resetChat(true);
-  };
 
   if (!activeSession) {
     // Stale selection (session deleted/missing) — offer recovery
@@ -23,7 +18,7 @@ export function ChatSubHeader() {
         <div className="flex h-[44px] items-center justify-between bg-[#F4F1F1] px-[24px] py-[8px]">
           <button
             type="button"
-            onClick={handleNewChat}
+            onClick={startNewChat}
             className="text-xs text-[#949494] hover:text-[#1E1E1E] transition-colors"
           >
             New chat
@@ -41,7 +36,7 @@ export function ChatSubHeader() {
       </span>
       <button
         type="button"
-        onClick={handleNewChat}
+        onClick={startNewChat}
         className="text-xs text-[#949494] hover:text-[#1E1E1E] transition-colors flex-shrink-0 ml-4"
       >
         New chat

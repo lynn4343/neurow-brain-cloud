@@ -50,20 +50,18 @@ export function ConsentScreen({ onConsent, onBack }: ConsentScreenProps) {
           </p>
         </div>
 
-        <div className="w-full border-t border-[#e6e5e3]" />
-
         {/* Section C — Sensitive Data Consent (TDPSA § 541.001) */}
-        <div className="flex w-full flex-col items-center gap-2 text-center">
-          <h2 className="text-xl font-semibold text-[#1e1e1e]">
-            Deeper Insights
+        <div className="-mt-3 flex w-full flex-col items-center gap-1.5 text-center">
+          <h2 className="text-sm font-semibold text-[#1e1e1e]">
+            Synthesized Insights
           </h2>
           <p className="text-sm leading-relaxed text-[#5f5e5b]">
             Neurow uses executive intelligence to process information related to
             your emotional states, health habits, and mental wellbeing to help
             you achieve your goals.
           </p>
-          <p className="text-sm leading-relaxed text-[#5f5e5b]">
-            You can change this anytime in Settings.
+          <p className="text-xs italic text-[#5f5e5b]">
+            (Change anytime in Settings.)
           </p>
         </div>
 
