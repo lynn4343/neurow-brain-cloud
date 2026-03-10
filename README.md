@@ -147,6 +147,8 @@ cd brain-cloud && uv sync && cd ..
 
 ### 2. Configure environment
 
+**Judges / reviewers:** We'll provide pre-configured `.env` files with all credentials (Neo4j, Supabase, Qdrant, Mem0, OpenAI) plus an Anthropic API key if you'd like to test live coaching. Email **lynn@neurow.io** and we'll send everything over.
+
 Two `.env` files are needed (`.env.example` templates provided in each directory):
 
 **`desktop/.env`** — AI model access:
