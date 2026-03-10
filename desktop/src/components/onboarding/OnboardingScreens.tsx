@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Check } from "@phosphor-icons/react";
 import { OnboardingLayout } from "./OnboardingLayout";
 import { BUSINESS_STAGES, COACHING_STYLES } from "./onboarding-data";
+import { useUser } from "@/contexts/UserContext";
 
 // ---------------------------------------------------------------------------
 // Data contract — fields written to UserProfile after onboarding
@@ -911,6 +912,8 @@ function getExpectedTotal(
 // ---------------------------------------------------------------------------
 
 export function OnboardingScreens({ onComplete }: OnboardingScreensProps) {
+  const { demoWalkthrough } = useUser();
+
   // --- Screen history stack (replaces linear index) ---
   const [screenHistory, setScreenHistory] = useState<Screen[]>(["roles"]);
   const currentScreen = screenHistory[screenHistory.length - 1];
@@ -926,15 +929,16 @@ export function OnboardingScreens({ onComplete }: OnboardingScreensProps) {
   }
 
   // --- State for ALL screens ---
-  const [roles, setRoles] = useState<string[]>([]);
-  const [sideHustleGoal, setSideHustleGoal] = useState("");
-  const [focusArea, setFocusArea] = useState("");
-  const [coachingStyle, setCoachingStyle] = useState("");
+  // Demo walkthrough: pre-fill with Theo's onboarding answers
+  const [roles, setRoles] = useState<string[]>(demoWalkthrough ? ["freelancer", "side-hustler"] : []);
+  const [sideHustleGoal, setSideHustleGoal] = useState(demoWalkthrough ? "growing" : "");
+  const [focusArea, setFocusArea] = useState(demoWalkthrough ? "career-business" : "");
+  const [coachingStyle, setCoachingStyle] = useState(demoWalkthrough ? "balanced" : "");
   // Path A
-  const [businessDescription, setBusinessDescription] = useState("");
-  const [businessStage, setBusinessStage] = useState("");
-  const [currentBusinessFocus, setCurrentBusinessFocus] = useState("");
-  const [businessChallenges, setBusinessChallenges] = useState<string[]>([]);
+  const [businessDescription, setBusinessDescription] = useState(demoWalkthrough ? "Freelance graphic designer \u2014 brand identity, logos, visual systems. Starting to learn motion design. Part-time barista to cover the gap but trying to go fully freelance." : "");
+  const [businessStage, setBusinessStage] = useState(demoWalkthrough ? "early" : "");
+  const [currentBusinessFocus, setCurrentBusinessFocus] = useState(demoWalkthrough ? "Getting more clients and charging what my work is worth" : "");
+  const [businessChallenges, setBusinessChallenges] = useState<string[]>(demoWalkthrough ? ["starting-not-finishing", "self-doubt", "money-scarcity"] : []);
   // Path B
   const [careerSituation, setCareerSituation] = useState("");
   const [careerStage, setCareerStage] = useState("");

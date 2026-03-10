@@ -18,6 +18,7 @@ import {
   GearSix,
   CalendarPlus,
   ListPlus,
+  Compass,
   type IconProps,
 } from "@phosphor-icons/react";
 import {
@@ -44,6 +45,7 @@ const mainNavItems: NavItem[] = [
   { icon: CalendarCheck, label: "Calendar", viewId: "daymap" },
   { icon: Cards, label: "Projects", viewId: "projects" },
   { icon: Note, label: "Notes", viewId: "notes" },
+  { icon: Compass, label: "Life Insights", viewId: "home" },
   { icon: GearSix, label: "Settings", viewId: "settings" },
 ];
 

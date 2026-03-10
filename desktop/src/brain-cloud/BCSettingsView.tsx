@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { BYOKSection } from "@/components/settings/BYOKSection";
-import { ExportSection } from "@/components/settings/ExportSection";
 import { DataPrivacySection } from "@/components/settings/DataPrivacySection";
 import { AccountSection } from "@/components/settings/AccountSection";
 import { PrivacyPolicyContent } from "@/components/settings/PrivacyPolicyContent";
@@ -65,11 +64,7 @@ export function BCSettingsView() {
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl space-y-8 px-6 pt-18 pb-8">
           {activeSection === "brain-cloud" && (
-            <>
-              <BYOKSection />
-              <div className="h-px bg-[#E6E5E3]" />
-              <ExportSection />
-            </>
+            <BYOKSection />
           )}
           {activeSection === "privacy" && (
             <DataPrivacySection

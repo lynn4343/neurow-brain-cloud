@@ -78,7 +78,7 @@ export function CalendarTopTools() {
 
   return (
     <>
-      <div className="flex items-center justify-between bg-[#F4F1F1] px-[24px] py-[8px]">
+      <div className="flex h-[48px] items-center gap-[64px] bg-[#F4F1F1] px-[24px]">
         {/* Left: Navigation + Date Label */}
         <div className="flex items-center gap-[16px]">
           <div className="flex items-center gap-[4px]">
@@ -136,8 +136,6 @@ export function CalendarTopTools() {
           })}
         </div>
 
-        {/* Spacer to balance the flex layout */}
-        <div />
       </div>
 
       {/* Month/Year Picker Modal */}

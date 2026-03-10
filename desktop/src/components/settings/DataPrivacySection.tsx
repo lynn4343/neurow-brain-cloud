@@ -34,8 +34,8 @@ export function DataPrivacySection({ onViewPolicy }: DataPrivacySectionProps) {
     <section className="space-y-8">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <ShieldCheck className="size-4 text-[#1E1E1E]" weight="regular" />
-        <h2 className="text-sm font-medium uppercase tracking-wider text-[#1E1E1E]">
+        <ShieldCheck className="size-7 text-[#1E1E1E] opacity-60" weight="regular" />
+        <h2 className="font-albra text-2xl font-medium text-[#1E1E1E]">
           Privacy
         </h2>
       </div>
@@ -70,11 +70,12 @@ export function DataPrivacySection({ onViewPolicy }: DataPrivacySectionProps) {
       <div className="flex items-start justify-between gap-6">
         <div className="flex-1">
           <p className="text-sm font-medium text-[#1E1E1E] mb-1.5">
-            Deeper Insights
+            Memory and Synthesized Insights
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed">
             When enabled, Neurow connects patterns across your emotional states,
-            health habits, and mental well-being for deeper executive insights to assist with goal attainment.
+            health habits, and mental well-being — and stores memories from your
+            sessions — for deeper executive insights to assist with goal attainment.
           </p>
         </div>
         <Switch

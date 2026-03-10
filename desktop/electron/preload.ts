@@ -61,11 +61,17 @@ contextBridge.exposeInMainWorld('neurow', {
   deleteAccount: (userId: string) => {
     return ipcRenderer.invoke('delete-account', userId);
   },
+  saveJsonFile: (jsonData: string, suggestedFilename: string) => {
+    return ipcRenderer.invoke('save-json-file', jsonData, suggestedFilename);
+  },
   openBrainCloud: (slug?: string) => {
     return ipcRenderer.invoke('open-brain-cloud', slug);
   },
   setBYOKConfig: (config: { provider: string; endpoint: string; apiKey: string; model: string } | null) => {
     return ipcRenderer.invoke('set-byok-config', config);
+  },
+  getGraphData: (userId: string) => {
+    return ipcRenderer.invoke('get-graph-data', userId);
   },
   onChatStream: (callback: (data: ChatStreamPayload) => void) => {
     const handler = (_event: IpcRendererEvent, data: ChatStreamPayload) => callback(data);

@@ -87,6 +87,11 @@ export interface BrainExportData {
   coaching_sessions: Record<string, unknown>[];
 }
 
+export interface GraphData {
+  nodes: { labels: string[]; properties: Record<string, unknown> }[];
+  edges: { type: string; from: Record<string, unknown>; to: Record<string, unknown> }[];
+}
+
 // --- Neurow API type (exposed by preload via contextBridge) ---
 
 interface NeurowAPI {
@@ -103,10 +108,12 @@ interface NeurowAPI {
   updateProfile: (userId: string, profileData: Record<string, unknown>) => Promise<UpdateProfileResult>;
   getProfile: (userId: string) => Promise<Record<string, unknown>>;
   exportData: (userId: string) => Promise<BrainExportData>;
+  saveJsonFile: (jsonData: string, suggestedFilename: string) => Promise<{ saved: boolean; filePath: string | null }>;
   deleteUserData: (userId: string) => Promise<{ deleted: true; tables: string[] }>;
   deleteAccount: (userId: string) => Promise<{ deleted: true; tables: string[] }>;
   openBrainCloud: (slug?: string) => Promise<void>;
   setBYOKConfig: (config: { provider: string; endpoint: string; apiKey: string; model: string } | null) => Promise<ChatAvailableResult>;
+  getGraphData: (userId: string) => Promise<GraphData>;
 }
 
 declare global {
@@ -188,6 +195,13 @@ export async function exportData(userId: string): Promise<BrainExportData> {
   return window.neurow.exportData(userId);
 }
 
+export async function saveJsonFile(
+  jsonData: string,
+  suggestedFilename: string,
+): Promise<{ saved: boolean; filePath: string | null }> {
+  return window.neurow.saveJsonFile(jsonData, suggestedFilename);
+}
+
 export async function deleteUserData(userId: string): Promise<{ deleted: true; tables: string[] }> {
   return window.neurow.deleteUserData(userId);
 }
@@ -204,4 +218,8 @@ export async function setBYOKConfig(
   config: { provider: string; endpoint: string; apiKey: string; model: string } | null,
 ): Promise<ChatAvailableResult> {
   return window.neurow.setBYOKConfig(config);
+}
+
+export async function getGraphData(userId: string): Promise<GraphData> {
+  return window.neurow.getGraphData(userId);
 }

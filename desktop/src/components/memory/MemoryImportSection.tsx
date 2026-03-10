@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { MemoryImportModal } from "./MemoryImportModal";
 import { FileImportModal } from "./FileImportModal";
 import { useUser } from "@/contexts/UserContext";
-import { BrainIcon } from "@/components/icons/BrainIcon";
 
 // ---------------------------------------------------------------------------
 // MemoryImportSection — settings placement for AI memory + file import
@@ -107,24 +106,11 @@ export function MemoryImportSection() {
   return (
     <>
       <section>
-        <div className="flex items-center gap-2.5">
-          <BrainIcon className="size-7 text-[#1E1E1E] opacity-60" />
-          <h2 className="font-albra text-2xl font-medium text-[#1E1E1E]">
-            Brain Cloud
-          </h2>
-        </div>
-        <p className="mt-1 mb-5 text-sm text-muted-foreground">
-          We structure and organize your data and memories into your own
-          personal knowledge graph — connecting your information similar to how
-          your brain stores it, for better insights and synthesis. Think of it
-          as a cognitive extension, so you don&apos;t have to hold all that
-          stuff in your head all the time. Brain Cloud does it for you.
-        </p>
         <div className="space-y-6">
           {/* AI Memory Import */}
           <div>
             <h3 className="text-sm font-medium text-[#1E1E1E]">
-              Import memory from other AI providers
+              IMPORT memory from other AI providers
             </h3>
             <div className="mt-1 flex items-start justify-between gap-4">
               <p className="text-sm text-muted-foreground">
@@ -147,7 +133,7 @@ export function MemoryImportSection() {
           {/* File Import */}
           <div>
             <h3 className="text-sm font-medium text-[#1E1E1E]">
-              Import from file
+              IMPORT from file
             </h3>
             <div className="mt-1 flex items-start justify-between gap-4">
               <p className="text-sm text-muted-foreground">

@@ -2,7 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- untyped Neo4j data shapes + react-force-graph-3d API */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { SpinnerGap, Graph as GraphIcon } from "@phosphor-icons/react";
 
@@ -38,6 +38,10 @@ interface ForceGraphData {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
+
+/** Theo's demo profile — shows the rich pre-generated graph (demo_graph.json).
+ *  Identified by UUID, not slug, to avoid collision with judges named "Theo". */
+const THEO_USER_ID = "0c4831b5-8df3-4fba-94be-57e4e3112116";
 
 /** Explicit colors for high-frequency node types */
 const EXPLICIT_COLORS: Record<string, string> = {
@@ -136,51 +140,92 @@ function transformGraphData(graph: {
 
 interface GraphViewProps {
   isActive: boolean;
+  userId?: string;
 }
 
-export function GraphView({ isActive }: GraphViewProps) {
+export function GraphView({ isActive, userId }: GraphViewProps) {
   const [graphData, setGraphData] = useState<ForceGraphData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{ nodes: number; edges: number; types: string[] } | null>(null);
 
-  const loadedRef = useRef(false);
+  // Track which user's data is currently loaded (prevents redundant fetches,
+  // resets on profile switch)
+  const loadedForRef = useRef<string | null>(null);
 
-  // Load graph data from static file (pre-generated from brain_export)
+  const applyGraphData = useCallback((raw: { nodes: any[]; edges: any[] }) => {
+    if (raw.nodes && raw.nodes.length > 0) {
+      const transformed = transformGraphData(raw);
+      setGraphData(transformed);
+      setStats({
+        nodes: transformed.nodes.length,
+        edges: transformed.links.length,
+        types: [...new Set(transformed.nodes.map((n) => n.group))],
+      });
+    } else {
+      // No data — let empty state render
+      setGraphData(null);
+      setStats(null);
+    }
+  }, []);
+
   useEffect(() => {
-    if (!isActive || loadedRef.current || loading) return;
+    if (!isActive || !userId) return;
+
+    // Already loaded for this user — skip
+    if (loadedForRef.current === userId) return;
+
+    // User changed — reset state
+    if (loadedForRef.current !== null) {
+      setGraphData(null);
+      setStats(null);
+      setError(null);
+    }
+
+    // Capture userId as a definite string for the async scope
+    // (TypeScript can't narrow optional props inside nested async functions)
+    const currentUserId = userId;
+    let cancelled = false;
 
     async function loadGraph() {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch("/demo_graph.json");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const raw = await res.json();
+        let raw: { nodes: any[]; edges: any[] };
 
-        if (raw.nodes && raw.edges) {
-          const transformed = transformGraphData(raw);
-          setGraphData(transformed);
-          setStats({
-            nodes: transformed.nodes.length,
-            edges: transformed.links.length,
-            types: [...new Set(transformed.nodes.map((n) => n.group))],
-          });
-          loadedRef.current = true;
+        if (currentUserId === THEO_USER_ID) {
+          // Theo's demo profile: static pre-generated graph (539 nodes, reliable for demo)
+          const res = await fetch("/demo_graph.json");
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          raw = await res.json();
         } else {
-          setError("Graph data file is missing nodes or edges");
+          // All other profiles: live data from Neo4j via IPC
+          raw = await window.neurow.getGraphData(currentUserId);
         }
+
+        // Stale check: if user switched while we were fetching, discard
+        if (cancelled) return;
+
+        applyGraphData(raw);
+        loadedForRef.current = currentUserId;
       } catch (e) {
+        if (cancelled) return;
         console.error("[GraphView] Failed to load graph data:", e);
         setError("Failed to load graph data");
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadGraph();
-  }, [isActive, loading]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isActive, userId, applyGraphData]);
 
   // ---------------------------------------------------------------------------
   // Render
@@ -246,7 +291,9 @@ export function GraphView({ isActive }: GraphViewProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4">
       <GraphIcon className="size-8 text-muted-foreground" weight="regular" />
-      <p className="text-sm text-muted-foreground">Your knowledge graph will appear here</p>
+      <p className="text-sm text-muted-foreground">
+        Your knowledge graph will appear here after your first coaching session
+      </p>
     </div>
   );
 }

@@ -1,11 +1,18 @@
 "use client";
 
 import { GraphView } from "@/components/graph/GraphView";
+import { useUser } from "@/contexts/UserContext";
 
 interface BCGraphViewProps {
   isActive: boolean;
 }
 
 export function BCGraphView({ isActive }: BCGraphViewProps) {
-  return <GraphView isActive={isActive} />;
+  const { activeUser } = useUser();
+  return (
+    <GraphView
+      isActive={isActive}
+      userId={activeUser?.id}
+    />
+  );
 }

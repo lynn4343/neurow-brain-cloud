@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDayMap } from "@/contexts/DayMapContext";
 import { useUser } from "@/contexts/UserContext";
 import { StickyWeekHeader } from "./StickyWeekHeader";
@@ -17,6 +17,7 @@ import { addDays, format, isSameWeek, startOfToday } from "date-fns";
 export function WeekTimelineView() {
   const { hourRowHeight, currentWeek } = useDayMap();
   const { activeUser } = useUser();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const hours = [
     "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM",
@@ -53,6 +54,16 @@ export function WeekTimelineView() {
     return parseInt(format(date, "d"));
   });
 
+  // Auto-scroll to current time on mount — position indicator ~25% from top
+  useEffect(() => {
+    if (scrollRef.current) {
+      const containerHeight = scrollRef.current.clientHeight;
+      const timePosition = currentHourRow * hourRowHeight + minuteOffset;
+      const scrollTarget = Math.max(0, timePosition - containerHeight * 0.25);
+      scrollRef.current.scrollTop = scrollTarget;
+    }
+  }, [currentHour, hourRowHeight]);
+
   // Event data
   const { events: allEvents, openEventModal, openNewEventModal } = useDemoData();
 
@@ -61,7 +72,7 @@ export function WeekTimelineView() {
       <StickyWeekHeader days={days} currentDay={currentDay} dates={dates} />
 
       {/* Scrollable grid */}
-      <div className="relative flex-1 overflow-y-auto timeline-scrollbar">
+      <div ref={scrollRef} className="relative flex-1 overflow-y-auto timeline-scrollbar">
         {/* Sticky Sun Icon - only in time column */}
         <div className="pointer-events-none sticky top-0 z-10 flex">
           <div className="flex w-[72px] items-center justify-center border-r border-[#E6E5E3] bg-white py-2">

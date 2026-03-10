@@ -15,6 +15,53 @@ import type { ChatSession, Workspace } from "@/types/sessions";
 
 export type Priority = "Urgent" | "High" | "Medium" | "Low" | "None";
 
+// Life Insights Dashboard types
+export type DomainDirection = "growth" | "steady" | "needs_attention" | "baseline";
+
+export interface DomainHealth {
+  id: string;
+  name: string;
+  icon: string;
+  direction: DomainDirection;
+  observation: string;
+}
+
+export interface Milestone {
+  text: string;
+  completed: boolean;
+}
+
+export interface QuarterlyGoal {
+  id: string;
+  title: string;
+  why: string;
+  milestones: Milestone[];
+  nextMilestone: string;
+  nextMilestoneDue: string;
+  celebration: string | null;
+}
+
+export interface PulseMetricData {
+  value: number | null; // null = no data yet (shows "—")
+  trend: number;
+  unit: string;
+  isPercentage?: boolean;
+}
+
+export interface PulseMetrics {
+  coachingStreak: PulseMetricData;
+  top3Completion: PulseMetricData;
+  sessionsThisWeek: PulseMetricData;
+  winsCaptured: PulseMetricData;
+}
+
+export interface InsightData {
+  type: "insight" | "welcome";
+  text: string;
+  domains?: string[];
+  lastUpdated?: string;
+}
+
 export interface Task {
   name: string;
   priority: Priority;
@@ -370,11 +417,14 @@ export const CALENDAR_EVENTS: Record<string, CalendarEvent[]> = {
 
     // Wed Mar 11
     { id: "e11", title: "Portfolio shoot \u2014 case study photos", date: "2026-03-11", startTime: "10:00", endTime: "12:00", durationMin: 120, category: "Freelance" },
+    { id: "e57", title: "Admin block \u2014 invoicing + follow-ups", date: "2026-03-11", startTime: "14:00", endTime: "15:30", durationMin: 90, category: "Admin" },
     { id: "e12", title: "School of Motion Module 4 exercises", date: "2026-03-11", startTime: "19:00", endTime: "20:30", durationMin: 90, category: "Learning" },
 
     // Thu Mar 12
     { id: "e13", title: "Coaching session", date: "2026-03-12", startTime: "10:00", endTime: "11:00", durationMin: 60, category: "Coaching" },
     { id: "e14", title: "Meridian \u2014 client presentation (Round 2)", date: "2026-03-12", startTime: "14:00", endTime: "15:00", durationMin: 60, category: "Freelance" },
+
+    { id: "e58", title: "Admin block \u2014 send invoices", date: "2026-03-12", startTime: "16:00", endTime: "17:00", durationMin: 60, category: "Admin" },
 
     // Fri Mar 13
     { id: "e15", title: "Lunch \u2014 Austin Creatives meetup", date: "2026-03-13", startTime: "12:00", endTime: "13:30", durationMin: 90, category: "Social" },
@@ -412,6 +462,31 @@ export const CALENDAR_EVENTS: Record<string, CalendarEvent[]> = {
     { id: "e35", title: "School of Motion Module 3 exercises", date: "2026-03-04", startTime: "19:00", endTime: "20:30", durationMin: 90, category: "Learning" },
     { id: "e36", title: "Lunch \u2014 Austin Creatives meetup", date: "2026-03-01", startTime: "12:00", endTime: "13:30", durationMin: 90, category: "Social" },
     { id: "e37", title: "Monthly review session", date: "2026-03-07", startTime: "10:00", endTime: "11:30", durationMin: 90, category: "Coaching" },
+
+    // Week of Mar 15-21
+    { id: "e38", title: "Cafe Rowan shift", date: "2026-03-15", startTime: "07:00", endTime: "12:00", durationMin: 300, category: "Work" },
+    { id: "e39", title: "Meridian — final deliverables", date: "2026-03-16", startTime: "10:00", endTime: "12:30", durationMin: 150, category: "Freelance" },
+    { id: "e40", title: "Admin block — invoicing", date: "2026-03-16", startTime: "14:00", endTime: "15:30", durationMin: 90, category: "Admin" },
+    { id: "e41", title: "Jog — Town Lake", date: "2026-03-17", startTime: "18:00", endTime: "18:45", durationMin: 45, category: "Personal" },
+    { id: "e42", title: "School of Motion Module 5", date: "2026-03-18", startTime: "19:00", endTime: "21:00", durationMin: 120, category: "Learning" },
+    { id: "e43", title: "Coaching session", date: "2026-03-19", startTime: "10:00", endTime: "11:00", durationMin: 60, category: "Coaching" },
+    { id: "e44", title: "New client intro — Varo Studio", date: "2026-03-19", startTime: "14:00", endTime: "14:45", durationMin: 45, category: "Freelance", location: "Zoom" },
+    { id: "e45", title: "Skate session — East Austin", date: "2026-03-21", startTime: "15:00", endTime: "16:30", durationMin: 90, category: "Personal" },
+
+    // Week of Mar 22-28
+    { id: "e46", title: "Varo Studio — brand discovery workshop", date: "2026-03-23", startTime: "10:00", endTime: "12:00", durationMin: 120, category: "Freelance", location: "Their studio" },
+    { id: "e47", title: "Cafe Rowan shift", date: "2026-03-24", startTime: "07:00", endTime: "12:00", durationMin: 300, category: "Work" },
+    { id: "e48", title: "School of Motion Module 5 exercises", date: "2026-03-25", startTime: "19:00", endTime: "20:30", durationMin: 90, category: "Learning" },
+    { id: "e49", title: "Coaching session", date: "2026-03-26", startTime: "10:00", endTime: "11:00", durationMin: 60, category: "Coaching" },
+    { id: "e50", title: "Jog — Town Lake", date: "2026-03-26", startTime: "18:30", endTime: "19:15", durationMin: 45, category: "Personal" },
+    { id: "e51", title: "Lunch — Dev + Jake", date: "2026-03-27", startTime: "12:00", endTime: "13:00", durationMin: 60, category: "Social" },
+    { id: "e52", title: "Cafe Rowan shift", date: "2026-03-28", startTime: "08:00", endTime: "13:00", durationMin: 300, category: "Work" },
+
+    // Week of Mar 29-31
+    { id: "e53", title: "Varo Studio — mood boards review", date: "2026-03-30", startTime: "14:00", endTime: "15:30", durationMin: 90, category: "Freelance", location: "Zoom" },
+    { id: "e54", title: "School of Motion Module 6", date: "2026-03-30", startTime: "19:00", endTime: "21:00", durationMin: 120, category: "Learning" },
+    { id: "e55", title: "Admin block — quarterly bookkeeping", date: "2026-03-31", startTime: "10:00", endTime: "12:00", durationMin: 120, category: "Admin" },
+    { id: "e56", title: "Jog — Town Lake", date: "2026-03-31", startTime: "18:00", endTime: "18:45", durationMin: 45, category: "Personal" },
   ],
   default: [
     { id: "new-e01", title: "Welcome coaching session", date: todayISO(), startTime: "10:00", endTime: "10:30", durationMin: 30, category: "Coaching" },
@@ -439,19 +514,20 @@ export const WORKSPACES: Record<string, Workspace[]> = {
 
 export const SESSIONS: Record<string, ChatSession[]> = {
   theo: [
-    // --- Coaching: Clarity Session ---
+    // --- Coaching: Clarity Session (8-turn spec: Welcome + Vision + Goal + Why + Milestone + Action + Identity + Release + Close) ---
     {
       id: "clarity-theo-demo",
       type: "clarity",
       title: "Clarity Session",
-      createdAt: "2026-02-10T10:00:00-06:00",
-      updatedAt: "2026-02-10T10:45:00-06:00",
+      createdAt: "2026-02-06T10:00:00-06:00",
+      updatedAt: "2026-02-06T10:25:00-06:00",
       personaId: "theo",
-      summary: "Vision: self-sustaining creative practice. Next action: send Meridian brand guide revisions.",
+      summary: "Vision: self-sustaining creative practice. Goal: $100/hr, 3 projects, School of Motion. Next action: update rate sheet.",
       goalCascade: {
         context_line: "Theo is a 23-year-old freelance graphic designer in East Austin, growing his creative practice.",
         vision: "Self-sustaining creative practice \u2014 brand identity + motion design, debt cleared, recognized in Austin creative community",
         quarterly_goal: "$100/hour for new clients, 3 concurrent projects, School of Motion modules 1-6",
+        quarterly_goal_headline: "Hit $100/hr, 3 active projects, start School of Motion",
         goal_why: "I'm tired of the feast-or-famine cycle",
         identity_traits: [
           "bold with pricing",
@@ -463,8 +539,8 @@ export const SESSIONS: Record<string, ChatSession[]> = {
           "the barista survival story",
           "putting off systems until later",
         ],
-        next_action_step: "Send Meridian brand guide revisions",
-        next_action_due: "2026-03-12",
+        next_action_step: "Update my rate sheet and send to my next inquiry",
+        next_action_due: "2026-02-13",
         focus_area: "career-business",
         declared_challenges: [
           "inconsistent income",
@@ -474,103 +550,124 @@ export const SESSIONS: Record<string, ChatSession[]> = {
         ],
       },
       messages: [
-        // Turn 1: user opens
+        // Welcome message
         {
           id: "clarity-demo-1",
-          role: "user",
-          content: "Just finished setting up my profile \u2014 ready to close the gap between vision and reality.",
-          timestamp: "2026-02-10T10:00:00-06:00",
+          role: "assistant",
+          content: "Hey Theo.\n\nThe freelance life has its own unique challenges \u2014 I see you.\n\nAs a **freelancer and side hustler** focused on **career and professional growth**, it makes total sense that **inconsistent income** keeps getting in the way.\n\nYou don\u2019t need to work harder or hustle more.\n\nYou need focus on the work that matters most, and boundaries that protect your energy.\n\n**That\u2019s what we\u2019re building together.**\n\nBy the end of this session, you\u2019ll know exactly what to focus on \u2014 and how to actually make it happen.\n\nSound good?",
+          timestamp: "2026-02-06T10:00:00-06:00",
         },
-        // Turn 1: assistant (vision prompt)
+        // User consent
         {
           id: "clarity-demo-2",
-          role: "assistant",
-          content: "Hey Theo. Nice to meet you.\n\nBefore we map out what\u2019s next, I want to understand where you\u2019re actually trying to go \u2014 not the safe answer, the real one.\n\n**If everything broke your way over the next year**, what would your life look like? Think about your work, your creative practice, how you spend your days. Don\u2019t edit yourself.",
-          timestamp: "2026-02-10T10:00:30-06:00",
+          role: "user",
+          content: "Yeah, let\u2019s do it.",
+          timestamp: "2026-02-06T10:01:15-06:00",
         },
-        // Turn 2: user shares vision
+        // Turn 1: Vision question
         {
           id: "clarity-demo-3",
-          role: "user",
-          content: "Honestly? I want to be fully self-sustaining as a designer. Not just scraping by with random logo jobs \u2014 I want a real practice. Brand identity work, maybe motion design too. I want to be the person small businesses in Austin call when they want their brand to feel like them. Debt cleared. No more barista shifts just to cover rent. Recognized in the Austin creative community as someone who does serious work.",
-          timestamp: "2026-02-10T10:03:00-06:00",
+          role: "assistant",
+          content: "Good. Before we map anything out, I want to understand where you\u2019re actually headed \u2014 not the safe answer, the real one.\n\nIf you could look ahead one year from today \u2014 February 2027 \u2014 and things had gone really well, what does your life look like? Your work, your creative practice, how you spend your days. Don\u2019t edit yourself.",
+          timestamp: "2026-02-06T10:01:45-06:00",
         },
-        // Turn 2: assistant (quarterly goal extraction)
+        // Turn 1: Theo's vision
         {
           id: "clarity-demo-4",
-          role: "assistant",
-          content: "That\u2019s clear. You\u2019re not talking about a side hustle \u2014 you\u2019re talking about building a practice.\n\nLet\u2019s make this concrete. **In the next 90 days**, what would need to be true for you to feel like you\u2019re actually on track? Think about income, clients, skills \u2014 the measurable stuff.",
-          timestamp: "2026-02-10T10:03:30-06:00",
+          role: "user",
+          content: "I want to be fully freelance \u2014 no more barista shifts to make rent. Running my own design practice, doing brand identity and starting to mix in motion work. Making enough that I\u2019m not checking my credit card balance with dread every month. And honestly? Being someone the Austin creative scene knows \u2014 not famous, just respected. Like, \u201coh yeah, Theo does great work.\u201d",
+          timestamp: "2026-02-06T10:04:30-06:00",
         },
-        // Turn 3: user quarterly goal
+        // Turn 2: Vision reflection + Quarterly Goal question
         {
           id: "clarity-demo-5",
-          role: "user",
-          content: "I\u2019d need to be charging $100/hour for new clients and actually getting it. Three concurrent projects instead of the feast-or-famine thing. And I want to be through modules 1-6 of School of Motion so I can add motion design to my offerings.",
-          timestamp: "2026-02-10T10:06:00-06:00",
+          role: "assistant",
+          content: "So if I\u2019m hearing you right: running a self-sustaining creative practice \u2014 brand identity plus motion design \u2014 on freelance income alone. Financially stable, debt cleared, savings building. Recognized in Austin\u2019s creative community for excellent work.\n\nYou\u2019re not talking about a side hustle anymore. You\u2019re talking about building a practice.\n\nLet\u2019s make this concrete. Looking at the next 90 days \u2014 what\u2019s the one goal that would make the biggest dent in getting there?",
+          timestamp: "2026-02-06T10:05:00-06:00",
         },
-        // Turn 3: assistant (goal why)
+        // Turn 2: Theo's quarterly goal
         {
           id: "clarity-demo-6",
-          role: "assistant",
-          content: "$100/hour, three projects, SoM through Module 6. Those are specific \u2014 good.\n\nNow the harder question: **Why does this matter to you right now?** Not why it makes logical sense. Why does it matter *to you*, personally, at this point in your life?",
-          timestamp: "2026-02-10T10:06:30-06:00",
+          role: "user",
+          content: "Okay, 90 days... I think the biggest move is raising my rate to $100/hour for new clients and actually keeping it there \u2014 no caving when someone pushes back. And having like 3 brand identity projects going at once so the income isn\u2019t all feast-or-famine. And I really want to get through at least the first half of School of Motion \u2014 I keep starting and stopping.",
+          timestamp: "2026-02-06T10:08:00-06:00",
         },
-        // Turn 4: user goal why
+        // Turn 3: Goal reflection + Why question
         {
           id: "clarity-demo-7",
-          role: "user",
-          content: "Because I\u2019m tired of the feast-or-famine cycle. I\u2019m 23 and I\u2019ve been doing this long enough to know I\u2019m good at it, but I keep playing small. Every time I underprice a project or take a gig I don\u2019t care about just to pay rent, I\u2019m choosing survival over building something real. I don\u2019t want to be 25 still having this same conversation with myself.",
-          timestamp: "2026-02-10T10:09:00-06:00",
+          role: "assistant",
+          content: "So this quarter: establish $100/hour for new clients, maintain 3 concurrent projects, and complete School of Motion modules 1 through 6. Those are specific \u2014 good.\n\nNow the harder question: why does this matter to you right now? Not why it makes logical sense. Why does it matter *to you*, personally, at this point in your life?",
+          timestamp: "2026-02-06T10:08:30-06:00",
         },
-        // Turn 4: assistant (identity traits)
+        // Turn 3: Theo's goal why
         {
           id: "clarity-demo-8",
-          role: "assistant",
-          content: "\u201cChoosing survival over building something real.\u201d That\u2019s honest.\n\nHere\u2019s what I\u2019m hearing: you know you\u2019re capable. The gap isn\u2019t skill \u2014 it\u2019s how you show up around money, commitment, and follow-through.\n\n**Who do you need to become** to close that gap? Not what you need to *do* \u2014 who you need to *be*. What traits would the version of you who\u2019s running a real practice actually have?",
-          timestamp: "2026-02-10T10:09:30-06:00",
+          role: "user",
+          content: "Because every time I raise my rate and the client says yes, I feel a little less like I\u2019m faking it. And the motion design thing \u2014 that\u2019s where the industry\u2019s going. Brand identity is my bread and butter but if I can add motion, I\u2019m not just another logo guy on Fiverr. I\u2019m building something that\u2019s actually mine. And honestly, the money part \u2014 I\u2019m tired of the anxiety. I just want to look at my bank account and feel okay.",
+          timestamp: "2026-02-06T10:11:30-06:00",
         },
-        // Turn 5: user identity traits
+        // Turn 4: Why reception + Halfway Milestone question
         {
           id: "clarity-demo-9",
-          role: "user",
-          content: "Bold with pricing \u2014 stop apologizing for my rates. Disciplined with the unsexy stuff, like invoicing and follow-ups and bookkeeping. And honestly, just someone who finishes what he starts. I have too many 80%-done projects.",
-          timestamp: "2026-02-10T10:12:00-06:00",
+          role: "assistant",
+          content: "\u201cI\u2019m building something that\u2019s actually mine.\u201d That\u2019s real. Thank you for that.\n\nOkay \u2014 we\u2019re about halfway through the quarter. If you\u2019re on track for $100/hour, 3 projects, and School of Motion through Module 6 \u2014 what would you see at the midpoint? What would be different by week 6?",
+          timestamp: "2026-02-06T10:12:00-06:00",
         },
-        // Turn 5: assistant (release items)
+        // Turn 4: Theo's halfway milestone
         {
           id: "clarity-demo-10",
-          role: "assistant",
-          content: "Bold. Disciplined. Finishes things. Those are real.\n\nNow the flip side: **What do you need to let go of** to become that person? What habits, stories, or patterns are you carrying that don\u2019t serve the version of you who charges $100/hour and runs three projects?",
-          timestamp: "2026-02-10T10:12:30-06:00",
+          role: "user",
+          content: "Halfway... I think by week 6 I\u2019d want to have quoted $100/hour on at least 2 new inquiries \u2014 and had at least one say yes. My revision policy sent to every new client before the first call, not after the fourth round of changes. And through Module 3 of School of Motion with something I can actually put in my portfolio.",
+          timestamp: "2026-02-06T10:15:00-06:00",
         },
-        // Turn 6: user release items
+        // Turn 5: Milestone reflection + Next Action question
         {
           id: "clarity-demo-11",
-          role: "user",
-          content: "Saying yes to underpriced projects because I\u2019m afraid of having no work. The whole barista survival story \u2014 \u201cI need shifts to cover rent\u201d keeps me from going all in on design. And putting off systems until later. I keep telling myself I\u2019ll set up proper invoicing and bookkeeping \u201cwhen I have time\u201d but that day never comes.",
-          timestamp: "2026-02-10T10:15:00-06:00",
+          role: "assistant",
+          content: "Two quotes out, one accepted, revision policy leading instead of following, and a portfolio piece from Module 3. That\u2019s a solid marker. We\u2019ll check in on that.\n\nNow \u2014 what\u2019s the one thing you could do *this week* that would start the momentum? Not a category of things. The actual move.",
+          timestamp: "2026-02-06T10:15:30-06:00",
         },
-        // Turn 6: assistant (next action commitment)
+        // Turn 5: Theo's next action
         {
           id: "clarity-demo-12",
-          role: "assistant",
-          content: "Three things to release: underpriced yeses, the survival story, and \u201clater\u201d for systems. All connected \u2014 they all protect you from the risk of going all in.\n\nLast question. We\u2019ve got the vision, the 90-day target, the identity shift, and what you\u2019re letting go of. Now: **What\u2019s the single next action** you can take in the next 48 hours that moves you toward $100/hour? One thing. Specific enough that you\u2019d know if you did it.",
-          timestamp: "2026-02-10T10:15:30-06:00",
+          role: "user",
+          content: "Update my rate sheet and send to my next inquiry.",
+          timestamp: "2026-02-06T10:17:00-06:00",
         },
-        // Turn 7: user next action
+        // Turn 6: Action confirmation + Identity Traits question
         {
           id: "clarity-demo-13",
-          role: "user",
-          content: "Send the Meridian brand guide revisions. I\u2019ve been sitting on them for a week because I keep second-guessing the color palette. It\u2019s done. I just need to send it.",
-          timestamp: "2026-02-10T10:18:00-06:00",
+          role: "assistant",
+          content: "So this week: \u201cupdate my rate sheet and send to my next inquiry.\u201d That\u2019s the move.\n\nNow I want to ask something different. You\u2019ve got a clear goal and a first step. To be the person who actually hits $100/hour with 3 projects and motion design in the mix \u2014 who do you need to become? Not what you need to *do*. What qualities does that version of you have?",
+          timestamp: "2026-02-06T10:17:30-06:00",
         },
-        // Turn 7: assistant (close + summary)
+        // Turn 6: Theo's identity traits
         {
           id: "clarity-demo-14",
+          role: "user",
+          content: "Bold with my pricing \u2014 not apologetic, not hedging, just stating the number. Disciplined with the unsexy stuff \u2014 invoicing, follow-ups, admin, not just the creative work. And honestly, someone who finishes what he starts \u2014 modules, policies, projects through to delivery.",
+          timestamp: "2026-02-06T10:20:30-06:00",
+        },
+        // Turn 7: Identity reflection + Release question
+        {
+          id: "clarity-demo-15",
           role: "assistant",
-          content: "Here\u2019s what you just built:\n\n**Vision:** Self-sustaining creative practice \u2014 brand identity + motion design, debt cleared, recognized in the Austin creative community.\n\n**90-Day Target:** $100/hour for new clients, 3 concurrent projects, School of Motion modules 1-6.\n\n**Why Now:** You\u2019re tired of the feast-or-famine cycle. You know you\u2019re good enough \u2014 the gap is commitment, not capability.\n\n**Who You\u2019re Becoming:** Bold with pricing. Disciplined with the unsexy stuff. Someone who finishes what he starts.\n\n**Releasing:** Underpriced yeses. The barista survival story. \u201CLater\u201d for systems.\n\n**Next Action:** Send the Meridian brand guide revisions.\n\nThis is your compass. Every decision runs through it: *does this move me toward the practice, or keep me in survival mode?*\n\nDon\u2019t worry about perfection \u2014 you\u2019ve already started. I\u2019ll check in on Meridian.",
-          timestamp: "2026-02-10T10:18:30-06:00",
+          content: "Bold with pricing. Disciplined with the unsexy stuff. Someone who finishes what he starts. Those are real, Theo.\n\nNow the flip side: what do you need to let go of to become that person? What habits, stories, or patterns are you carrying that don\u2019t serve the version of you who charges $100/hour and runs three projects?",
+          timestamp: "2026-02-06T10:21:00-06:00",
+        },
+        // Turn 7: Theo's release items
+        {
+          id: "clarity-demo-16",
+          role: "user",
+          content: "Saying yes to projects I know are underpriced \u2014 the people-pleasing rate discount. The story that I still need the coffee shop to survive \u2014 my income data says otherwise but the narrative hasn\u2019t caught up. And putting off systems until \u201clater\u201d \u2014 the revision policy, the invoicing template. Later never comes.",
+          timestamp: "2026-02-06T10:24:00-06:00",
+        },
+        // Turn 8: Release reception + Milton Model close
+        {
+          id: "clarity-demo-17",
+          role: "assistant",
+          content: "Those are real. And notice something \u2014 they\u2019re all connected. The underpriced yes, the barista safety net, the systems you keep pushing to \u201clater\u201d \u2014 they\u2019re all ways of staying in survival mode instead of building the practice you just described.\n\nHere\u2019s what I want you to sit with, Theo. You walked in here talking about wanting to be fully freelance, and somewhere in the last twenty minutes you stopped talking about wanting it and started describing it \u2014 the $100/hour rate, the three projects, the motion work, the Austin creative community knowing your name. That shift matters. You\u2019re not dreaming about someone else\u2019s life. You\u2019re describing yours. And the person who gets there \u2014 bold with pricing, disciplined with the unsexy stuff, someone who finishes what he starts \u2014 that\u2019s not a costume you put on. You already showed me that person in how you talked about your work today. What\u2019s changing is you\u2019re deciding to stop apologizing for him.\n\nThe underpriced yeses, the coffee shop story, the \u201clater\u201d that never comes \u2014 you already know those aren\u2019t protecting you anymore. They\u2019re just familiar. And as you start letting them go, something you said is going to keep coming back: \u201cI\u2019m building something that\u2019s actually mine.\u201d That\u2019s the thread. Every time you quote your real rate, every time you send the invoice instead of putting it off, every time you sit down for School of Motion when you\u2019d rather scroll \u2014 you\u2019re building it.\n\nThat\u2019s your Clarity Session. Your first move this week: \u201cUpdate my rate sheet and send to my next inquiry.\u201d I\u2019ll check in on it.",
+          timestamp: "2026-02-06T10:24:30-06:00",
         },
       ],
     },
@@ -908,4 +1005,125 @@ export const SESSIONS: Record<string, ChatSession[]> = {
   ],
 
   default: [],
+};
+
+// ---------------------------------------------------------------------------
+// Life Insights: Domain Health
+// ---------------------------------------------------------------------------
+
+const BASELINE_DOMAINS: DomainHealth[] = [
+  { id: "health", name: "Health & Vitality", icon: "Heartbeat", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "mental", name: "Mental Wellness", icon: "Brain", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "relationships", name: "Relationships", icon: "UsersThree", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "career", name: "Career & Mission", icon: "Briefcase", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "financial", name: "Financial", icon: "CurrencyCircleDollar", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "learning", name: "Growth & Learning", icon: "BookOpenText", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "environment", name: "Environment", icon: "House", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "fun", name: "Fun & Joy", icon: "SmileyWink", direction: "baseline", observation: "Tracking begins after your first week." },
+  { id: "spirituality", name: "Spirituality", icon: "Sparkle", direction: "baseline", observation: "Tracking begins after your first week." },
+];
+
+export const DOMAIN_HEALTH: Record<string, DomainHealth[]> = {
+  theo: [
+    { id: "health", name: "Health & Vitality", icon: "Heartbeat", direction: "growth", observation: "Running 3x/week at Town Lake \u2014 best consistency in 6 weeks." },
+    { id: "mental", name: "Mental Wellness", icon: "Brain", direction: "steady", observation: "ADHD focus strategies stabilizing. Phone-in-backpack habit holding." },
+    { id: "relationships", name: "Relationships", icon: "UsersThree", direction: "steady", observation: "Regular lunches with Dev. Mom boundary conversation still open." },
+    { id: "career", name: "Career & Mission", icon: "Briefcase", direction: "growth", observation: "First $100/hr quote accepted. Meridian project on track." },
+    { id: "financial", name: "Financial", icon: "CurrencyCircleDollar", direction: "needs_attention", observation: "$2,400 in outstanding invoices \u2014 3 weeks overdue." },
+    { id: "learning", name: "Growth & Learning", icon: "BookOpenText", direction: "growth", observation: "School of Motion Module 4. On pace for Module 6 by quarter end." },
+    { id: "environment", name: "Environment", icon: "House", direction: "steady", observation: "Home studio functional. External monitor making a difference." },
+    { id: "fun", name: "Fun & Joy", icon: "SmileyWink", direction: "growth", observation: "Skating every Saturday. Austin Creatives meetup becoming regular." },
+    { id: "spirituality", name: "Spirituality", icon: "Sparkle", direction: "needs_attention", observation: "No reflection practice this month. Journaling dropped off." },
+  ],
+  default: BASELINE_DOMAINS,
+};
+
+// ---------------------------------------------------------------------------
+// Life Insights: Quarterly Goals
+// ---------------------------------------------------------------------------
+
+export const QUARTERLY_GOALS: Record<string, QuarterlyGoal[]> = {
+  theo: [
+    {
+      id: "goal-1",
+      title: "$100/hr for new clients",
+      why: "I\u2019m tired of the feast-or-famine cycle",
+      milestones: [
+        { text: "Quoted $100/hr to first prospect", completed: true },
+        { text: "Meridian accepted at full rate", completed: true },
+        { text: "Land 3rd concurrent project", completed: false },
+        { text: "Close all outstanding invoices", completed: false },
+        { text: "Drop barista shifts to 2x/week", completed: false },
+      ],
+      nextMilestone: "Land 3rd concurrent project",
+      nextMilestoneDue: "Mar 31",
+      celebration: "First $100/hr client accepted!",
+    },
+    {
+      id: "goal-2",
+      title: "School of Motion through Module 6",
+      why: "Motion design opens a new revenue stream",
+      milestones: [
+        { text: "Complete Modules 1-2", completed: true },
+        { text: "Complete Module 3", completed: true },
+        { text: "Complete Module 4 exercises", completed: false },
+        { text: "Complete Module 5", completed: false },
+        { text: "Complete Module 6 + portfolio piece", completed: false },
+      ],
+      nextMilestone: "Complete Module 4 exercises",
+      nextMilestoneDue: "Mar 14",
+      celebration: null,
+    },
+    {
+      id: "goal-3",
+      title: "3 concurrent design projects",
+      why: "Stability means I can stop saying yes to survival gigs",
+      milestones: [
+        { text: "Meridian brand identity (active)", completed: true },
+        { text: "Discovery call pipeline established", completed: true },
+        { text: "Land 2nd concurrent project", completed: false },
+        { text: "Land 3rd concurrent project", completed: false },
+      ],
+      nextMilestone: "Land 2nd concurrent project",
+      nextMilestoneDue: "Mar 21",
+      celebration: null,
+    },
+  ],
+  default: [],
+};
+
+// ---------------------------------------------------------------------------
+// Life Insights: Weekly Pulse
+// ---------------------------------------------------------------------------
+
+export const WEEKLY_PULSE: Record<string, PulseMetrics> = {
+  theo: {
+    coachingStreak: { value: 18, trend: 5, unit: "days" },
+    top3Completion: { value: 72, trend: 8, unit: "%", isPercentage: true },
+    sessionsThisWeek: { value: 4, trend: 0, unit: "sessions" },
+    winsCaptured: { value: 6, trend: 2, unit: "wins" },
+  },
+  default: {
+    coachingStreak: { value: null, trend: 0, unit: "days" },
+    top3Completion: { value: null, trend: 0, unit: "%", isPercentage: true },
+    sessionsThisWeek: { value: null, trend: 0, unit: "sessions" },
+    winsCaptured: { value: null, trend: 0, unit: "wins" },
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Life Insights: Cross-Domain Insight
+// ---------------------------------------------------------------------------
+
+export const CROSS_DOMAIN_INSIGHT: Record<string, InsightData> = {
+  theo: {
+    type: "insight",
+    text: "Your pricing confidence is up significantly since February \u2014 you quoted $100/hr and held it. But your invoice follow-through hasn\u2019t matched. The same part of you that got bold enough to name your price is avoiding the follow-up conversation. The courage you\u2019re building in Career is exactly the courage you need in Financial. They\u2019re the same muscle.",
+    domains: ["Career & Mission", "Financial"],
+    lastUpdated: "Monday",
+  },
+  default: {
+    type: "welcome",
+    text: "Welcome to your Life Insights. As you complete your first week in Neurow, I\u2019ll start surfacing patterns across your life domains that you might not see on your own. Every session adds depth to your personal picture.",
+  },
 };

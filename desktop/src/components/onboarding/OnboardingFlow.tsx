@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
+import { NeurowLogo } from "@/components/icons/NeurowLogo";
 import { ProfileCreation } from "./ProfileCreation";
 import { ConnectAI } from "./ConnectAI";
 import { MemoryImportStep } from "./MemoryImportStep";
@@ -18,13 +19,16 @@ interface OnboardingFlowProps {
 }
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const { activeUser, updateProfile } = useUser();
+  const { activeUser, updateProfile, demoWalkthrough } = useUser();
 
   // If we already have an active profile (e.g., switching to an incomplete profile),
   // skip to consent step. Otherwise start with profile creation.
-  const [step, setStep] = useState<OnboardingStep>(() =>
-    activeUser ? "consent" : "profile",
-  );
+  // Demo walkthrough: if activeUser is already set, start at import (not consent)
+  // so the import screen is always shown during the demo flow.
+  const [step, setStep] = useState<OnboardingStep>(() => {
+    if (!activeUser) return "profile";
+    return demoWalkthrough ? "import" : "consent";
+  });
 
   // Hold onboarding data between screens completion and profile update
   const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(
@@ -33,7 +37,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   switch (step) {
     case "profile":
-      return <ProfileCreation onComplete={() => setStep("connect")} />;
+      return <ProfileCreation onComplete={() => setStep(demoWalkthrough ? "import" : "connect")} />;
 
     case "connect":
       return <ConnectAI onComplete={() => setStep("import")} />;
@@ -50,6 +54,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       return (
         <ConsentScreen
           onConsent={async (consented) => {
+            if (demoWalkthrough) {
+              setStep("screens");
+              return;
+            }
             try {
               await updateProfile({
                 pattern_consent: consented,
@@ -74,10 +82,29 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         />
       );
 
-    case "updating_profile":
+    case "updating_profile": {
       if (!activeUser || !onboardingData) {
         console.error("OnboardingFlow: Missing activeUser or onboardingData at updating_profile step");
         return null;
+      }
+      // Demo walkthrough: skip Supabase API call, complete immediately with Theo's full profile
+      if (demoWalkthrough) {
+        // Use setTimeout to avoid calling onComplete during render
+        setTimeout(() => {
+          onComplete({
+            ...activeUser,
+            ...onboardingData,
+            onboarding_completed: true,
+          });
+        }, 0);
+        return (
+          <div className="relative flex min-h-screen items-center justify-center bg-[#faf8f8]">
+            <div className="flex flex-col items-center gap-6">
+              <NeurowLogo className="h-[48px] w-[34px]" />
+              <p className="text-sm text-[#5f5e5b]">Personalizing your experience...</p>
+            </div>
+          </div>
+        );
       }
       return (
         <ProfileUpdateLoader
@@ -92,5 +119,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           }}
         />
       );
+    }
   }
 }

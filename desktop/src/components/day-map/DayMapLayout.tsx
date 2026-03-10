@@ -167,7 +167,7 @@ function DayMapContent() {
       />
 
       {/* Content column */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden bg-[#FAF8F8]">
         <CalendarTopTools />
 
         {/* View-dependent content */}

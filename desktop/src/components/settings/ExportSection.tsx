@@ -4,8 +4,7 @@ import { useState } from "react";
 import { Export, Check, X as XIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/UserContext";
-import { exportData } from "@/lib/electron";
-import { downloadJson } from "@/lib/download";
+import { exportData, saveJsonFile } from "@/lib/electron";
 
 // ---------------------------------------------------------------------------
 // ExportSection — Direct Supabase API (model-agnostic)
@@ -23,6 +22,7 @@ interface ExportResult {
   sessionCount: number;
   categoryCount: number;
   filename: string;
+  filePath: string;
 }
 
 export function ExportSection() {
@@ -42,13 +42,18 @@ export function ExportSection() {
       const json = JSON.stringify(data, null, 2);
       const date = new Date().toISOString().split("T")[0];
       const filename = `brain-cloud-export-${activeUser.slug}-${date}.json`;
-      downloadJson(json, filename);
+      const saveResult = await saveJsonFile(json, filename);
+      if (!saveResult.saved) {
+        setIsExporting(false);
+        return; // User cancelled save dialog
+      }
 
       setExportResult({
         memoryCount: Array.isArray(data.episodic) ? data.episodic.length : 0,
         sessionCount: Array.isArray(data.coaching_sessions) ? data.coaching_sessions.length : 0,
         categoryCount: Array.isArray(data.metadata?.categories) ? data.metadata.categories.length : 0,
         filename,
+        filePath: saveResult.filePath!,
       });
     } catch (err) {
       console.error("Export failed:", err);
@@ -68,8 +73,8 @@ export function ExportSection() {
 
   return (
     <section>
-      <h2 className="text-sm font-medium uppercase tracking-wider text-[#1E1E1E] mb-1">
-        Your Data
+      <h2 className="font-albra text-xl font-medium text-[#1E1E1E] mb-1">
+        Export Your Data
       </h2>
       <p className="text-sm text-muted-foreground mb-1.5">
         Export your data as a portable JSON file. Everything about you is yours.
@@ -112,8 +117,7 @@ export function ExportSection() {
                 {exportResult.sessionCount} coaching {exportResult.sessionCount === 1 ? "session" : "sessions"}
               </p>
             )}
-            <p className="text-xs text-[#8e8b86] font-mono">{exportResult.filename}</p>
-            <p className="text-xs text-[#8e8b86]">Saved to your download folder</p>
+            <p className="text-xs text-[#8e8b86] font-mono break-all">{exportResult.filePath}</p>
           </div>
         </div>
       )}

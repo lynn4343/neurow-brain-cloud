@@ -7,12 +7,14 @@ import { DashboardView } from "./DashboardView";
 import { ConnectedAppsView } from "./ConnectedAppsView";
 import { BCSettingsView } from "./BCSettingsView";
 import { BCImportView } from "./BCImportView";
+import { BCExportView } from "./BCExportView";
 import { BCGraphView } from "./BCGraphView";
 
 const headerTitles: Record<BCView, string> = {
   dashboard: "DASHBOARD",
   graph: "KNOWLEDGE GRAPH",
   import: "IMPORT",
+  export: "EXPORT",
   settings: "SETTINGS",
   "connected-apps": "CONNECTED APPS",
 };
@@ -100,6 +102,15 @@ export function BrainCloudShell() {
             }
           >
             <BCImportView />
+          </div>
+          <div
+            className={
+              activeView === "export"
+                ? "flex-1 flex flex-col overflow-hidden"
+                : "hidden"
+            }
+          >
+            <BCExportView />
           </div>
           <div
             className={

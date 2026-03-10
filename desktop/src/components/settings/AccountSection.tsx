@@ -68,11 +68,11 @@ export function AccountSection() {
 
   return (
     <section>
-      <h2 className="text-sm font-medium uppercase tracking-wider text-[#1E1E1E] mb-1">
-        Account
+      <h2 className="text-sm font-medium text-[#1E1E1E] mb-1">
+        MANAGE ACCOUNT
       </h2>
       <p className="text-sm text-muted-foreground mb-6">
-        Manage your account and data. These actions cannot be undone.
+        These actions cannot be undone.
       </p>
 
       <div className="space-y-4">

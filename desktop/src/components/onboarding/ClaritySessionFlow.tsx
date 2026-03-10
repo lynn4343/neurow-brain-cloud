@@ -6,7 +6,7 @@ import { ChatMessage, type Message } from "@/components/chat/ChatMessage";
 import { ActivityIndicator, type ActivityItem } from "@/components/chat/ActivityIndicator";
 import { Button } from "@/components/ui/button";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
-import { useUser } from "@/contexts/UserContext";
+import { useUser, THEO_PROFILE } from "@/contexts/UserContext";
 import {
   sendMessage,
   onChatStream,
@@ -23,6 +23,7 @@ import type { GoalCascade } from "@/contexts/UserContext";
 import { useSessions } from "@/contexts/SessionContext";
 import { extractClaritySummary, type ChatSession } from "@/types/sessions";
 import { GoalCascadeFetcher } from "./GoalCascadeFetcher";
+import { SESSIONS } from "@/lib/demo-data";
 
 // Close phrase from the Turn 9 verbatim close template.
 // Both apostrophe variants: straight (U+0027) and curly (U+2019).
@@ -36,6 +37,110 @@ const CLOSE_PHRASES = [
 // ---------------------------------------------------------------------------
 
 export function ClaritySessionFlow() {
+  const { demoWalkthrough } = useUser();
+
+  if (demoWalkthrough) {
+    return <DemoClaritySession />;
+  }
+
+  return <LiveClaritySession />;
+}
+
+// ---------------------------------------------------------------------------
+// DemoClaritySession — pre-loaded Theo conversation for demo video
+// ---------------------------------------------------------------------------
+
+function DemoClaritySession() {
+  const { completeClaritySession, setActiveUser, setDemoWalkthrough } = useUser();
+  const { saveSession } = useSessions();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Load pre-built messages from demo data
+  const demoSession = SESSIONS.theo?.find((s) => s.type === "clarity");
+  const messages = demoSession?.messages ?? [];
+
+  // Auto-scroll to bottom on mount
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, []);
+
+  function handleComplete() {
+    // Save the demo clarity session
+    if (demoSession) {
+      try {
+        saveSession(demoSession);
+      } catch (err) {
+        console.error("Failed to save demo Clarity Session:", err);
+      }
+    }
+
+    // Restore Theo's full profile, clear demo flag, transition to main
+    setDemoWalkthrough(false);
+    setActiveUser(THEO_PROFILE);
+    completeClaritySession(THEO_PROFILE.goal_cascade ?? undefined);
+  }
+
+  return (
+    <div className="flex h-screen flex-col">
+      {/* Header */}
+      <div className="relative flex flex-col items-center overflow-hidden border-b bg-[#faf8f8] px-4 pb-3 pt-3">
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 z-0 -translate-x-1/2 rounded-full"
+          style={{
+            width: 607,
+            height: 607,
+            background:
+              "linear-gradient(313deg, rgba(178,160,232,0.2) 0%, rgba(178,200,255,0.2) 50%, rgba(232,178,220,0.2) 100%)",
+            filter: "blur(80px)",
+          }}
+        />
+        <NeurowLogo className="relative z-10 h-6 w-[17px]" />
+        <div className="relative z-10 mt-1 inline-flex flex-col">
+          <h1 className="font-albra-sans text-2xl font-normal uppercase tracking-wide text-black">
+            The Clarity Flow
+          </h1>
+          <p
+            className="mt-0.5 self-stretch text-sm font-semibold uppercase text-black"
+            style={{ textAlignLast: "justify" }}
+          >
+            Vision. Focus. Action.
+          </p>
+        </div>
+        <p className="relative z-10 mt-1 text-center text-sm text-black">
+          We&apos;ll help you get <span className="font-extrabold italic">clear</span> about your <span className="font-extrabold italic">vision</span>, and help you <span className="font-extrabold italic">stay aligned</span> with <span className="font-extrabold italic">what to do next</span>. (Even when life gets &ldquo;life-y&rdquo;)
+        </p>
+      </div>
+
+      {/* Chat area — scrollable pre-loaded history */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-[767px] flex-col gap-4 px-4 pt-6 pb-6">
+          {messages.map((msg) => (
+            <Fragment key={msg.id}>
+              <ChatMessage message={msg} />
+            </Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Continue button — always visible in demo mode */}
+      <div className="flex-shrink-0 bg-white">
+        <div className="flex justify-center px-4 py-6">
+          <Button onClick={handleComplete} size="lg" className="px-8">
+            Continue to Neurow
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// LiveClaritySession — original live AI coaching flow
+// ---------------------------------------------------------------------------
+
+function LiveClaritySession() {
   const { activeUser, completeClaritySession } = useUser();
   const { saveSession } = useSessions();
 

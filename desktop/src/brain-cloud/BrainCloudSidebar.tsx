@@ -11,6 +11,7 @@ import {
   House,
   Graph,
   DownloadSimple,
+  Export,
   GearSix,
   Plugs,
   CaretDoubleLeft,
@@ -25,6 +26,7 @@ export type BCView =
   | "dashboard"
   | "graph"
   | "import"
+  | "export"
   | "settings"
   | "connected-apps";
 
@@ -38,6 +40,7 @@ const navItems: BCNavItem[] = [
   { icon: House, label: "Dashboard", viewId: "dashboard" },
   { icon: Graph, label: "Knowledge Graph", viewId: "graph" },
   { icon: DownloadSimple, label: "Import", viewId: "import" },
+  { icon: Export, label: "Export", viewId: "export" },
   { icon: GearSix, label: "Settings", viewId: "settings" },
   { icon: Plugs, label: "Connected Apps", viewId: "connected-apps" },
 ];

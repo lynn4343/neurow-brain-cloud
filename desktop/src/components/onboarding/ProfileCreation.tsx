@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { NeurowLogo } from "@/components/icons/NeurowLogo";
-import { useUser } from "@/contexts/UserContext";
+import { useUser, THEO_PROFILE } from "@/contexts/UserContext";
 import { OnboardingLayout } from "./OnboardingLayout";
 import { createProfile } from "@/lib/electron";
 import type { UserProfile } from "@/contexts/UserContext";
@@ -23,11 +23,23 @@ export function ProfileCreation({ onComplete }: ProfileCreationProps) {
   const [name, setName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addProfile } = useUser();
+  const { addProfile, demoWalkthrough, setActiveUser } = useUser();
 
   const handleCreate = useCallback(async () => {
     const trimmed = name.trim();
     if (!trimmed || isCreating) return;
+
+    // Demo walkthrough: skip API call, use Theo's existing profile
+    if (demoWalkthrough) {
+      const tempProfile: UserProfile = {
+        ...THEO_PROFILE,
+        onboarding_completed: false,
+        clarity_session_completed: false,
+      };
+      setActiveUser(tempProfile);
+      onComplete();
+      return;
+    }
 
     setIsCreating(true);
     setError(null);
@@ -57,7 +69,7 @@ export function ProfileCreation({ onComplete }: ProfileCreationProps) {
     } finally {
       setIsCreating(false);
     }
-  }, [name, isCreating, addProfile, onComplete]);
+  }, [name, isCreating, addProfile, demoWalkthrough, setActiveUser, onComplete]);
 
   const canProceed = name.trim().length > 0;
 

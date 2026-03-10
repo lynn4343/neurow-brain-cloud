@@ -30,7 +30,7 @@ export default function Home() {
 
 // DEV: Floating phase switcher — remove before submission
 function DevPhaseSwitcher() {
-  const { appPhase, activeUser, profiles, setAppPhase, startNewProfile, switchProfile } = useUser();
+  const { appPhase, activeUser, profiles, setAppPhase, startNewProfile, startDemoWalkthrough, demoWalkthrough, switchProfile } = useUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -119,6 +119,14 @@ function DevPhaseSwitcher() {
         title={hasUser ? "Switch to main app" : "No active profile — click Theo or New first"}
       >
         Main
+      </button>
+      <span className="text-[#e6e5e3]">|</span>
+      <button
+        onClick={startDemoWalkthrough}
+        className={`${btnBase} hover:bg-[#fef3c7] hover:text-[#92400e] ${demoWalkthrough ? "bg-[#fef3c7] text-[#92400e] font-medium" : "text-[#92400e]"}`}
+        title="Start Theo demo walkthrough from the beginning"
+      >
+        Demo
       </button>
     </div>
   );

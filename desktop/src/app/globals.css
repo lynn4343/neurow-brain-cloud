@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Hide Next.js dev error overlay — restore after hackathon */
+nextjs-portal { display: none !important; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

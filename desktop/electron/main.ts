@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut, dialog } from 'electron';
 import path from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { sendMessage, sendMessageAPI, sendMessageOpenAI, checkClaudeInstalled, checkChatAvailable, cleanupMCPClient, type UserContext, type ChatAvailableResult } from './claude';
 import { createProfileDirect, updateProfileDirect, getProfileDirect, exportDataDirect, deleteUserDataDirect, deleteAccountDirect, type SupabaseConfig } from './supabase';
+import { getGraphDataDirect, closeDriver, type Neo4jConfig } from './neo4j';
 
 // Load .env from desktop/ root (no dotenv dependency needed)
 // __dirname at runtime is electron-dist/, so ../ is desktop/
@@ -35,6 +36,14 @@ const supabaseConfig: SupabaseConfig = {
   url: 'https://ymmmpkmxaqpnkubmlkiw.supabase.co',
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltbW1wa214YXFwbmt1Ym1sa2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1MTI0NDUsImV4cCI6MjA4ODA4ODQ0NX0.bHtkeA6P3kHrAc97Jtq3JO4bE5lCvtnZ0x10a6bzF4E',
   timeoutMs: 10_000,
+};
+
+// Neo4j direct access — knowledge graph visualization.
+// Credentials from desktop/.env (gitignored). Same pattern as Supabase config.
+const neo4jConfig: Neo4jConfig = {
+  uri: process.env.NEO4J_URI || '',
+  username: process.env.NEO4J_USERNAME || 'neo4j',
+  password: process.env.NEO4J_PASSWORD || '',
 };
 
 // BYOK config — bridged from renderer localStorage via IPC.
@@ -168,6 +177,38 @@ ipcMain.handle('delete-account', (_event, userId: string) => {
   return deleteAccountDirect(supabaseConfig, userId);
 });
 
+// --- File Save (Electron-native save dialog — works across all BrowserWindows) ---
+
+ipcMain.handle('save-json-file', async (event, jsonData: string, suggestedFilename: string) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) {
+    return { saved: false, filePath: null, error: 'Window not found' };
+  }
+  const result = await dialog.showSaveDialog(win, {
+    defaultPath: suggestedFilename,
+    filters: [{ name: 'JSON Files', extensions: ['json'] }],
+  });
+
+  if (result.canceled || !result.filePath) return { saved: false, filePath: null };
+
+  try {
+    writeFileSync(result.filePath, jsonData, 'utf-8');
+    return { saved: true, filePath: result.filePath };
+  } catch (err) {
+    console.error('[save-json-file] Write failed:', err);
+    return { saved: false, filePath: null, error: (err as Error).message };
+  }
+});
+
+// --- Knowledge Graph (live Neo4j data for non-demo profiles) ---
+
+ipcMain.handle('get-graph-data', async (_event, userId: string) => {
+  if (!userId || typeof userId !== 'string') {
+    throw new Error('userId is required and must be a string');
+  }
+  return getGraphDataDirect(neo4jConfig, userId);
+});
+
 // --- Brain Cloud Standalone Window ---
 
 function openBrainCloudWindow(slug?: string) {
@@ -220,6 +261,7 @@ app.whenReady().then(() => {
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
   cleanupMCPClient(); // fire-and-forget — process exits anyway
+  closeDriver();      // close Neo4j connection pool
 });
 
 app.on('window-all-closed', () => {

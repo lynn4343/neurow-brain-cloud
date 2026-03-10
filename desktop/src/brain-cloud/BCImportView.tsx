@@ -119,6 +119,7 @@ export function BCImportView() {
             <Button
               variant="outline"
               size="sm"
+              disabled={!activeUser}
               onClick={() => setMemoryImportOpen(true)}
             >
               Start import
@@ -139,7 +140,7 @@ export function BCImportView() {
                   Import from File
                 </p>
                 <p className="text-sm text-[#5f5e5b] mt-0.5">
-                  Import .json or .jsonl files &mdash; hackathon data, Google
+                  Import .json or .jsonl files &mdash; Google
                   Takeout, DTP format.
                 </p>
               </div>
@@ -147,6 +148,7 @@ export function BCImportView() {
             <Button
               variant="outline"
               size="sm"
+              disabled={!activeUser}
               onClick={() => setFileImportOpen(true)}
             >
               Import file

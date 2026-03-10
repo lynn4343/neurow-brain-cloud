@@ -9,6 +9,7 @@ import { DayMapLayout } from "@/components/day-map/DayMapLayout";
 import { NotesLayout } from "@/components/notes/NotesLayout";
 import { SettingsView } from "@/components/settings/SettingsView";
 import { ProjectsLayout } from "@/components/projects/ProjectsLayout";
+import { LifeInsightsView } from "@/components/life-insights/LifeInsightsView";
 import { checkChatAvailable, setBYOKConfig, type ChatAvailableResult } from "@/lib/electron";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AssistantButton } from "./AssistantButton";
@@ -18,7 +19,7 @@ import { TaskEventModal } from "@/components/day-map/TaskEventModal";
 import { cn } from "@/lib/utils";
 
 const headerTitles: Record<View, string> = {
-  home: "NEUROW CENTER",
+  home: "LIFE INSIGHTS",
   daymap: "DAY MAP",
   chat: "NEUROW CHAT",
   projects: "PROJECTS",
@@ -199,14 +200,11 @@ export function AppShell() {
                 <div
                   className={
                     activeView === "home"
-                      ? "flex-1 flex items-center justify-center"
+                      ? "flex-1 flex flex-col overflow-hidden"
                       : "hidden"
                   }
                 >
-                  <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-semibold">Neurow Center</h2>
-                    <p className="text-muted-foreground">Dashboard view</p>
-                  </div>
+                  <LifeInsightsView />
                 </div>
 
                 <div

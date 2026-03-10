@@ -63,13 +63,16 @@ export interface UserContextType {
   activeUser: UserProfile | null;
   profiles: UserProfile[];
   appPhase: AppPhase;
+  demoWalkthrough: boolean;
   // Low-level setters (use sparingly — prefer action methods)
   setActiveUser: (profile: UserProfile | null) => void;
   setAppPhase: (phase: AppPhase) => void;
+  setDemoWalkthrough: (v: boolean) => void;
 
   // Action methods (encapsulate state transitions — preferred API)
   switchProfile: (slug: string) => void;
   startNewProfile: () => void;
+  startDemoWalkthrough: () => void;
   addProfile: (profile: UserProfile) => void;
   completeOnboarding: (profile: UserProfile) => void;
   completeClaritySession: (goalCascade?: GoalCascade) => void;
@@ -94,7 +97,7 @@ const AVATAR_COLORS = [
 // Default profile — Theo (always present, pre-populated for demo)
 // ---------------------------------------------------------------------------
 
-const THEO_PROFILE: UserProfile = {
+export const THEO_PROFILE: UserProfile = {
   id: "0c4831b5-8df3-4fba-94be-57e4e3112116",
   slug: "theo",
   display_name: "Theo Nakamura",
@@ -145,44 +148,87 @@ const THEO_PROFILE: UserProfile = {
 };
 
 // ---------------------------------------------------------------------------
-// Default profile — Avery (judge onboarding persona, pre-populated)
+// Default profile — Lynn Hayden (founder demo persona)
 // ---------------------------------------------------------------------------
 
-const AVERY_PROFILE: UserProfile = {
-  id: "6afa0062-93f6-427e-bad3-b0542d6692a5",
-  slug: "avery",
-  display_name: "Avery Alfonso",
+const LYNN_PROFILE: UserProfile = {
+  id: "ddecea03-9c40-43c2-baa2-7470e7d579fa",
+  slug: "lynn",
+  display_name: "Lynn Hayden",
+  avatar_color: "#9FA3FF",
   onboarding_completed: true,
-  clarity_session_completed: false,
+  clarity_session_completed: true,
   coaching_style: "balanced",
+  pattern_consent: true,
+  pattern_consent_at: "2026-03-08T07:31:53.712668Z",
   roles: ["founder", "creative"],
   focus_area: "career-business",
-  declared_challenges: [
-    "procrastination",
-    "perfectionism",
-    "overwhelm",
-    "dont-know-next",
-    "time-scarcity",
-    "money-scarcity",
-  ],
-  goal_cascade: null,
+  declared_challenges: ["perfectionism", "time-scarcity"],
   is_business_owner: true,
   business_description:
-    "I have a supplement business called Mastermind, we make nootropics",
-  business_stage: "momentum",
+    "Neurow is an AI life operating system and executive coaching platform. It helps you get clear about your vision and close the gap between vision to reality.",
+  business_stage: "building",
   current_business_focus:
-    "building the social media presence and consistency and doing brand collaborations",
-  business_challenges: [
-    "procrastination",
-    "perfectionism",
-    "overwhelm",
-    "dont-know-next",
-    "time-scarcity",
-    "money-scarcity",
-  ],
+    "Working on building the public-facing prototype and getting ready for fundraising this year.",
+  business_challenges: ["perfectionism", "time-scarcity"],
+  goal_cascade: {
+    // Empty strings = clarity session started but vision/quarterly goal not yet captured
+    vision: "",
+    goal_why:
+      "It allows me to take care of my family while also being in my purpose.",
+    release_items: [
+      "excuses around working out \u2014 because working out gives the energy and focus needed",
+    ],
+    quarterly_goal: "",
+    identity_traits: ["dedication", "focus", "courage", "discipline"],
+    next_action_due: "2026-03-15",
+    next_action_step: "Finish hackathon demo (doubles as investor demo)",
+  },
 };
 
-const DEFAULT_PROFILES = [THEO_PROFILE, AVERY_PROFILE];
+// ---------------------------------------------------------------------------
+// Default profile — Jordan Lee (relationship coaching persona)
+// ---------------------------------------------------------------------------
+
+const JORDAN_PROFILE: UserProfile = {
+  id: "ff0f6540-9d9d-4ae3-8a57-40e3e778d120",
+  slug: "jordan",
+  display_name: "Jordan Lee",
+  avatar_color: "#34C38F",
+  onboarding_completed: true,
+  clarity_session_completed: true,
+  coaching_style: "balanced",
+  pattern_consent: true,
+  pattern_consent_at: "2026-03-08T07:31:53.712668Z",
+  roles: ["employed"],
+  focus_area: "love",
+  declared_challenges: [
+    "feeling-disconnected",
+    "not-enough-time",
+    "holding-back",
+    "fear-vulnerable",
+  ],
+  is_business_owner: false,
+  love_partner_situation: "strengthening",
+  goal_cascade: {
+    vision:
+      "A year from now, Jordan and his wife are in a great place together and actively traveling as a couple.",
+    goal_why:
+      "It strengthens my family and my home space, and I want my wife to be happy.",
+    release_items: [
+      "working too late",
+      "being too stressed out to listen to my wife",
+    ],
+    quarterly_goal:
+      "This quarter, Jordan and his wife are having regular date nights and spending more quality time together.",
+    quarterly_goal_headline: "Regular date nights with my wife",
+    identity_traits: ["empathetic", "present", "compassionate"],
+    next_action_due: "2026-03-15",
+    next_action_step: "Ask my wife on a date",
+  },
+};
+
+const DEFAULT_PROFILES = [THEO_PROFILE, LYNN_PROFILE, JORDAN_PROFILE];
 
 // ---------------------------------------------------------------------------
 // localStorage helpers
@@ -243,6 +289,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<UserProfile[]>(DEFAULT_PROFILES);
   const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   const [appPhase, setAppPhase] = useState<AppPhase>("loading");
+  const [demoWalkthrough, setDemoWalkthrough] = useState(false);
   // Client-side initialization — loads profiles from localStorage, sets phase.
   // This is a one-time hydration effect: server renders 'loading', client reads
   // localStorage and transitions. Not a cascading render — fires once on mount.
@@ -278,6 +325,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
 
   const startNewProfile = useCallback(() => {
+    setActiveUser(null);
+    setAppPhase("onboarding");
+  }, []);
+
+  const startDemoWalkthrough = useCallback(() => {
+    setDemoWalkthrough(true);
     setActiveUser(null);
     setAppPhase("onboarding");
   }, []);
@@ -371,10 +424,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
         activeUser,
         profiles,
         appPhase,
+        demoWalkthrough,
         setActiveUser,
         setAppPhase,
+        setDemoWalkthrough,
         switchProfile,
         startNewProfile,
+        startDemoWalkthrough,
         addProfile,
         completeOnboarding,
         completeClaritySession,

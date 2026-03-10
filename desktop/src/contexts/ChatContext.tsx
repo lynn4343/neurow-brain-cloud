@@ -466,8 +466,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     // Path 2: event listener (Settings import while ChatView is already mounted)
     window.addEventListener("neurow-import-ready", processImports);
 
+    // Path 3: cross-window detection (Brain Cloud import writes to shared localStorage)
+    // The 'storage' event fires in OTHER windows when localStorage changes — lets
+    // the main Neurow window detect imports made in the Brain Cloud window.
+    const handleStorage = (e: StorageEvent) => {
+      if (
+        e.key?.startsWith("neurow_pending_import_") ||
+        e.key?.startsWith("neurow_pending_file_import_")
+      ) {
+        processImports();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+
     return () => {
       window.removeEventListener("neurow-import-ready", processImports);
+      window.removeEventListener("storage", handleStorage);
       if (importTimerRef.current) {
         clearTimeout(importTimerRef.current);
         importTimerRef.current = null;

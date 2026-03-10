@@ -6,6 +6,7 @@ import { OnboardingLayout } from "./OnboardingLayout";
 import { checkChatAvailable } from "@/lib/electron";
 import { Info } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/contexts/UserContext";
 import {
   PROVIDER_PRESETS,
   STORAGE_KEY,
@@ -26,6 +27,7 @@ interface ConnectAIProps {
 }
 
 export function ConnectAI({ onComplete }: ConnectAIProps) {
+  const { demoWalkthrough } = useUser();
   const mountedRef = useRef(true);
   const [tab, setTab] = useState<ConnectionTab>("provided");
   const [apiKey, setApiKey] = useState("");
@@ -54,7 +56,7 @@ export function ConnectAI({ onComplete }: ConnectAIProps) {
     checkChatAvailable().then((result) => {
       clearTimeout(timeout);
       if (!mountedRef.current) return;
-      if (result.mode === "api") {
+      if (result.mode === "api" && !demoWalkthrough) {
         onComplete();
       } else if (result.mode === "cli") {
         setCliDetected(true);
@@ -351,6 +353,15 @@ export function ConnectAI({ onComplete }: ConnectAIProps) {
         )}
         {status === "error" && errorMessage && (
           <p className="text-center text-xs text-red-500">{errorMessage}</p>
+        )}
+
+        {demoWalkthrough && (
+          <button
+            onClick={onComplete}
+            className="mt-2 text-xs text-[#8a6ee4] underline underline-offset-2 transition-colors hover:text-[#6b52c0]"
+          >
+            Skip for now
+          </button>
         )}
       </div>
     </OnboardingLayout>
